@@ -24,9 +24,25 @@ public:
 	int writeByte(unsigned char byte);
 	void writeShort(short nShort);
 	void writeUShort(unsigned uShort);
+	void writeFloat(float value);
 	void flush();
 	short _twoBytesToShort(unsigned char msb, unsigned char lsb);
 	float _fourBytesToFloat(unsigned char b1, unsigned char b2, unsigned char b3, unsigned char b4);
+
+	template<typename T>
+	void Write(T thing)
+	{
+		writeBytes((unsigned char*)&thing, sizeof(thing));
+	}
+
+	template<typename T>
+	T Read()
+	{
+		T thing;
+		readNBytes((unsigned char*)&thing, sizeof(thing));
+		return thing;
+	}
+
 private:
 	int bytesToRead;
 	void _changeNrOfBytesNeeded(int nrOfBytesNeeded);

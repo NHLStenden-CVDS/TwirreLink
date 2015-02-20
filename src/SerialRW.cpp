@@ -189,6 +189,11 @@ void SerialRW::writeUShort(unsigned uShort)
 	write(_fd, &uShort, 2);
 }
 
+void SerialRW::writeFloat(float value)
+{
+	write(_fd, &value, 4);
+}
+
 short SerialRW::_twoBytesToShort(unsigned char msb, unsigned char lsb)
 {
 	short result = 0;
