@@ -18,16 +18,8 @@ public:
 	unsigned char readByte();
 	std::string readString();
 	void readNBytes(unsigned char *buf, int n);
-	short readShort();
-	unsigned short readUShort();
 	void writeBytes(unsigned char *bytes, int nrOfBytes);
-	int writeByte(unsigned char byte);
-	void writeShort(short nShort);
-	void writeUShort(unsigned uShort);
-	void writeFloat(float value);
 	void flush();
-	short _twoBytesToShort(unsigned char msb, unsigned char lsb);
-	float _fourBytesToFloat(unsigned char b1, unsigned char b2, unsigned char b3, unsigned char b4);
 
 	template<typename T>
 	void Write(T thing)

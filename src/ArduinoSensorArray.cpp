@@ -21,13 +21,13 @@ int main() {
 
 	while (1)
 	{
-		srw->writeByte((unsigned char)'S');
-		srw->writeByte((unsigned char)0);
-		srw->writeByte((unsigned char)1);
-		srw->writeByte((unsigned char)0);
-		srw->writeByte((unsigned char)1);
-		cout << (char)srw->readByte() << " ";
-		cout << (int)srw->readByte() << endl;
+//		srw->writeByte((unsigned char)'S');
+//		srw->writeByte((unsigned char)0);
+//		srw->writeByte((unsigned char)1);
+//		srw->writeByte((unsigned char)0);
+//		srw->writeByte((unsigned char)1);
+//		cout << (char)srw->readByte() << " ";
+//		cout << (int)srw->readByte() << endl;
 	}
 
 	return 0;

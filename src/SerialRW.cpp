@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <stdexcept>
+#include <cstdint>
 
 #include "SerialRW.h"
 
@@ -108,18 +109,6 @@ void SerialRW::flush()
 	tcflush(_fd, TCIOFLUSH);
 }
 
-unsigned char SerialRW::readByte()
-{
-	_changeNrOfBytesNeeded(1);
-
-	unsigned char result;
-
-	int x = read(_fd, &result, 1);
-	if (x < 1) throw(runtime_error(string("Serial read error")));
-
-	return result;
-}
-
 std::string SerialRW::readString()
 {
 	string result = "";
@@ -128,7 +117,7 @@ std::string SerialRW::readString()
 
 	do
 	{
-		t = readByte();
+		t = Read<uint8_t>();
 		result += t;
 	}
 	while (t != '\0');
@@ -148,74 +137,10 @@ void SerialRW::readNBytes(unsigned char *buf, int n)
 
 }
 
-short SerialRW::readShort()
-{
-	short result;
-	unsigned char buf[2];
-	readNBytes(buf, 2);
-
-	result = _twoBytesToShort(buf[1], buf[0]);
-
-	return result;
-}
-
-unsigned short SerialRW::readUShort()
-{
-	short x = readShort();
-	unsigned short result = *reinterpret_cast<unsigned short*>(&x);
-
-	return result;
-}
-
-int SerialRW::writeByte(unsigned char byte)
-{
-	int n = write(_fd, &byte, 1);
-	if (n != 1) return -1;
-	return 0;
-}
-
 void SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
 {
 	write(_fd, bytes, nrOfBytes);
 }
-
-void SerialRW::writeShort(short nShort)
-{
-	write(_fd, &nShort, 2);
-}
-
-void SerialRW::writeUShort(unsigned uShort)
-{
-	write(_fd, &uShort, 2);
-}
-
-void SerialRW::writeFloat(float value)
-{
-	write(_fd, &value, 4);
-}
-
-short SerialRW::_twoBytesToShort(unsigned char msb, unsigned char lsb)
-{
-	short result = 0;
-
-	result = (msb << 8) | lsb;
-
-	return result;
-}
-
-float SerialRW::_fourBytesToFloat(unsigned char b1, unsigned char b2, unsigned char b3, unsigned char b4){
-	union {
-		float f;
-		unsigned char b[4];
-	} u;
-
-	u.b[3] = b1;
-	u.b[2] = b2;
-	u.b[1] = b3;
-	u.b[0] = b4;
-	return u.f;
-}
-
 
 
 void SerialRW::_changeNrOfBytesNeeded(int nrOfBytesNeeded)
