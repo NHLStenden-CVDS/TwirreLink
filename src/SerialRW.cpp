@@ -105,8 +105,7 @@ int SerialRW::Initialize(char *serialPort, int baud)
 
 void SerialRW::flush()
 {
-	unsigned char result;
-	while(read(_fd,&result,1));
+	tcflush(_fd, TCIOFLUSH);
 }
 
 unsigned char SerialRW::readByte()
