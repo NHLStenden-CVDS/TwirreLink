@@ -1,0 +1,70 @@
+//============================================================================
+// Name        : ArduinoSensorArray.cpp
+// Author      : Jasper J. J. Westra
+// Version     : 1.0
+// Description : Library for reading arduino data.
+//============================================================================
+
+#include <iostream>
+#include "SerialRW.h"
+#include <unistd.h>
+#include <cstdint>
+
+using namespace std;
+
+void IA();
+void IS();
+
+SerialRW *srw;
+
+int main() {
+	cout << " !!! Arduino Sensor Array Library || JJJ W !!!" << endl;
+	cout << endl << "------------------" << endl;
+
+	srw = new SerialRW("/dev/ttyACM0", 115200);
+
+	sleep(4);
+
+	srw->flush();
+
+
+
+		srw->writeByte((unsigned char)'A');
+		srw->Write<uint8_t>(0);
+		srw->Write<uint16_t>(25);
+		srw->Write<uint8_t>(0);
+		srw->Write(-1.0f);
+		srw->Write<uint8_t>(1);
+		srw->Write(-0.3f);
+		srw->Write<uint8_t>(2);
+		srw->Write(0.3f);
+		srw->Write<uint8_t>(3);
+		srw->Write(1.0f);
+		srw->Write<uint8_t>(4);
+		srw->Write<uint32_t>(3000);
+
+//
+//		srw->writeByte((unsigned char)1);
+//		cout << (char)srw->readByte() << " ";
+//		cout << (int)srw->readByte() << endl;
+
+//while(true)
+{
+	//printf("%s\n", srw->readString().c_str());
+}
+
+
+	return 0;
+}
+
+void IA()
+{
+	srw->writeByte((unsigned char)'I');
+	srw->writeByte((unsigned char)'A');
+}
+
+void IS()
+{
+	srw->writeByte((unsigned char)'I');
+	srw->writeByte((unsigned char)'S');
+}
