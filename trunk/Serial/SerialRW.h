@@ -38,6 +38,7 @@ public:
 private:
 	int bytesToRead;
 	void _changeNrOfBytesNeeded(int nrOfBytesNeeded);
+	bool _CheckFdTimeout(int usec);
 };
 
 #endif /* SERIALRW_H_ */

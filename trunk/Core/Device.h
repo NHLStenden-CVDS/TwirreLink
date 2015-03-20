@@ -4,27 +4,30 @@
  *  Created on: Mar 6, 2015
  *      Author: root
  */
+#ifndef DEVICE_H_
+#define DEVICE_H_
 
 #include <string>
 #include <map>
 #include "Value.h"
 
-#ifndef DEVICE_H_
-#define DEVICE_H_
+using namespace std;
 
 namespace twirre
 {
-	class Device
-	{
-		public:
-			Device();
+class Device
+{
+public:
+	Device();
 
-			int						ID;
-			std::string 			Name;
-			std::string 			Description;
+	int ID;
+	string Name;
+	string Description;
 
-			std::string 			ToString(void);
-	};
+	string ToString(void);
+
+	map<string, Value> valueList;
+};
 
 } /* namespace twirre */
 

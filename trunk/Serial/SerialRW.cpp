@@ -116,12 +116,10 @@ std::string SerialRW::readString()
 
 	unsigned char t;
 
-	do
+	while ((t = Read<char>()) != '\0')
 	{
-		t = Read<uint8_t>();
 		result += t;
 	}
-	while (t != '\0');
 
 	return result;
 }
@@ -133,9 +131,16 @@ void SerialRW::readNBytes(unsigned char *buf, int n)
 	_changeNrOfBytesNeeded(n);
 	}
 
-	int x = read(_fd, buf, n);
-	if (x < n) throw(runtime_error(string("Serial read error")));
 
+	if(_CheckFdTimeout(50000))
+	{
+		int x = read(_fd, buf, n);
+		if (x < n) throw(runtime_error(string("Serial read error")));
+	}
+	else
+	{
+		throw(runtime_error(string("Serial read time out")));
+	}
 }
 
 void SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
@@ -158,6 +163,30 @@ void SerialRW::_changeNrOfBytesNeeded(int nrOfBytesNeeded)
 	if (tcsetattr(_fd, TCSANOW, &toptions) < 0)
 	{
 		throw(runtime_error(string("init_serialport: Couldn't get term attributes")));
+	}
+}
+
+bool SerialRW::_CheckFdTimeout(int usec) {
+	// Initialize file descriptor sets
+	fd_set read_fds, write_fds, except_fds;
+
+	//set timeout
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = usec;
+
+	FD_ZERO(&read_fds);
+	FD_ZERO(&write_fds);
+	FD_ZERO(&except_fds);
+
+	FD_SET(_fd, &read_fds);
+
+	//return 0 if timeout, -1 if error
+	int res = select(_fd + 1, &read_fds, &write_fds, &except_fds, &timeout);
+	if (res < 0) {
+		throw(runtime_error(string("Error occurred in select()")));
+	} else {
+		return res == 1;
 	}
 }
 

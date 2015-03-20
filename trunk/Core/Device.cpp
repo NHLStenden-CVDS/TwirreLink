@@ -10,21 +10,21 @@
 namespace twirre
 {
 
-	Device::Device ()
-	{
-		// TODO Auto-generated constructor stub
-	}
+Device::Device()
+{
+	// TODO Auto-generated constructor stub
+}
 
-	std::string Device::ToString()
-	{
-		char str[1024];
-		sprintf(str, "%d", ID);
-		std::string buf = str;
-		buf.append(": ");
-		buf.append(Name);
-		buf.append(" -> ");
-		buf.append(Description);
+std::string Device::ToString()
+{
+	char str[1024];
+	sprintf(str, "%d", ID);
+	std::string buf = str;
+	buf.append(": ");
+	buf.append(Name);
+	buf.append(" -> ");
+	buf.append(Description);
 
-		return buf;
-	}
+	return buf;
+}
 } /* namespace twirre */

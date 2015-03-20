@@ -10,10 +10,10 @@
 namespace twirre
 {
 
-	Sensor::Sensor ()
-	{
-		// TODO Auto-generated constructor stub
+Sensor::Sensor()
+{
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
 } /* namespace twirre */

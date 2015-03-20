@@ -7,110 +7,172 @@
 
 #include "TwirreLib.h"
 
+using namespace twirre;
+
 int main()
 {
-	std::cout << "Hello World!" << std::endl;
+	TwirreLib twirre;
+	twirre.init("/dev/ttyACM0");
 	return 0;
 }
 
 namespace twirre
 {
 
-	TwirreLib::TwirreLib ()
+TwirreLib::TwirreLib()
+{
+}
+
+bool TwirreLib::init(char * device)
+{
+	if (TwirreLib::_soiw.Initialize(device, 115200) == -1)
 	{
+		return false;
 	}
+	cout << "Serial port initialized." << endl;
+	sleep(1);
+	TwirreLib::_soiw.flush();
 
-	std::string TwirreLib::init (char * device)
+	_InitActuators();
+	_InitSensors();
+	cout << "Twirre Library ready to use!" << endl;
+	return true;
+}
+
+void TwirreLib::_InitActuators()
+{
+	unsigned char pchar[2] =
+	{ 'I', 'A' };
+	TwirreLib::_soiw.writeBytes(pchar, 2);
+	sleep(1);
+	std::string s = TwirreLib::_soiw.readString();
+	_actuatorList = _ProcessInitString<Actuator>(s);
+	cout << "Actuators initialized. Number of actuators: "
+			<< _actuatorList.size() << endl;
+}
+
+void TwirreLib::_InitSensors()
+{
+	unsigned char pchar[2] =
+	{ 'I', 'S' };
+	TwirreLib::_soiw.writeBytes(pchar, 2);
+	sleep(1);
+	std::string s = TwirreLib::_soiw.readString();
+	_sensorList = _ProcessInitString<Sensor>(s);
+	cout << "Sensors initialized. Number of sensors: " << _sensorList.size()
+			<< endl;
+
+}
+
+template<typename T> std::vector<T> TwirreLib::_ProcessInitString(string & s)
+{
+	std::vector<T> deviceList;
+	if (s.length() > 1)
 	{
-		TwirreLib::soiw.Initialize(device, 115200);
-
-		sleep(4);
-		TwirreLib::soiw.flush();
-
-		initActuators();
-
-		return "Twirre Library initialized!";
-	}
-
-	void TwirreLib::initActuators ()
-	{
-		unsigned char* pchar = new unsigned char[2] { 'I', 'A' };
-		TwirreLib::soiw.writeBytes(pchar, 2);
-		std::string s = TwirreLib::soiw.readString();
-
-		if (s.length() > 1)
+		char responseCode = s[0];
+		std::string payloadString = s.substr(1);
+		if (responseCode == 'O')
 		{
-			char a = s[0];
-			if (a == 'O')
+
+			std::vector<std::string> deviceStrings;
+
+			// Split all devices into a vector of device strings
+			Helper::split(payloadString, ';', deviceStrings);
+
+			for (int i = 0; i < deviceStrings.size(); ++i)
 			{
-				std::string b = s.substr(1);
+				std::vector<std::string> deviceInformation;
+				Helper::split(deviceStrings[i], '|', deviceInformation);
 
-				std::vector<std::string> v;
-				Helper::split(b, ';', v);
+				T device;
 
-				for (int i = 0; i < v.size(); ++i)
-				{
-					std::cout << v[i] << std::endl;
+				device.ID = i;
+				device.Name = deviceInformation[0];
+				device.Description = deviceInformation[1];
 
-					std::vector<std::string> x;
-					Helper::split(v[i], '|', x);
+				device.valueList = _ProcessValuesString(deviceInformation[2]);
 
-					Actuator a;
+				cout << "Device " << device.ID << ": " << device.Name << ". "
+						<< device.Description << endl;
 
-					a.ID = i;
-					a.Name = x[0];
-					a.Description[1];
-
-					TwirreLib::actuatorList.push_back(a);
-				}
+				deviceList.push_back(device);
 			}
-			else
-			{
-				std::cout << "LEEG" << std::endl;
-			}
+		}
+		else if (responseCode == 'E')
+		{
+			cout << "Error received from Arduino: " << payloadString << endl;
 		}
 		else
 		{
-			std::cout << "LEEG" << std::endl;
+			cout << "NOOOOOOOOOOOOOOOOOOO!" << endl;
+			// something broke quite hard
 		}
-
-		//-------------------------------------------------------------
-
-		delete pchar;
 	}
+	return deviceList;
+}
 
-	std::vector<Actuator> TwirreLib::GetActuatorList ()
+std::map<string, Value> TwirreLib::_ProcessValuesString(string & s)
+{
+	std::vector<std::string> valueStrings;
+	Helper::split(s, ',', valueStrings);
+
+	map<string, Value> values;
+
+	for (int i = 0; i < valueStrings.size(); i++)
 	{
-		return TwirreLib::actuatorList;
+		std::vector<std::string> nameAndType;
+		Helper::split(valueStrings[i], '=', nameAndType);
+
+		Value value(nameAndType[1]);
+
+		values.insert(pair<string, Value>(nameAndType[0], value));
 	}
 
-	std::vector<Sensor> TwirreLib::GetSensorList ()
+	return values;
+}
+
+std::vector<Actuator> TwirreLib::GetActuatorList()
+{
+	return TwirreLib::_actuatorList;
+}
+
+std::vector<Sensor> TwirreLib::GetSensorList()
+{
+	return TwirreLib::_sensorList;
+}
+
+Actuator TwirreLib::GetActuator(int n)
+{
+	if (n < _actuatorList.size())
 	{
-		std::vector<Sensor> lijst;
-
-		return lijst;
+		return _actuatorList[n];
 	}
-
-	Actuator TwirreLib::GetActuator (int n)
+	else
 	{
-		Actuator a;
-		return a;
+		throw new runtime_error("actuator id out of bounds");
 	}
+}
 
-	Sensor TwirreLib::GetSensor (int n)
+Sensor TwirreLib::GetSensor(int n)
+{
+	if (n < _sensorList.size())
 	{
-		Sensor s;
-		return s;
+		return _sensorList[n];
 	}
+	else
+	{
+		throw new runtime_error("sensor id out of bounds");
+	}
+}
 
-	char TwirreLib::Ping ()
-	{
-		TwirreLib::soiw.Write('P');
-		return TwirreLib::soiw.Read<char>();
-	}
+bool TwirreLib::Ping()
+{
+	TwirreLib::_soiw.Write('P');
+	return TwirreLib::_soiw.Read<char>() == 'P';
+}
 
-	TwirreLib::~TwirreLib ()
-	{
-	}
+TwirreLib::~TwirreLib()
+{
+}
 
 } /* namespace twirre */

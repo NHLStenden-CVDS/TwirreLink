@@ -4,7 +4,8 @@
  *  Created on: Mar 6, 2015
  *      Author: root
  */
-
+#ifndef TWIRRELIB_H_
+#define TWIRRELIB_H_
 #include <unistd.h>
 #include <iostream>
 #include <vector>
@@ -13,34 +14,40 @@
 #include "Core/Sensor.h"
 #include "Serial/SerialRW.h"
 #include "Support/Helper.h"
+#include "Core/Value.h"
 
-#ifndef TWIRRELIB_H_
-#define TWIRRELIB_H_
+using namespace std;
 
 namespace twirre
 {
-	class TwirreLib
-	{
-		public:
-			TwirreLib();
-			virtual 				~TwirreLib();
-			std::string				init(char*);
+class TwirreLib
+{
+public:
+	TwirreLib();
+	virtual ~TwirreLib();
+	bool init(char*);
 
-			char					Ping(void);
+	bool Ping();
 
-			Sensor 					GetSensor(int);
-			Actuator 				GetActuator(int);
+	Sensor GetSensor(int);
+	Actuator GetActuator(int);
 
-			std::vector<Actuator> 	GetActuatorList(void);
-			std::vector<Sensor> 	GetSensorList(void);
+	vector<Actuator> GetActuatorList(void);
+	vector<Sensor> GetSensorList(void);
 
-		private:
-			std::vector<Actuator>	actuatorList;
-			std::vector<Sensor>		sensorList;
-			SerialRW				soiw;
+private:
+	enum DeviceType{SENSOR, ACTUATOR};
 
-			void 					initActuators(void);
-	};
+	vector<Actuator> _actuatorList;
+	vector<Sensor> _sensorList;
+	SerialRW _soiw;
+
+	template<typename T> std::vector<T> _ProcessInitString(string & s);
+	void _InitActuators();
+	void _InitSensors();
+	map<string, Value> _ProcessValuesString(string & s);
+
+};
 
 } /* namespace twirre */
 

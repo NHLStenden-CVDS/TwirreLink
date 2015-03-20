@@ -10,10 +10,9 @@
 namespace twirre
 {
 
-	Value::Value ()
-	{
-		// TODO Auto-generated constructor stub
+Value::Value(string s)
+{
 
-	}
+}
 
 } /* namespace twirre */

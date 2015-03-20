@@ -10,10 +10,10 @@
 namespace twirre
 {
 
-	Actuator::Actuator ()
-	{
-		// TODO Auto-generated constructor stub
+Actuator::Actuator()
+{
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
 } /* namespace twirre */

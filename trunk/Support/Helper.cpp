@@ -9,11 +9,17 @@
 
 namespace twirre
 {
-	void Helper::split (const std::string& s, char c, std::vector<std::string>& v)
-	{
-		std::string::size_type i = 0;
-		std::string::size_type j = s.find(c);
+void Helper::split(const std::string& s, char c, std::vector<std::string>& v)
+{
+	std::string::size_type i = 0;
+	std::string::size_type j = s.find(c);
 
+	if (j == std::string::npos)
+	{
+		v.push_back(s);
+	}
+	else
+	{
 		while (j != std::string::npos)
 		{
 			v.push_back(s.substr(i, j - i));
@@ -26,4 +32,5 @@ namespace twirre
 			}
 		}
 	}
+}
 } /* namespace twirre */
