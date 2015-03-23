@@ -17,8 +17,11 @@ namespace twirre
 class Value
 {
 public:
-	Value(string s);
-
+	Value(int ID, string name, string type);
+	int ID;
+	string Name;
+	int GetSize();
+	void SetBuffer(unsigned char *buffer);
 };
 
 } /* namespace twirre */

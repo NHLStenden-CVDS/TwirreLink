@@ -12,7 +12,7 @@ using namespace twirre;
 int main()
 {
 	TwirreLib twirre;
-	twirre.init("/dev/ttyACM0");
+	twirre.Init("/dev/ttyACM0");
 	return 0;
 }
 
@@ -23,7 +23,7 @@ TwirreLib::TwirreLib()
 {
 }
 
-bool TwirreLib::init(char * device)
+bool TwirreLib::Init(char * device)
 {
 	if (TwirreLib::_soiw.Initialize(device, 115200) == -1)
 	{
@@ -46,7 +46,7 @@ void TwirreLib::_InitActuators()
 	TwirreLib::_soiw.writeBytes(pchar, 2);
 	sleep(1);
 	std::string s = TwirreLib::_soiw.readString();
-	_actuatorList = _ProcessInitString<Actuator>(s);
+	_ProcessInitString<Actuator>(s, _actuatorList);
 	cout << "Actuators initialized. Number of actuators: "
 			<< _actuatorList.size() << endl;
 }
@@ -58,15 +58,14 @@ void TwirreLib::_InitSensors()
 	TwirreLib::_soiw.writeBytes(pchar, 2);
 	sleep(1);
 	std::string s = TwirreLib::_soiw.readString();
-	_sensorList = _ProcessInitString<Sensor>(s);
+	_ProcessInitString<Sensor>(s, _sensorList);
 	cout << "Sensors initialized. Number of sensors: " << _sensorList.size()
 			<< endl;
 
 }
 
-template<typename T> std::vector<T> TwirreLib::_ProcessInitString(string & s)
+template<typename T> void TwirreLib::_ProcessInitString(string & s, map<string, T> &deviceList)
 {
-	std::vector<T> deviceList;
 	if (s.length() > 1)
 	{
 		char responseCode = s[0];
@@ -95,7 +94,7 @@ template<typename T> std::vector<T> TwirreLib::_ProcessInitString(string & s)
 				cout << "Device " << device.ID << ": " << device.Name << ". "
 						<< device.Description << endl;
 
-				deviceList.push_back(device);
+				deviceList.insert(pair<string, T>(device.Name, device));
 			}
 		}
 		else if (responseCode == 'E')
@@ -108,7 +107,6 @@ template<typename T> std::vector<T> TwirreLib::_ProcessInitString(string & s)
 			// something broke quite hard
 		}
 	}
-	return deviceList;
 }
 
 std::map<string, Value> TwirreLib::_ProcessValuesString(string & s)
@@ -123,7 +121,7 @@ std::map<string, Value> TwirreLib::_ProcessValuesString(string & s)
 		std::vector<std::string> nameAndType;
 		Helper::split(valueStrings[i], '=', nameAndType);
 
-		Value value(nameAndType[1]);
+		Value value(i, nameAndType[0], nameAndType[1]);
 
 		values.insert(pair<string, Value>(nameAndType[0], value));
 	}
@@ -131,38 +129,61 @@ std::map<string, Value> TwirreLib::_ProcessValuesString(string & s)
 	return values;
 }
 
-std::vector<Actuator> TwirreLib::GetActuatorList()
+Value TwirreLib::Sense(string sensorName, string valueName)
 {
-	return TwirreLib::_actuatorList;
-}
+	if(_sensorList.find(sensorName) == _sensorList.end()){
+		throw new runtime_error("Sense: sensor name not in the list");
+	}
+	Sensor *sensor = &_sensorList.at(sensorName);
+	if(sensor->valueList.find(valueName) == sensor->valueList.end()){
+		throw new runtime_error("Sense: value name not in the list");
+	}
+	Value *value = &sensor->valueList.at(valueName);
 
-std::vector<Sensor> TwirreLib::GetSensorList()
-{
-	return TwirreLib::_sensorList;
-}
+	//Write sense request
+	MessageHeader mh;
+	mh.opcode = 'S';
+	mh.targetID = sensor->ID;
+	mh.payloadSize = 1;
+	_soiw.Write(mh);
+	unsigned char valueID = value->ID;
+	_soiw.writeBytes(&valueID, 1);
 
-Actuator TwirreLib::GetActuator(int n)
-{
-	if (n < _actuatorList.size())
-	{
-		return _actuatorList[n];
+	//Wait for processing response
+	usleep(50);
+
+	//Receive response
+	unsigned char opcode;
+	_soiw.readNBytes(&opcode, 1);
+	if(opcode =='O'){
+		int bufferSize = value->GetSize();
+		unsigned char *buffer = new unsigned char[bufferSize];
+		_soiw.readNBytes(buffer, bufferSize);
+		value->SetBuffer(buffer);
+		delete buffer;
 	}
 	else
 	{
-		throw new runtime_error("actuator id out of bounds");
+		throw new runtime_error("error from arduino while reading sensor value.");
 	}
+
+	return *value;
 }
 
-Sensor TwirreLib::GetSensor(int n)
+Actuator* TwirreLib::GetActuator(string actuatorName)
 {
-	if (n < _sensorList.size())
-	{
-		return _sensorList[n];
+	if(_actuatorList.find(actuatorName) == _actuatorList.end()){
+		throw new runtime_error("GetActuator: actuator id out of bounds");
 	}
-	else
-	{
-		throw new runtime_error("sensor id out of bounds");
+	return &_actuatorList.at(actuatorName);
+}
+
+Sensor* TwirreLib::GetSensor(string sensorName)
+{
+	if(_sensorList.find(sensorName) == _sensorList.end()){
+		throw new runtime_error("GetSensor: sensor id out of bounds");
 	}
+	return &_sensorList.at(sensorName);
 }
 
 bool TwirreLib::Ping()

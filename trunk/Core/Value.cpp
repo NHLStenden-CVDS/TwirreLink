@@ -10,9 +10,21 @@
 namespace twirre
 {
 
-Value::Value(string s)
+Value::Value(int ID, string name, string type)
 {
 
 }
+
+int Value::GetSize()
+{
+	return 0;
+}
+
+void Value::SetBuffer(unsigned char *buffer)
+{
+
+}
+
+
 
 } /* namespace twirre */
