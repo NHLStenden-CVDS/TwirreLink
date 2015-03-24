@@ -110,42 +110,49 @@ void SerialRW::flush()
 
 
 
-std::string SerialRW::readString()
+bool SerialRW::readString(std::string &s)
 {
-	string result = "";
+	s = "";
 
 	unsigned char t;
 
-	while ((t = Read<char>()) != '\0')
+	if(!Read<unsigned char>(t))
 	{
-		result += t;
+		return false;
+	}
+	while (t != '\0')
+	{
+		s += t;
+		if(!Read<unsigned char>(t))
+		{
+			return false;
+		}
 	}
 
-	return result;
+	return true;
 }
 
-void SerialRW::readNBytes(unsigned char *buf, int n)
+//Returns number of bytes read
+int SerialRW::readNBytes(unsigned char *buf, int n)
 {
 	if(bytesToRead != n)
 	{
 	_changeNrOfBytesNeeded(n);
 	}
 
-
 	if(_CheckFdTimeout(50000))
 	{
-		int x = read(_fd, buf, n);
-		if (x < n) throw(runtime_error(string("Serial read error")));
+		return read(_fd, buf, n);
 	}
 	else
 	{
-		throw(runtime_error(string("Serial read time out")));
+		return 0;
 	}
 }
 
-void SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
+int SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
 {
-	write(_fd, bytes, nrOfBytes);
+	return write(_fd, bytes, nrOfBytes);
 }
 
 
@@ -162,7 +169,7 @@ void SerialRW::_changeNrOfBytesNeeded(int nrOfBytesNeeded)
 
 	if (tcsetattr(_fd, TCSANOW, &toptions) < 0)
 	{
-		throw(runtime_error(string("init_serialport: Couldn't get term attributes")));
+		throw(runtime_error(string("init_serialport: Couldn't set term attributes")));
 	}
 }
 

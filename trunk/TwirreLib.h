@@ -31,8 +31,8 @@ public:
 	bool Ping();
 	Value Sense(string sensorName, string valueName);
 
-	Sensor* GetSensor(string sensorName);
-	Actuator* GetActuator(string actuatorName);
+	Sensor& GetSensor(string sensorName);
+	Actuator& GetActuator(string actuatorName);
 
 private:
 	#pragma pack(push, 1) //set 1-byte element alignment (effectively disables automatic struct padding)
@@ -41,16 +41,15 @@ private:
 			char targetID;
 			uint16_t payloadSize;
 	};
-
 	#pragma pack(pop)
 
 	map<string, Actuator> _actuatorList;
 	map<string, Sensor> _sensorList;
 	SerialRW _soiw;
 
-	template<typename T> void _ProcessInitString(string & s, map<string, T> &deviceList);
-	void _InitActuators();
-	void _InitSensors();
+	template<typename T> bool _ProcessInitString(string & s, map<string, T> &deviceList);
+	bool _InitActuators();
+	bool _InitSensors();
 	map<string, Value> _ProcessValuesString(string & s);
 
 };

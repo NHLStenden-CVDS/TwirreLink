@@ -25,46 +25,80 @@ TwirreLib::TwirreLib()
 
 bool TwirreLib::Init(char * device)
 {
-	if (TwirreLib::_soiw.Initialize(device, 115200) == -1)
+	//Initialize serial port
+	if (TwirreLib::_soiw.Initialize(device, 115200) != -1)
 	{
-		return false;
+		//Wait for arduino to initialize the connection
+		sleep(1);
+		cout << "Serial port initialized." << endl;
+
+		//Flush file descriptor (discard read/write data)
+		TwirreLib::_soiw.flush();
+
+		//Initialize sensors and actuators
+		if(_InitActuators() && _InitSensors())
+		{
+			cout << "Twirre Library ready to use!" << endl;
+			return true;
+		}
 	}
-	cout << "Serial port initialized." << endl;
-	sleep(1);
-	TwirreLib::_soiw.flush();
-
-	_InitActuators();
-	_InitSensors();
-	cout << "Twirre Library ready to use!" << endl;
-	return true;
+	cout << "Twirre Library NOT initialized :(" << endl;
+	return false;
 }
 
-void TwirreLib::_InitActuators()
+bool TwirreLib::_InitActuators()
 {
-	unsigned char pchar[2] =
-	{ 'I', 'A' };
-	TwirreLib::_soiw.writeBytes(pchar, 2);
+	struct ia{
+		char i = 'I';
+		char a = 'A';
+	};
+	ia m;
+	TwirreLib::_soiw.Write<ia>(m);
 	sleep(1);
-	std::string s = TwirreLib::_soiw.readString();
-	_ProcessInitString<Actuator>(s, _actuatorList);
-	cout << "Actuators initialized. Number of actuators: "
-			<< _actuatorList.size() << endl;
+	std::string s;
+	if(TwirreLib::_soiw.readString(s))
+	{
+		if(_ProcessInitString<Actuator>(s, _actuatorList))
+		{
+			cout << "Actuators initialized. Number of actuators: "
+				<< _actuatorList.size() << endl;
+			return true;
+		}
+	}
+	else
+	{
+		cout << "Actuators NOT initialized. Error reading initialization string.";
+	}
+	return false;
 }
 
-void TwirreLib::_InitSensors()
+bool TwirreLib::_InitSensors()
 {
-	unsigned char pchar[2] =
-	{ 'I', 'S' };
-	TwirreLib::_soiw.writeBytes(pchar, 2);
+	struct is{
+		char i = 'I';
+		char s = 'S';
+	};
+	is m;
+	TwirreLib::_soiw.Write<is>(m);
 	sleep(1);
-	std::string s = TwirreLib::_soiw.readString();
-	_ProcessInitString<Sensor>(s, _sensorList);
-	cout << "Sensors initialized. Number of sensors: " << _sensorList.size()
-			<< endl;
-
+	std::string s;
+	if(TwirreLib::_soiw.readString(s))
+	{
+		if(_ProcessInitString<Sensor>(s, _sensorList))
+		{
+			cout << "Sensors initialized. Number of sensors: " << _sensorList.size()
+				<< endl;
+			return true;
+		}
+	}
+	else
+	{
+		cout << "Sensors NOT initialized. Error reading initialization string.";
+	}
+	return false;
 }
 
-template<typename T> void TwirreLib::_ProcessInitString(string & s, map<string, T> &deviceList)
+template<typename T> bool TwirreLib::_ProcessInitString(string & s, map<string, T> &deviceList)
 {
 	if (s.length() > 1)
 	{
@@ -100,13 +134,16 @@ template<typename T> void TwirreLib::_ProcessInitString(string & s, map<string, 
 		else if (responseCode == 'E')
 		{
 			cout << "Error received from Arduino: " << payloadString << endl;
+			return false;
 		}
 		else
 		{
 			cout << "NOOOOOOOOOOOOOOOOOOO!" << endl;
 			// something broke quite hard
+			return false;
 		}
 	}
+	return true;
 }
 
 std::map<string, Value> TwirreLib::_ProcessValuesString(string & s)
@@ -145,51 +182,59 @@ Value TwirreLib::Sense(string sensorName, string valueName)
 	mh.opcode = 'S';
 	mh.targetID = sensor->ID;
 	mh.payloadSize = 1;
-	_soiw.Write(mh);
+	_soiw.Write<MessageHeader>(mh);
 	unsigned char valueID = value->ID;
-	_soiw.writeBytes(&valueID, 1);
+	_soiw.Write<unsigned char>(valueID);
 
 	//Wait for processing response
 	usleep(50);
 
 	//Receive response
 	unsigned char opcode;
-	_soiw.readNBytes(&opcode, 1);
-	if(opcode =='O'){
-		int bufferSize = value->GetSize();
-		unsigned char *buffer = new unsigned char[bufferSize];
-		_soiw.readNBytes(buffer, bufferSize);
-		value->SetBuffer(buffer);
-		delete buffer;
+	if(_soiw.Read<unsigned char>(opcode))
+	{
+		if(opcode =='O'){
+			int bufferSize = value->GetSize();
+			unsigned char *buffer = new unsigned char[bufferSize];
+			_soiw.readNBytes(buffer, bufferSize);
+			value->SetBuffer(buffer);
+			delete buffer;
+		}
+		else
+		{
+			throw new runtime_error("error from arduino while reading sensor value.");
+		}
 	}
 	else
 	{
-		throw new runtime_error("error from arduino while reading sensor value.");
+		throw new runtime_error("Timeout in Sense(). No response from arduino.");
 	}
 
 	return *value;
 }
 
-Actuator* TwirreLib::GetActuator(string actuatorName)
+Actuator& TwirreLib::GetActuator(string actuatorName)
 {
 	if(_actuatorList.find(actuatorName) == _actuatorList.end()){
 		throw new runtime_error("GetActuator: actuator id out of bounds");
 	}
-	return &_actuatorList.at(actuatorName);
+	return _actuatorList.at(actuatorName);
 }
 
-Sensor* TwirreLib::GetSensor(string sensorName)
+Sensor& TwirreLib::GetSensor(string sensorName)
 {
 	if(_sensorList.find(sensorName) == _sensorList.end()){
 		throw new runtime_error("GetSensor: sensor id out of bounds");
 	}
-	return &_sensorList.at(sensorName);
+	return _sensorList.at(sensorName);
 }
 
 bool TwirreLib::Ping()
 {
 	TwirreLib::_soiw.Write('P');
-	return TwirreLib::_soiw.Read<char>() == 'P';
+	char p;
+	_soiw.Read<char>(p);
+	return p == 'P';
 }
 
 TwirreLib::~TwirreLib()

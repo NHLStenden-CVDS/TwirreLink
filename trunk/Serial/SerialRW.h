@@ -16,23 +16,21 @@ public:
 	int _fd;
 	int Initialize(char *serialPort, int baud);
 	unsigned char readByte();
-	std::string readString();
-	void readNBytes(unsigned char *buf, int n);
-	void writeBytes(unsigned char *bytes, int nrOfBytes);
+	bool readString(std::string &s);
+	int readNBytes(unsigned char *buf, int n);
+	int writeBytes(unsigned char *bytes, int nrOfBytes);
 	void flush();
 
 	template<typename T>
-	void Write(T thing)
+	int Write(T thing)
 	{
-		writeBytes((unsigned char*)&thing, sizeof(thing));
+		return writeBytes((unsigned char*)&thing, sizeof(thing));
 	}
 
 	template<typename T>
-	T Read()
+	int Read(T &buffer)
 	{
-		T thing;
-		readNBytes((unsigned char*)&thing, sizeof(thing));
-		return thing;
+		return readNBytes((unsigned char*)&buffer, sizeof(buffer));
 	}
 
 private:
