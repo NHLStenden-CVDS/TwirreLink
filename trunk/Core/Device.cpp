@@ -10,20 +10,20 @@
 namespace twirre
 {
 
-Device::Device()
+Device::Device(int id, string name, string description, SerialRW & serialRW) : _id(id), _name(name), _description(description), _serialRW(serialRW)
 {
-	// TODO Auto-generated constructor stub
+
 }
 
 std::string Device::ToString()
 {
 	char str[1024];
-	sprintf(str, "%d", ID);
+	sprintf(str, "%d", _id);
 	std::string buf = str;
 	buf.append(": ");
-	buf.append(Name);
+	buf.append(_name);
 	buf.append(" -> ");
-	buf.append(Description);
+	buf.append(_description);
 
 	return buf;
 }

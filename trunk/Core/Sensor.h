@@ -14,9 +14,9 @@ namespace twirre
 class Sensor: public Device
 {
 public:
-	Sensor();
+	Sensor(int id, string name, string description, SerialRW & serialRW);
 
-	std::map<std::string, Value> GetValue(void);
+	Value * Sense(string valueName);
 };
 
 } /* namespace twirre */

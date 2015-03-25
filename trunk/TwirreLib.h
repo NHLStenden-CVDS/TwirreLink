@@ -26,10 +26,10 @@ class TwirreLib
 public:
 	TwirreLib();
 	virtual ~TwirreLib();
-	bool Init(char*);
+	bool Init(const char*);
 
 	bool Ping();
-	Value Sense(string sensorName, string valueName);
+	Value* Sense(string sensorName, string valueName);
 
 	Sensor& GetSensor(string sensorName);
 	Actuator& GetActuator(string actuatorName);
@@ -50,7 +50,7 @@ private:
 	template<typename T> bool _ProcessInitString(string & s, map<string, T> &deviceList);
 	bool _InitActuators();
 	bool _InitSensors();
-	map<string, Value> _ProcessValuesString(string & s);
+	map<string, Value*> _ProcessValuesString(string & s);
 
 };
 

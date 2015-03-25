@@ -10,7 +10,7 @@
 namespace twirre
 {
 
-Actuator::Actuator()
+Actuator::Actuator(int id, string name, string description, SerialRW & serialRW) : Device(id,name, description, serialRW)
 {
 	// TODO Auto-generated constructor stub
 

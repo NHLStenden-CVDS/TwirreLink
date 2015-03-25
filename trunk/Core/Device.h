@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include "Value.h"
+#include "SerialRW.h"
 
 using namespace std;
 
@@ -18,15 +19,16 @@ namespace twirre
 class Device
 {
 public:
-	Device();
-
-	int ID;
-	string Name;
-	string Description;
-
+	Device(int id, string name, string description, SerialRW & serialRW);
 	string ToString(void);
 
-	map<string, Value> valueList;
+	map<string, Value*> valueList;
+protected:
+	int _id;
+	string _name;
+	string _description;
+
+	SerialRW & _serialRW;
 };
 
 } /* namespace twirre */

@@ -14,13 +14,13 @@ namespace twirre
 class Actuator: public Device
 {
 public:
-	Actuator();
+	Actuator(int id, string name, string description, SerialRW & serialRW);
 
-	std::map<std::string, Value> GetParameters(void);
-	void Actuate(std::map<std::string, Value>);
+	Value* GetParameter(void);
+	void Actuate();
 
 private:
-	std::map<std::string, Value> DefaultParameters;
+	std::map<std::string, Value*> _parameters;
 };
 
 } /* namespace twirre */

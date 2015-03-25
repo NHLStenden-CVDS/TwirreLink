@@ -21,7 +21,7 @@ SerialRW::SerialRW()
 {
 }
 
-int SerialRW::Initialize(char *serialPort, int baud)
+int SerialRW::Initialize(const char *serialPort, int baud)
 {
 	struct termios toptions;
 
@@ -113,17 +113,18 @@ void SerialRW::flush()
 bool SerialRW::readString(std::string &s)
 {
 	s = "";
+	s.reserve(2048);
 
-	unsigned char t;
+	char t;
 
-	if(!Read<unsigned char>(t))
+	if(!Read<char>(t))
 	{
 		return false;
 	}
 	while (t != '\0')
 	{
 		s += t;
-		if(!Read<unsigned char>(t))
+		if(!Read<char>(t))
 		{
 			return false;
 		}

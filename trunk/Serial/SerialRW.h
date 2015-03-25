@@ -14,7 +14,7 @@ public:
 	SerialRW();
 	~SerialRW();
 	int _fd;
-	int Initialize(char *serialPort, int baud);
+	int Initialize(const char *serialPort, int baud);
 	unsigned char readByte();
 	bool readString(std::string &s);
 	int readNBytes(unsigned char *buf, int n);
@@ -24,13 +24,13 @@ public:
 	template<typename T>
 	int Write(T thing)
 	{
-		return writeBytes((unsigned char*)&thing, sizeof(thing));
+		return writeBytes((unsigned char*)&thing, sizeof(T));
 	}
 
 	template<typename T>
 	int Read(T &buffer)
 	{
-		return readNBytes((unsigned char*)&buffer, sizeof(buffer));
+		return readNBytes((unsigned char*)&buffer, sizeof(T));
 	}
 
 private:

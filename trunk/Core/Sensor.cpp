@@ -10,10 +10,14 @@
 namespace twirre
 {
 
-Sensor::Sensor()
+Sensor::Sensor(int id, string name, string description, SerialRW & serialRW) : Device(id,name, description, serialRW)
 {
 	// TODO Auto-generated constructor stub
 
+}
+
+Value * Sensor::Sense(string valueName)
+{
 }
 
 } /* namespace twirre */
