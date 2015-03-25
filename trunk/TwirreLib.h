@@ -34,6 +34,8 @@ public:
 	Sensor& GetSensor(string sensorName);
 	Actuator& GetActuator(string actuatorName);
 
+	static bool CheckOk(SerialRW & serialRW);
+
 private:
 	#pragma pack(push, 1) //set 1-byte element alignment (effectively disables automatic struct padding)
 	struct MessageHeader{

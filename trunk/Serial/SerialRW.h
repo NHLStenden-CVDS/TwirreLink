@@ -15,7 +15,6 @@ public:
 	~SerialRW();
 	int _fd;
 	int Initialize(const char *serialPort, int baud);
-	unsigned char readByte();
 	bool readString(std::string &s);
 	int readNBytes(unsigned char *buf, int n);
 	int writeBytes(unsigned char *bytes, int nrOfBytes);

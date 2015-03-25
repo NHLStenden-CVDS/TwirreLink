@@ -30,12 +30,23 @@
 namespace twirre
 {
 
-Value::Value(int ID, string n, SerialRW & serialRW) : id(ID), name(n), _serialRW(serialRW)
+Value::Value(const uint8_t ID, const string n, SerialRW & serialRW) : _id(ID), _name(n), _serialRW(serialRW)
 {
 
 }
 
-Parameter::Parameter(int ID, string n, SerialRW & serialRW) : Value(ID, n, serialRW), _modified(false)
+
+const uint8_t Value::getId()
+{
+	return _id;
+}
+
+const string Value::getName()
+{
+	return _name;
+}
+
+Parameter::Parameter(const uint8_t ID, const string n, SerialRW & serialRW) : Value(ID, n, serialRW), _modified(false)
 {
 
 }
@@ -55,9 +66,15 @@ void Value::SetBuffer(unsigned char *buffer)
 
 
 template <typename T>
-ValueImpl<T>::ValueImpl(int ID, string n, T val, SerialRW & serialRW) : Parameter(ID, n, serialRW),_val(val)
+ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW & serialRW) : Parameter(ID, n, serialRW),_val(val)
 {
 	//nothing left to do
+}
+
+template <typename T>
+void ValueImpl<T>::UpdateFromSerial()
+{
+	_serialRW.Read<T>(_val);
 }
 
 VALUEIMPL_GETTER(uint8_t)
@@ -94,6 +111,7 @@ template class ValueImpl<uint64_t>;
 template class ValueImpl<int64_t>;
 template class ValueImpl<float>;
 template class ValueImpl<double>;
+
 
 
 } /* namespace twirre */

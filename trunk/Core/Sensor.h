@@ -14,9 +14,13 @@ namespace twirre
 class Sensor: public Device
 {
 public:
-	Sensor(int id, string name, string description, SerialRW & serialRW);
+	Sensor(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string valuesString);
+
 
 	Value * Sense(string valueName);
+protected:
+	map<string, Value*> _valueList;
+	void _ProcessValuesString(const string & s);
 };
 
 } /* namespace twirre */

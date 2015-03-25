@@ -17,11 +17,11 @@ using namespace std;
 
 namespace twirre {
 class Value {
+	friend class Sensor;
+	friend class Actuator;
 public:
-	int id;
-	string name;
 
-	Value(int ID, string name, SerialRW & serialRW);
+	Value(const uint8_t ID, const string name, SerialRW & serialRW);
 	virtual ~Value(){};
 
 	int GetSize();
@@ -37,14 +37,20 @@ public:
 	virtual int64_t getAs_int64_t() = 0;
 	virtual float getAs_float() = 0;
 	virtual double getAs_double() = 0;
+
+	const uint8_t getId();
+	const string getName();
 protected:
 	SerialRW & _serialRW;
+	virtual void UpdateFromSerial() = 0;
+	const uint8_t _id;
+	const string _name;
 
 };
 
 class Parameter: public Value {
 public:
-	Parameter(int ID, string name, SerialRW & serialRW);
+	Parameter(const uint8_t ID, const string name, SerialRW & serialRW);
 	virtual ~Parameter(){};
 
 	virtual void set(uint8_t val) = 0;
@@ -65,7 +71,7 @@ protected:
 template<typename T>
 class ValueImpl: public Parameter {
 public:
-	ValueImpl(int ID, string name, T val, SerialRW & serialRW);
+	ValueImpl(const uint8_t ID, const string name, T val, SerialRW & serialRW);
 	virtual ~ValueImpl(){};
 
 	virtual uint8_t getAs_uint8_t() override;
@@ -92,6 +98,7 @@ public:
 
 protected:
 	T _val;
+	virtual void UpdateFromSerial();
 };
 
 } /* namespace twirre */

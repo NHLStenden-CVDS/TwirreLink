@@ -19,14 +19,12 @@ namespace twirre
 class Device
 {
 public:
-	Device(int id, string name, string description, SerialRW & serialRW);
+	Device(const uint8_t id, const string name, const string description, SerialRW & serialRW);
 	string ToString(void);
-
-	map<string, Value*> valueList;
 protected:
-	int _id;
-	string _name;
-	string _description;
+	const uint8_t _id;
+	const string _name;
+	const string _description;
 
 	SerialRW & _serialRW;
 };

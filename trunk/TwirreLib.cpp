@@ -13,7 +13,12 @@ int main()
 {
 	TwirreLib twirre;
 	twirre.Init("/dev/ttyACM0");
-	return 0;
+
+	while(true)
+	{
+		float pitch = twirre.GetSensor("myAHRS+").Sense("pitch")->getAs_int32_t();
+		std::cout << pitch << std::endl;
+	}
 }
 
 namespace twirre
@@ -121,9 +126,7 @@ template<typename T> bool TwirreLib::_ProcessInitString(string & s, map<string, 
 
 
 				// input: id, name, description, serial interface
-				T device(i, deviceInformation[0], deviceInformation[1], _soiw);
-
-				device.valueList = _ProcessValuesString(deviceInformation[2]);
+				T device(i, deviceInformation[0], deviceInformation[1], _soiw, deviceInformation[2]);
 
 				cout << device.ToString() << endl;
 
@@ -145,93 +148,11 @@ template<typename T> bool TwirreLib::_ProcessInitString(string & s, map<string, 
 	return true;
 }
 
-std::map<string, Value*> TwirreLib::_ProcessValuesString(string & s)
-{
-	std::vector<std::string> valueStrings;
-	Helper::split(s, ',', valueStrings);
-
-	map<string, Value*> values;
-
-	for (int i = 0; i < valueStrings.size(); i++)
-	{
-		std::vector<std::string> nameAndType;
-		Helper::split(valueStrings[i], '=', nameAndType);
-
-		//Value value(i, nameAndType[0], nameAndType[1]);
-		Value* value = nullptr;
-		if(!nameAndType[1].compare("UI8"))
-			value = new ValueImpl<uint8_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("I8"))
-					value = new ValueImpl<int8_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("UI16"))
-					value = new ValueImpl<uint16_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("I16"))
-					value = new ValueImpl<int16_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("UI32"))
-					value = new ValueImpl<uint32_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("I32"))
-					value = new ValueImpl<int32_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("UI64"))
-					value = new ValueImpl<uint64_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("I64"))
-					value = new ValueImpl<int64_t>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("F"))
-					value = new ValueImpl<float>(i, nameAndType[0], 0, _soiw);
-		if(!nameAndType[1].compare("D"))
-					value = new ValueImpl<double>(i, nameAndType[0], 0, _soiw);
-
-		values.insert(pair<string, Value*>(nameAndType[0], value));
-	}
-
-	return values;
-}
-//
-//Value* TwirreLib::Sense(string sensorName, string valueName)
-//{
-//	if(_sensorList.find(sensorName) == _sensorList.end()){
-//		throw new runtime_error("Sense: sensor name not in the list");
-//	}
-//
-//	Sensor *sensor = &_sensorList.at(sensorName);
-//	if(sensor->valueList.find(valueName) == sensor->valueList.end()){
-//		throw new runtime_error("Sense: value name not in the list");
-//	}
-//	Value *value = sensor->valueList.at(valueName);
-//
-//	//Write sense request
-//	MessageHeader mh = {'S', sensor->_id, 1};
-//	_soiw.Write<MessageHeader>(mh);
-//	unsigned char valueID = value->id;
-//	_soiw.Write<unsigned char>(valueID);
-//
-//	//Receive response
-//	char opcode;
-//	if(_soiw.Read<char>(opcode))
-//	{
-//		if(opcode =='O'){
-//			int bufferSize = value->GetSize();
-//			unsigned char *buffer = new unsigned char[bufferSize];
-//			_soiw.readNBytes(buffer, bufferSize);
-//			value->SetBuffer(buffer);
-//			delete buffer;
-//		}
-//		else
-//		{
-//			throw new runtime_error("error from arduino while reading sensor value.");
-//		}
-//	}
-//	else
-//	{
-//		throw new runtime_error("Timeout in Sense(). No response from arduino.");
-//	}
-//
-//	return value;
-//}
 
 Actuator& TwirreLib::GetActuator(string actuatorName)
 {
 	if(_actuatorList.find(actuatorName) == _actuatorList.end()){
-		throw new runtime_error("GetActuator: actuator id out of bounds");
+		throw runtime_error("GetActuator: actuator id out of bounds");
 	}
 	return _actuatorList.at(actuatorName);
 }
@@ -239,7 +160,7 @@ Actuator& TwirreLib::GetActuator(string actuatorName)
 Sensor& TwirreLib::GetSensor(string sensorName)
 {
 	if(_sensorList.find(sensorName) == _sensorList.end()){
-		throw new runtime_error("GetSensor: sensor id out of bounds");
+		throw runtime_error("GetSensor: sensor id out of bounds");
 	}
 	return _sensorList.at(sensorName);
 }
@@ -256,4 +177,25 @@ TwirreLib::~TwirreLib()
 {
 }
 
+bool TwirreLib::CheckOk(SerialRW & serialRW)
+{
+	char checkChar;
+	serialRW.Read<char>(checkChar);
+
+	if(checkChar == 'O')
+	{
+		return true;
+	}
+	else if(checkChar == 'E')
+	{
+		string error = "";
+		serialRW.readString(error);
+		cerr << error << endl;
+		return false;
+	}
+	else
+	{
+		throw runtime_error("CheckOk: protocol error");
+	}
+}
 } /* namespace twirre */
