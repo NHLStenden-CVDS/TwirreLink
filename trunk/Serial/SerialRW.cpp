@@ -141,7 +141,7 @@ int SerialRW::readNBytes(unsigned char *buf, int n)
 	_changeNrOfBytesNeeded(n);
 	}
 
-	if(_CheckFdTimeout(50000))
+	if(_CheckFdTimeout(5000000))
 	{
 		return read(_fd, buf, n);
 	}

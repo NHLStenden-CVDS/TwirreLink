@@ -51,6 +51,61 @@ Value * Sensor::Sense(string valueName)
 	return value;
 }
 
+map<string, Value*> Sensor::Sense(vector<string> names)
+{
+	map<string, Value*> valuesMap;
+	vector<Value*> values;
+	for(const auto& str : names)
+	{
+		if(!(_valueList.find(str) == _valueList.end()))
+		{
+			Value* val = _valueList.at(str);
+			values.push_back(val);
+			valuesMap[str] = val;
+		}
+	}
+
+/*
+	unsigned char buf[100];
+	buf[0] = 'S';
+	buf[1] = 2;
+	buf[2] = 3;
+	buf[3] = 0;
+	buf[4] = values.at(0)->_id;
+	buf[5] = values.at(1)->_id;
+	buf[6] = values.at(2)->_id;
+	*/
+
+#pragma pack(push,1)
+	struct
+	{
+		char requestType;
+		uint8_t sensorId;
+		uint16_t nrOfRequestedValues;
+	} requestPackage = {'S', _id, values.size()};
+#pragma pack(pop)
+
+	_serialRW.Write(requestPackage);
+	for(const auto& val : values)
+	{
+		_serialRW.Write(val->getId());
+	}
+
+	//_serialRW.writeBytes(buf, 7);
+
+	if(!TwirreLib::CheckOk(_serialRW))
+	{
+		return map<string, Value*>();
+	}
+
+	for(const auto& val : values)
+	{
+		val->UpdateFromSerial();
+	}
+
+	return valuesMap;
+}
+
 
 void Sensor::_ProcessValuesString(const string & s)
 {

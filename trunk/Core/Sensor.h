@@ -8,6 +8,7 @@
 #define SENSOR_H_
 
 #include "Device.h"
+#include <vector>
 
 namespace twirre
 {
@@ -18,6 +19,7 @@ public:
 
 
 	Value * Sense(string valueName);
+	map<string, Value*> Sense(vector<string>);
 protected:
 	map<string, Value*> _valueList;
 	void _ProcessValuesString(const string & s);
