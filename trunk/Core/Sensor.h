@@ -18,8 +18,11 @@ public:
 	Sensor(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string valuesString);
 
 
-	Value * Sense(string valueName);
-	map<string, Value*> Sense(vector<string>);
+	Value * Sense(const string &name);
+	map<string, Value*> Sense(const vector<string> &names);
+
+	Value* operator[](const string &name);
+	map<string, Value*> operator[](const vector<string> &names);
 protected:
 	map<string, Value*> _valueList;
 	void _ProcessValuesString(const string & s);

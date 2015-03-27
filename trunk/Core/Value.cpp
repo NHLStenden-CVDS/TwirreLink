@@ -10,7 +10,7 @@
 //copy paste machine
 #define VALUEIMPL_GETTER(GET_T) 				\
 	template <typename T>						\
-	GET_T ValueImpl<T>::getAs_##GET_T () 		\
+	GET_T ValueImpl<T>::as_##GET_T () 		\
 	{ 											\
 		return static_cast<GET_T>(_val); 		\
 	}

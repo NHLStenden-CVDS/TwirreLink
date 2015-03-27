@@ -18,7 +18,7 @@ Sensor::Sensor(const uint8_t id, const string name, const string description, Se
 	_ProcessValuesString(valuesString);
 }
 
-Value * Sensor::Sense(string valueName)
+Value * Sensor::Sense(const string &valueName)
 {
 
 	if(_valueList.find(valueName) == _valueList.end())
@@ -51,7 +51,12 @@ Value * Sensor::Sense(string valueName)
 	return value;
 }
 
-map<string, Value*> Sensor::Sense(vector<string> names)
+Value* Sensor::operator[](const string &name)
+{
+	return Sense(name);
+}
+
+map<string, Value*> Sensor::Sense(const vector<string> &names)
 {
 	map<string, Value*> valuesMap;
 	vector<Value*> values;
@@ -82,7 +87,7 @@ map<string, Value*> Sensor::Sense(vector<string> names)
 		char requestType;
 		uint8_t sensorId;
 		uint16_t nrOfRequestedValues;
-	} requestPackage = {'S', _id, values.size()};
+	} requestPackage = {'S', _id, static_cast<uint16_t>(values.size())};
 #pragma pack(pop)
 
 	_serialRW.Write(requestPackage);
@@ -104,6 +109,11 @@ map<string, Value*> Sensor::Sense(vector<string> names)
 	}
 
 	return valuesMap;
+}
+
+map<string, Value*> Sensor::operator[](const vector<string> &names)
+{
+	return Sense(names);
 }
 
 

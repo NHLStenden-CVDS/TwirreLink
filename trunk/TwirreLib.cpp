@@ -16,10 +16,11 @@ int main()
 
 	while(true)
 	{
-		auto vals = twirre.GetSensor("myAHRS+").Sense({"pitch", "roll", "yaw"});
+		auto vals = twirre.GetSensor("myAHRS+")[{"pitch", "roll", "yaw"}];
+
 		if(vals.size() == 3)
 		{
-			std::cout << vals["pitch"]->getAs_float() << " " << vals["roll"]->getAs_float() << " " << vals["yaw"]->getAs_float() << " " << std::endl;
+			std::cout << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
 		}
 
 
