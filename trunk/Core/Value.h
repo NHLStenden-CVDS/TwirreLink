@@ -77,7 +77,7 @@ namespace twirre
 		virtual void set(const double val) = 0;
 
 	protected:
-		virtual void addValue(vector<unsigned char> &data) const = 0;
+		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const = 0;
 		void resetModified();
 		bool _modified;
 	};
@@ -116,7 +116,7 @@ namespace twirre
 		virtual bool isValid() override;
 	protected:
 		T _val;
-		virtual void addValue(vector<unsigned char> &data) const;
+		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const;
 		virtual void UpdateFromSerial();
 	};
 
@@ -159,7 +159,7 @@ namespace twirre
 		virtual bool isValid() override;
 	protected:
 		const string _errorMsg;
-		virtual void addValue(vector<unsigned char> &data) const
+		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const
 		{
 		}
 		virtual void UpdateFromSerial()

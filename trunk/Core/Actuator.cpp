@@ -55,18 +55,19 @@ void Actuator::Actuate()
 	message.push_back('A');
 	message.push_back(_id);
 
-	//set amount of updated parameters
-	uint16_t count = static_cast<uint16_t>(paramsToSet.size());
-	unsigned char * count_b = reinterpret_cast<unsigned char *>(&count);
-	message.push_back(count_b[0]);
-	message.push_back(count_b[1]);
+	//reserve space for payload size (we will only know this after all parameters have been added)
+	message.push_back(0);
+	message.push_back(0);
 
 	//add all parameters
+	uint16_t payloadSize = 0;
 	for(const auto & param : paramsToSet)
 	{
-		message.push_back(param->_id);
-		param->addValue(message);
+		param->addToMessage(message, payloadSize);
 	}
+
+	//overwrite payload size with new value
+	*reinterpret_cast<uint16_t*>(&(message.data()[2])) = payloadSize;
 
 	//transmit message
 	_serialRW.writeBytes(message.data(), message.size());

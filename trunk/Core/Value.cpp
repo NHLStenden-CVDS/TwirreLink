@@ -60,13 +60,15 @@ ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW * seri
 { }
 
 template <typename T>
-void ValueImpl<T>::addValue(vector<unsigned char> &data) const
+void ValueImpl<T>::addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const
 {
+	data.push_back(_id);
 	const unsigned char * bytes = reinterpret_cast<const unsigned char*>(&_val);
 	for(int i = 0; i < sizeof(_val); i++)
 	{
 		data.push_back(bytes[i]);
 	}
+	payloadSize += sizeof(_val) + 1;
 }
 
 template <typename T>
