@@ -19,6 +19,23 @@ Actuator::Actuator(const uint8_t id, const string name, const string description
 	_ProcessParametersString(parametersString);
 }
 
+Parameter * Actuator::GetParameter(const string & name)
+{
+	if(_parametersList.find(name) == _parametersList.end())
+	{
+		return ErrorValue::getInstance();
+	}
+	else
+	{
+		return _parametersList.at(name);
+	}
+}
+
+Parameter * Actuator::operator [](const string & name)
+{
+	return GetParameter(name);
+}
+
 void Actuator::Actuate()
 {
 	vector<unsigned char> message;
