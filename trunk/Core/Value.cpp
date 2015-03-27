@@ -23,18 +23,11 @@
 		_val = static_cast<T>(val);				\
 	}
 
-
-
-
-
 namespace twirre
 {
 
 Value::Value(const uint8_t ID, const string n, SerialRW & serialRW) : _id(ID), _name(n), _serialRW(serialRW)
-{
-
-}
-
+{ }
 
 const uint8_t Value::getId()
 {
@@ -47,29 +40,16 @@ const string Value::getName()
 }
 
 Parameter::Parameter(const uint8_t ID, const string n, SerialRW & serialRW) : Value(ID, n, serialRW), _modified(false)
+{ }
+
+void Parameter::resetModified()
 {
-
+	_modified = false;
 }
-
-int Value::GetSize()
-{
-	return 0;
-}
-
-void Value::SetBuffer(unsigned char *buffer)
-{
-
-}
-
-
-
-
 
 template <typename T>
 ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW & serialRW) : Parameter(ID, n, serialRW),_val(val)
-{
-	//nothing left to do
-}
+{ }
 
 template <typename T>
 void ValueImpl<T>::UpdateFromSerial()

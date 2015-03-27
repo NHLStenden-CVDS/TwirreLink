@@ -54,6 +54,7 @@ namespace twirre
 
 	class Parameter: public Value
 	{
+		friend class Actuator;
 	public:
 		Parameter(const uint8_t ID, const string name, SerialRW & serialRW);
 		virtual ~Parameter()
@@ -73,6 +74,7 @@ namespace twirre
 		virtual void set(double val) = 0;
 
 	protected:
+		void resetModified();
 		bool _modified;
 	};
 

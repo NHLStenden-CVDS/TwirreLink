@@ -33,6 +33,9 @@ namespace twirre
 
 TwirreLib::TwirreLib()
 {
+
+
+
 }
 
 bool TwirreLib::Init(const char * device)
