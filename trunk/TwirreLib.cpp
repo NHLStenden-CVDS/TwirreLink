@@ -14,10 +14,12 @@ int main()
 	TwirreLib twirre;
 	twirre.Init("/dev/ttyACM0");
 
+	std::cout << twirre.GetSensor("myAHRS+").ToString();
+
 	while(true)
 	{
-		auto vals = twirre.GetSensor("myAHRS+")[{"pitch", "roll", "yaw"}];
-	//	std::cout << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
+		auto vals = twirre.GetSensor("myAHRS+").Sense({"pitch", "roll", "yaw", "temp"});
+		std::cout << vals["temp"]->as_uint32_t() << " " << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
 	}
 }
 
@@ -194,7 +196,6 @@ bool TwirreLib::CheckOk(SerialRW & serialRW)
 		string error = "";
 		serialRW.readString(error);
 		cerr << error << endl;
-		return false;
 	}
 	else
 	{
@@ -203,5 +204,6 @@ bool TwirreLib::CheckOk(SerialRW & serialRW)
 		usleep(50000);
 		serialRW.flush();
 	}
+	return false;
 }
 } /* namespace twirre */

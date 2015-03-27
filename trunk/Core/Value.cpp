@@ -60,6 +60,16 @@ ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW * seri
 { }
 
 template <typename T>
+void ValueImpl<T>::addValue(vector<unsigned char> &data) const
+{
+	const unsigned char * bytes = reinterpret_cast<const unsigned char*>(&_val);
+	for(int i = 0; i < sizeof(_val); i++)
+	{
+		data.push_back(bytes[i]);
+	}
+}
+
+template <typename T>
 void ValueImpl<T>::UpdateFromSerial()
 {
 	_serialRW->Read<T>(_val);

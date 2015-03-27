@@ -10,6 +10,7 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
 #include "SerialRW.h"
 
 using namespace std;
@@ -76,6 +77,7 @@ namespace twirre
 		virtual void set(const double val) = 0;
 
 	protected:
+		virtual void addValue(vector<unsigned char> &data) const = 0;
 		void resetModified();
 		bool _modified;
 	};
@@ -114,6 +116,7 @@ namespace twirre
 		virtual bool isValid() override;
 	protected:
 		T _val;
+		virtual void addValue(vector<unsigned char> &data) const;
 		virtual void UpdateFromSerial();
 	};
 
@@ -156,6 +159,9 @@ namespace twirre
 		virtual bool isValid() override;
 	protected:
 		const string _errorMsg;
+		virtual void addValue(vector<unsigned char> &data) const
+		{
+		}
 		virtual void UpdateFromSerial()
 		{
 		}

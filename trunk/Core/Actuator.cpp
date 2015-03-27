@@ -7,6 +7,7 @@
 
 #include "../Core/Actuator.h"
 #include <vector>
+#include "TwirreLib.h"
 #include "Helper.h"
 
 
@@ -16,6 +17,45 @@ namespace twirre
 Actuator::Actuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString) : Device(id,name, description, serialRW)
 {
 	_ProcessParametersString(parametersString);
+}
+
+void Actuator::Actuate()
+{
+	vector<unsigned char> message;
+	vector<Parameter *> paramsToSet;
+
+	//find all modified values
+	for(auto & pair : _parametersList)
+	{
+		if(pair.second->_modified)
+		{
+			pair.second->resetModified();
+			paramsToSet.push_back(pair.second);
+		}
+	}
+
+	//set message header
+	message.push_back('A');
+	message.push_back(_id);
+
+	//set amount of updated parameters
+	uint16_t count = static_cast<uint16_t>(paramsToSet.size());
+	unsigned char * count_b = reinterpret_cast<unsigned char *>(&count);
+	message.push_back(count_b[0]);
+	message.push_back(count_b[1]);
+
+	//add all parameters
+	for(const auto & param : paramsToSet)
+	{
+		message.push_back(param->_id);
+		param->addValue(message);
+	}
+
+	//transmit message
+	_serialRW.writeBytes(message.data(), message.size());
+
+	//check response
+	TwirreLib::CheckOk(_serialRW);
 }
 
 void Actuator::_ProcessParametersString(const string & s)

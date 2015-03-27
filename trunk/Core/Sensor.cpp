@@ -41,6 +41,7 @@ namespace twirre
 	{
 		map<string, Value*> valuesMap;
 		vector<Value*> values;
+
 		for (const auto& str : names)
 		{
 			if (!(_valueList.find(str) == _valueList.end()))
@@ -59,22 +60,20 @@ namespace twirre
 			}
 		}
 
-#pragma pack(push,1)
-		struct
-		{
-			char requestType;
-			uint8_t sensorId;
-			uint16_t nrOfRequestedValues;
-		} requestPackage =
-		{ 'S', _id, static_cast<uint16_t>(values.size()) };
-#pragma pack(pop)
+		unsigned char* message = reinterpret_cast<unsigned char*>(malloc(values.size() + 4));
+		message[0] = 'S';
+		message[1] = _id;
+		*reinterpret_cast<uint16_t*>(&message[2]) = static_cast<uint16_t>(values.size());
 
-		_serialRW.Write(requestPackage);
+		int nextId = 4;
 		for (const auto& val : values)
 		{
-			//usleep(1000);
-			_serialRW.Write(val->getId());
+			message[nextId++] = val->_id;
 		}
+
+		_serialRW.writeBytes(message, values.size() + 4);
+
+		delete message;
 
 		if (TwirreLib::CheckOk(_serialRW))
 		{
@@ -116,6 +115,23 @@ namespace twirre
 
 			_valueList.insert(pair<string, Value*>(nameAndType[0], value));
 		}
+	}
+
+	string Sensor::ToString()
+	{
+		string s = "";
+		s.reserve(2048);
+		s += _name + ": " + _description + "\n";
+		for(const auto& pair : _valueList)
+		{
+			s += "\t";
+			s += to_string(pair.second->_id);
+			s += " ";
+			s += pair.second->_name;
+			s += "\n";
+		}
+
+		return s;
 	}
 
 } /* namespace twirre */

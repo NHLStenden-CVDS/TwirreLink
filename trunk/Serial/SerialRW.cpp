@@ -17,7 +17,7 @@
 
 using namespace std;
 
-SerialRW::SerialRW()
+SerialRW::SerialRW() : _fd(0), bytesToRead(1)
 {
 }
 
@@ -141,7 +141,7 @@ int SerialRW::readNBytes(unsigned char *buf, int n)
 	_changeNrOfBytesNeeded(n);
 	}
 
-	if(_CheckFdTimeout(5000000))
+	if(_CheckFdTimeout(250000))
 	{
 		return read(_fd, buf, n);
 	}

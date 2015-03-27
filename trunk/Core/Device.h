@@ -20,7 +20,9 @@ class Device
 {
 public:
 	Device(const uint8_t id, const string name, const string description, SerialRW & serialRW);
-	string ToString(void);
+	virtual ~Device() {};
+
+	virtual string ToString(void);
 protected:
 	const uint8_t _id;
 	const string _name;
