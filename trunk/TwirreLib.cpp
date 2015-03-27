@@ -17,14 +17,7 @@ int main()
 	while(true)
 	{
 		auto vals = twirre.GetSensor("myAHRS+")[{"pitch", "roll", "yaw"}];
-
-		if(vals.size() == 3)
-		{
-			std::cout << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
-		}
-
-
-		//usleep(50000);
+	//	std::cout << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
 	}
 }
 
@@ -205,7 +198,10 @@ bool TwirreLib::CheckOk(SerialRW & serialRW)
 	}
 	else
 	{
-		throw runtime_error("CheckOk: protocol error");
+		//protocol error
+		std::cerr << "CheckOK: Protocol Error, resetting serial" << std::endl;
+		usleep(50000);
+		serialRW.flush();
 	}
 }
 } /* namespace twirre */

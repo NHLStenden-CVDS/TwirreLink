@@ -72,6 +72,7 @@ namespace twirre
 		_serialRW.Write(requestPackage);
 		for (const auto& val : values)
 		{
+			//usleep(1000);
 			_serialRW.Write(val->getId());
 		}
 
