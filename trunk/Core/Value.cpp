@@ -8,25 +8,33 @@
 #include "../Core/Value.h"
 
 //copy paste machine
+//as_... functions for the Value implementations
 #define VALUEIMPL_GETTER(GET_T) 				\
 	template <typename T>						\
-	GET_T ValueImpl<T>::as_##GET_T () 		\
+	GET_T ValueImpl<T>::as_##GET_T () 			\
 	{ 											\
 		return static_cast<GET_T>(_val); 		\
+	}											\
+	GET_T ErrorValue::as_##GET_T ()				\
+	{											\
+		return GET_T(0);						\
 	}
 
+//set(...) functions for the Value implementations
 #define VALUEIMPL_SETTER(SET_T) 				\
 	template <typename T>						\
-	void ValueImpl<T>::set( SET_T val ) 		\
+	void ValueImpl<T>::set(const SET_T val ) 	\
 	{ 											\
 		_modified = true;						\
 		_val = static_cast<T>(val);				\
-	}
+	}											\
+	void ErrorValue::set(const SET_T val )		\
+	{}
 
 namespace twirre
 {
 
-Value::Value(const uint8_t ID, const string n, SerialRW & serialRW) : _id(ID), _name(n), _serialRW(serialRW)
+Value::Value(const uint8_t ID, const string n, SerialRW * serialRW) : _id(ID), _name(n), _serialRW(serialRW)
 { }
 
 const uint8_t Value::getId()
@@ -34,12 +42,12 @@ const uint8_t Value::getId()
 	return _id;
 }
 
-const string Value::getName()
+const string& Value::getName()
 {
 	return _name;
 }
 
-Parameter::Parameter(const uint8_t ID, const string n, SerialRW & serialRW) : Value(ID, n, serialRW), _modified(false)
+Parameter::Parameter(const uint8_t ID, const string n, SerialRW * serialRW) : Value(ID, n, serialRW), _modified(false)
 { }
 
 void Parameter::resetModified()
@@ -48,13 +56,35 @@ void Parameter::resetModified()
 }
 
 template <typename T>
-ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW & serialRW) : Parameter(ID, n, serialRW),_val(val)
+ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW * serialRW) : Parameter(ID, n, serialRW),_val(val)
 { }
 
 template <typename T>
 void ValueImpl<T>::UpdateFromSerial()
 {
-	_serialRW.Read<T>(_val);
+	_serialRW->Read<T>(_val);
+}
+
+template <typename T>
+bool ValueImpl<T>::isValid()
+{
+	return true;
+}
+
+ErrorValue *ErrorValue::_instance = nullptr;
+ErrorValue * const ErrorValue::getInstance()
+{
+	if(_instance == nullptr)
+		_instance = new ErrorValue(0xFF, "<error>", nullptr);
+	return _instance;
+}
+
+ErrorValue::ErrorValue(const uint8_t ID, const string n, SerialRW * serialRW) : Parameter(ID, n, serialRW)
+{ }
+
+bool ErrorValue::isValid()
+{
+	return false;
 }
 
 VALUEIMPL_GETTER(uint8_t)

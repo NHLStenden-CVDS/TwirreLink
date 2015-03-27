@@ -29,27 +29,27 @@ void Actuator::_ProcessParametersString(const string & s)
 		Helper::split(valueStrings[i], '=', nameAndType);
 
 		//Value value(i, nameAndType[0], nameAndType[1]);
-		Parameter* value = nullptr;
+		Parameter* value = ErrorValue::getInstance();
 		if(!nameAndType[1].compare("UI8"))
-			value = new ValueImpl<uint8_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<uint8_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("I8"))
-					value = new ValueImpl<int8_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<int8_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("UI16"))
-					value = new ValueImpl<uint16_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<uint16_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("I16"))
-					value = new ValueImpl<int16_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<int16_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("UI32"))
-					value = new ValueImpl<uint32_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<uint32_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("I32"))
-					value = new ValueImpl<int32_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<int32_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("UI64"))
-					value = new ValueImpl<uint64_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<uint64_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("I64"))
-					value = new ValueImpl<int64_t>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<int64_t>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("F"))
-					value = new ValueImpl<float>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<float>(i, nameAndType[0], 0, &_serialRW);
 		if(!nameAndType[1].compare("D"))
-					value = new ValueImpl<double>(i, nameAndType[0], 0, _serialRW);
+			value = new ValueImpl<double>(i, nameAndType[0], 0, &_serialRW);
 
 		_parametersList.insert(pair<string, Parameter*>(nameAndType[0], value));
 	}
