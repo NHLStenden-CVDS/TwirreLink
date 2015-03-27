@@ -14,12 +14,30 @@ int main()
 	TwirreLib twirre;
 	twirre.Init("/dev/ttyACM0");
 
-	std::cout << twirre.GetSensor("myAHRS+").ToString();
+	//std::cout << twirre.GetSensor("myAHRS+").ToString();
 
+	Actuator & naza = twirre.GetActuator("The naza flight controller");
+
+	std::cout << naza["pitch"]->isValid() << std::endl;
+	naza["pitch"]->set(1.0f);
+	naza["roll"]->set(1.0f);
+	naza["yaw"]->set(1.0f);
+	naza["gaz"]->set(1.0f);
+	naza["timeout"]->set(10000);
+	naza.Actuate();
+
+	float gaz_sweep = -1.0f;
 	while(true)
 	{
 		auto vals = twirre.GetSensor("myAHRS+").Sense({"pitch", "roll", "yaw", "temp"});
-		std::cout << vals["temp"]->as_uint32_t() << " " << vals["pitch"]->as_float() << " " << vals["roll"]->as_float() << " " << vals["yaw"]->as_float() << " " << std::endl;
+		naza["pitch"]->set((vals["pitch"]->as_float() / 180.0f) - 1.0f);
+		naza["roll"]->set((vals["roll"]->as_float() / 180.0f) - 1.0f);
+		naza["yaw"]->set((vals["yaw"]->as_float() / 180.0f) - 1.0f);
+		naza["gaz"]->set(gaz_sweep += 0.001f);
+		naza["timeout"]->set(10000);
+		naza.Actuate();
+
+		if(gaz_sweep >= 1.0f) gaz_sweep = -1.0f;
 	}
 }
 
