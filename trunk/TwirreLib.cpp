@@ -5,73 +5,56 @@
  *      Author: root
  */
 
+#include <unistd.h>
+#include <iostream>
+
 #include "TwirreLib.h"
 
 using namespace twirre;
 
 int main()
 {
-	TwirreLib twirre;
-	twirre.Init("/dev/ttyACM0");
+	TwirreLib twirre("/dev/ttyACM1");
 
-	//std::cout << twirre.GetSensor("myAHRS+").ToString();
+	std::cout << (twirre.HaveSensor("sonar1") ? "yes" : "no") << std::endl;
 
-	Actuator & naza = twirre.GetActuator("The naza flight controller");
-
-	std::cout << naza["pitch"]->isValid() << std::endl;
-	naza["pitch"]->set(1.0f);
-	naza["roll"]->set(1.0f);
-	naza["yaw"]->set(1.0f);
-	naza["gaz"]->set(1.0f);
-	naza["timeout"]->set(10000);
-	naza.Actuate();
-
-	float gaz_sweep = -1.0f;
 	while(true)
 	{
-		auto vals = twirre.GetSensor("myAHRS+").Sense({"pitch", "roll", "yaw", "temp"});
-		naza["pitch"]->set((vals["pitch"]->as_float() / 180.0f) - 1.0f);
-		naza["roll"]->set((vals["roll"]->as_float() / 180.0f) - 1.0f);
-		naza["yaw"]->set((vals["yaw"]->as_float() / 180.0f) - 1.0f);
-		naza["gaz"]->set(gaz_sweep += 0.001f);
-		naza["timeout"]->set(10000);
-		naza.Actuate();
-
-		if(gaz_sweep >= 1.0f) gaz_sweep = -1.0f;
+		auto& vals = twirre.GetSensor("sonar1")["distanceValues"];
+		std::cout << vals.getSize() << ":";
+		for(int i = 0; i < vals.getSize(); i++)
+		{
+			std::cout << " " << vals.as_uint16_t(i);
+		}
+		std::cout << std::endl;
 	}
 }
 
 namespace twirre
 {
 
-TwirreLib::TwirreLib()
-{
-
-
-
-}
-
-bool TwirreLib::Init(const char * device)
+TwirreLib::TwirreLib(const char * device)
 {
 	//Initialize serial port
-	if (_soiw.Initialize(device, 115200) != -1)
-	{
-		//Wait for arduino to initialize the connection
-		sleep(1);
-		cout << "Serial port initialized." << endl;
+	if (_serial.Initialize(device, 115200) < 0)
+		throw std::runtime_error("Twirre initialization failed: failed to init serial port");
 
-		//Flush file descriptor (discard read/write data)
-		_soiw.flush();
+	//Wait for arduino to initialize the connection
+	sleep(1);
 
-		//Initialize sensors and actuators
-		if(_InitActuators() && _InitSensors())
-		{
-			cout << "Twirre Library ready to use!" << endl;
-			return true;
-		}
-	}
-	cout << "Twirre Library NOT initialized :(" << endl;
-	return false;
+	//Flush file descriptor (discard read/write data)
+	_serial.flush();
+
+	//Initialize sensors and actuators
+	if(!_InitActuators())
+		throw std::runtime_error("Twirre initialization failed: could not init actuators");
+	if(!_InitSensors())
+		throw std::runtime_error("Twirre initialization failed: could not init sensors");
+}
+
+TwirreLib::~TwirreLib()
+{
+
 }
 
 bool TwirreLib::_InitActuators()
@@ -83,21 +66,15 @@ bool TwirreLib::_InitActuators()
 	};
 #pragma pack(pop)
 	ia m;
-	_soiw.Write<ia>(m);
+	_serial.Write<ia>(m);
 	sleep(1);
 	std::string s;
-	if(_soiw.readString(s))
+	if(_serial.readString(s))
 	{
 		if(_ProcessInitString<Actuator>(s, _actuatorList))
 		{
-			cout << "Actuators initialized. Number of actuators: "
-				<< _actuatorList.size() << endl;
 			return true;
 		}
-	}
-	else
-	{
-		cout << "Actuators NOT initialized. Error reading initialization string.";
 	}
 	return false;
 }
@@ -109,26 +86,20 @@ bool TwirreLib::_InitSensors()
 		char s = 'S';
 	};
 	is m;
-	_soiw.Write<is>(m);
+	_serial.Write<is>(m);
 	sleep(1);
 	std::string s;
-	if(_soiw.readString(s))
+	if(_serial.readString(s))
 	{
 		if(_ProcessInitString<Sensor>(s, _sensorList))
 		{
-			cout << "Sensors initialized. Number of sensors: " << _sensorList.size()
-				<< endl;
 			return true;
 		}
-	}
-	else
-	{
-		cout << "Sensors NOT initialized. Error reading initialization string.";
 	}
 	return false;
 }
 
-template<typename T> bool TwirreLib::_ProcessInitString(string & s, map<string, T> &deviceList)
+template<typename T> bool TwirreLib::_ProcessInitString(const string & s, map<string, T*> &deviceList)
 {
 	if (s.length() > 1)
 	{
@@ -142,62 +113,54 @@ template<typename T> bool TwirreLib::_ProcessInitString(string & s, map<string, 
 			// Split all devices into a vector of device strings
 			Helper::split(payloadString, ';', deviceStrings);
 
-			for (int i = 0; i < deviceStrings.size(); ++i)
+			for (size_t i = 0; i < deviceStrings.size(); ++i)
 			{
 				std::vector<std::string> deviceInformation;
 				Helper::split(deviceStrings[i], '|', deviceInformation);
 
-
 				// input: id, name, description, serial interface
-				T device(i, deviceInformation[0], deviceInformation[1], _soiw, deviceInformation[2]);
+				T* device = new T(i, deviceInformation[0], deviceInformation[1], _serial, deviceInformation[2]);
 
-				cout << device.ToString() << endl;
+				cout << device->ToString() << endl;
 
-				deviceList.insert(pair<string, T>(deviceInformation[0], device));
+				deviceList.insert(pair<string, T*>(deviceInformation[0], device));
 			}
 		}
-		else if (responseCode == 'E')
-		{
-			cout << "Error received from Arduino: " << payloadString << endl;
-			return false;
-		}
-		else
-		{
-			cout << "NOOOOOOOOOOOOOOOOOOO!" << endl;
-			// something broke quite hard
-			return false;
-		}
+		else return false;
 	}
 	return true;
 }
 
+bool TwirreLib::HaveSensor(const string & sensorName) const
+{
+	return (_sensorList.find(sensorName) != _sensorList.end());
+}
 
-Actuator& TwirreLib::GetActuator(string actuatorName)
+bool TwirreLib::HaveActuator(const string & actuatorName) const
+{
+	return (_actuatorList.find(actuatorName) != _actuatorList.end());
+}
+
+Actuator& TwirreLib::GetActuator(const string & actuatorName)
 {
 	if(_actuatorList.find(actuatorName) == _actuatorList.end()){
 		throw runtime_error("GetActuator: actuator id out of bounds");
 	}
-	return _actuatorList.at(actuatorName);
+	return *_actuatorList.at(actuatorName);
 }
 
-Sensor& TwirreLib::GetSensor(string sensorName)
+Sensor& TwirreLib::GetSensor(const string & sensorName)
 {
 	if(_sensorList.find(sensorName) == _sensorList.end()){
 		throw runtime_error("GetSensor: sensor id out of bounds");
 	}
-	return _sensorList.at(sensorName);
+	return *_sensorList.at(sensorName);
 }
 
 bool TwirreLib::Ping()
 {
-	TwirreLib::_soiw.Write('P');
-	char p;
-	_soiw.Read<char>(p);
-	return p == 'P';
-}
-
-TwirreLib::~TwirreLib()
-{
+	TwirreLib::_serial.Write('P');
+	return _serial.Read<char>() == 'P';
 }
 
 bool TwirreLib::CheckOk(SerialRW & serialRW)
@@ -219,7 +182,7 @@ bool TwirreLib::CheckOk(SerialRW & serialRW)
 	{
 		//protocol error
 		std::cerr << "CheckOK: Protocol Error, resetting serial" << std::endl;
-		usleep(50000);
+		usleep(60000);
 		serialRW.flush();
 	}
 	return false;

@@ -19,19 +19,27 @@ Actuator::Actuator(const uint8_t id, const string name, const string description
 	_ProcessParametersString(parametersString);
 }
 
-Parameter * Actuator::GetParameter(const string & name)
+Actuator::~Actuator()
 {
-	if(_parametersList.find(name) == _parametersList.end())
+	for(auto & paramPair : _parametersList)
 	{
-		return ErrorValue::getInstance();
-	}
-	else
-	{
-		return _parametersList.at(name);
+		delete paramPair.second;
 	}
 }
 
-Parameter * Actuator::operator [](const string & name)
+Parameter & Actuator::GetParameter(const string & name)
+{
+	if(_parametersList.find(name) == _parametersList.end())
+	{
+		return *ErrorValue::getInstance();
+	}
+	else
+	{
+		return *_parametersList.at(name);
+	}
+}
+
+Parameter & Actuator::operator [](const string & name)
 {
 	return GetParameter(name);
 }
@@ -60,14 +68,13 @@ void Actuator::Actuate()
 	message.push_back(0);
 
 	//add all parameters
-	uint16_t payloadSize = 0;
 	for(const auto & param : paramsToSet)
 	{
-		param->addToMessage(message, payloadSize);
+		param->addToMessage(message);
 	}
 
 	//overwrite payload size with new value
-	*reinterpret_cast<uint16_t*>(&(message.data()[2])) = payloadSize;
+	*reinterpret_cast<uint16_t*>(&(message.data()[2])) = static_cast<uint16_t>(message.size());
 
 	//transmit message
 	_serialRW.writeBytes(message.data(), message.size());
@@ -81,7 +88,7 @@ void Actuator::_ProcessParametersString(const string & s)
 	std::vector<std::string> valueStrings;
 	Helper::split(s, ',', valueStrings);
 
-	for (int i = 0; i < valueStrings.size(); i++)
+	for (size_t i = 0; i < valueStrings.size(); i++)
 	{
 		std::vector<std::string> nameAndType;
 		Helper::split(valueStrings[i], '=', nameAndType);

@@ -16,11 +16,12 @@ class Sensor: public Device
 {
 public:
 	Sensor(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string valuesString);
+	virtual ~Sensor();
 
-	Value * Sense(const string &name);
+	Value & Sense(const string &name);
 	map<string, Value*> Sense(const vector<string> &names);
 
-	Value* operator[](const string &name);
+	Value & operator[](const string &name);
 	map<string, Value*> operator[](const vector<string> &names);
 
 	virtual string ToString() override;

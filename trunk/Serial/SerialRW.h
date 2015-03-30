@@ -32,6 +32,14 @@ public:
 		return readNBytes((unsigned char*)&buffer, sizeof(T));
 	}
 
+	template<typename T>
+	T Read(void)
+	{
+		T thing;
+		readNBytes((unsigned char*)&thing, sizeof(T));
+		return thing;
+	}
+
 private:
 	int bytesToRead;
 	void _changeNrOfBytesNeeded(int nrOfBytesNeeded);

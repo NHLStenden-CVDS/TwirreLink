@@ -17,17 +17,20 @@ using namespace std;
 
 namespace twirre
 {
+	class Parameter;
+
 	class Value
 	{
 		friend class Sensor;
 		friend class Actuator;
+		template<typename T> friend class ValueImpl;
+		template<typename T> friend class ArrayValue;
 	public:
 
 		Value(const uint8_t ID, const string name, SerialRW * serialRW);
 		virtual ~Value()
 		{
 		}
-		;
 
 		int GetSize();
 		void SetBuffer(unsigned char *buffer);
@@ -43,15 +46,29 @@ namespace twirre
 		virtual float as_float() = 0;
 		virtual double as_double() = 0;
 
-		const uint8_t getId();
+		virtual uint8_t as_uint8_t(uint16_t index) = 0;
+		virtual int8_t as_int8_t(uint16_t index) = 0;
+		virtual uint16_t as_uint16_t(uint16_t index) = 0;
+		virtual int16_t as_int16_t(uint16_t index) = 0;
+		virtual uint32_t as_uint32_t(uint16_t index) = 0;
+		virtual int32_t as_int32_t(uint16_t index) = 0;
+		virtual uint64_t as_uint64_t(uint16_t index) = 0;
+		virtual int64_t as_int64_t(uint16_t index) = 0;
+		virtual float as_float(uint16_t index) = 0;
+		virtual double as_double(uint16_t index) = 0;
+
+		uint8_t getId();
 		const string& getName();
+
+		virtual uint16_t getSize() const = 0;
 
 		virtual bool isValid() = 0;
 	protected:
-		SerialRW * _serialRW;
 		virtual void UpdateFromSerial() = 0;
+		virtual void copyTo(Parameter* const parm) const = 0;
 		const uint8_t _id;
 		const string _name;
+		SerialRW * _serialRW;
 
 	};
 
@@ -63,7 +80,6 @@ namespace twirre
 		virtual ~Parameter()
 		{
 		}
-		;
 
 		virtual void set(const uint8_t val) = 0;
 		virtual void set(const int8_t val) = 0;
@@ -75,9 +91,17 @@ namespace twirre
 		virtual void set(const int64_t val) = 0;
 		virtual void set(const float val) = 0;
 		virtual void set(const double val) = 0;
+		virtual void set(const Value& val) = 0;
+
+		template<typename T>
+		Parameter& operator =(const T & value)
+		{
+			set(value);
+			return *this;
+		}
 
 	protected:
-		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const = 0;
+		virtual void addToMessage(vector<unsigned char> &data) const = 0;
 		void resetModified();
 		bool _modified;
 	};
@@ -102,6 +126,17 @@ namespace twirre
 		virtual float as_float() override;
 		virtual double as_double() override;
 
+		virtual uint8_t as_uint8_t(uint16_t index) override;
+		virtual int8_t as_int8_t(uint16_t index) override;
+		virtual uint16_t as_uint16_t(uint16_t index) override;
+		virtual int16_t as_int16_t(uint16_t index) override;
+		virtual uint32_t as_uint32_t(uint16_t index) override;
+		virtual int32_t as_int32_t(uint16_t index) override;
+		virtual uint64_t as_uint64_t(uint16_t index) override;
+		virtual int64_t as_int64_t(uint16_t index) override;
+		virtual float as_float(uint16_t index) override;
+		virtual double as_double(uint16_t index) override;
+
 		virtual void set(const uint8_t val) override;
 		virtual void set(const int8_t val) override;
 		virtual void set(const uint16_t val) override;
@@ -112,22 +147,82 @@ namespace twirre
 		virtual void set(const int64_t val) override;
 		virtual void set(const float val) override;
 		virtual void set(const double val) override;
+		virtual void set(const Value& val) override;
 
 		virtual bool isValid() override;
+
+		virtual uint16_t getSize() const override;
 	protected:
 		T _val;
-		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const;
+		virtual void copyTo(Parameter* parm) const override;
+		virtual void addToMessage(vector<unsigned char> &data) const;
+		virtual void UpdateFromSerial();
+	};
+
+	template<typename T>
+	class ArrayValue: public Parameter
+	{
+	public:
+		ArrayValue(const uint8_t ID, const string name, SerialRW * serialRW);
+		virtual ~ArrayValue()
+		{
+		}
+
+		virtual uint8_t as_uint8_t() override;
+		virtual int8_t as_int8_t() override;
+		virtual uint16_t as_uint16_t() override;
+		virtual int16_t as_int16_t() override;
+		virtual uint32_t as_uint32_t() override;
+		virtual int32_t as_int32_t() override;
+		virtual uint64_t as_uint64_t() override;
+		virtual int64_t as_int64_t() override;
+		virtual float as_float() override;
+		virtual double as_double() override;
+
+		virtual uint8_t as_uint8_t(uint16_t index) override;
+		virtual int8_t as_int8_t(uint16_t index) override;
+		virtual uint16_t as_uint16_t(uint16_t index) override;
+		virtual int16_t as_int16_t(uint16_t index) override;
+		virtual uint32_t as_uint32_t(uint16_t index) override;
+		virtual int32_t as_int32_t(uint16_t index) override;
+		virtual uint64_t as_uint64_t(uint16_t index) override;
+		virtual int64_t as_int64_t(uint16_t index) override;
+		virtual float as_float(uint16_t index) override;
+		virtual double as_double(uint16_t index) override;
+
+		virtual void set(const uint8_t val) override;
+		virtual void set(const int8_t val) override;
+		virtual void set(const uint16_t val) override;
+		virtual void set(const int16_t val) override;
+		virtual void set(const uint32_t val) override;
+		virtual void set(const int32_t val) override;
+		virtual void set(const uint64_t val) override;
+		virtual void set(const int64_t val) override;
+		virtual void set(const float val) override;
+		virtual void set(const double val) override;
+		virtual void set(const Value& val) override;
+
+		virtual bool isValid() override;
+
+		virtual uint16_t getSize() const override;
+	protected:
+		T* _val;
+		uint16_t _size;
+		virtual void copyTo(Parameter* parm) const override;
+		virtual void addToMessage(vector<unsigned char> &data) const;
 		virtual void UpdateFromSerial();
 	};
 
 	class ErrorValue: public Parameter
 	{
-	/* singleton */
+		/* singleton */
 	public:
-		static ErrorValue * const getInstance();
+		static ErrorValue * getInstance();
 	private:
 		static ErrorValue *_instance;
-		void operator delete( void * ) {} //prevent deletion
+		void operator delete(void *)
+		{
+		} //prevent deletion
 
 		ErrorValue(const uint8_t ID, const string name, SerialRW * serialRW);
 		virtual ~ErrorValue()
@@ -145,6 +240,17 @@ namespace twirre
 		virtual float as_float() override;
 		virtual double as_double() override;
 
+		virtual uint8_t as_uint8_t(uint16_t index) override;
+		virtual int8_t as_int8_t(uint16_t index) override;
+		virtual uint16_t as_uint16_t(uint16_t index) override;
+		virtual int16_t as_int16_t(uint16_t index) override;
+		virtual uint32_t as_uint32_t(uint16_t index) override;
+		virtual int32_t as_int32_t(uint16_t index) override;
+		virtual uint64_t as_uint64_t(uint16_t index) override;
+		virtual int64_t as_int64_t(uint16_t index) override;
+		virtual float as_float(uint16_t index) override;
+		virtual double as_double(uint16_t index) override;
+
 		virtual void set(const uint8_t val) override;
 		virtual void set(const int8_t val) override;
 		virtual void set(const uint16_t val) override;
@@ -155,11 +261,19 @@ namespace twirre
 		virtual void set(const int64_t val) override;
 		virtual void set(const float val) override;
 		virtual void set(const double val) override;
+		virtual void set(const Value&) override
+		{
+		}
+		;
 
 		virtual bool isValid() override;
+
+		virtual uint16_t getSize() const override;
 	protected:
-		const string _errorMsg;
-		virtual void addToMessage(vector<unsigned char> &data, uint16_t &payloadSize) const
+		virtual void copyTo(Parameter*) const override
+		{
+		}
+		virtual void addToMessage(vector<unsigned char> &) const
 		{
 		}
 		virtual void UpdateFromSerial()

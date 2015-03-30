@@ -15,10 +15,10 @@ class Actuator: public Device
 {
 public:
 	Actuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString);
+	virtual ~Actuator();
 
-	Parameter* GetParameter(const string & name);
-	Parameter* operator[] (const string & name);
-
+	Parameter & GetParameter(const string & name);
+	Parameter & operator[] (const string & name);
 
 	void Actuate();
 

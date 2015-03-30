@@ -20,13 +20,21 @@ namespace twirre
 		_ProcessValuesString(valuesString);
 	}
 
-	Value * Sensor::Sense(const string &valueName)
+	Sensor::~Sensor()
 	{
-
-		return Sense(vector<string>{ valueName })[valueName];
+		for(const auto & valuePair : _valueList)
+		{
+			delete valuePair.second;
+		}
 	}
 
-	Value* Sensor::operator[](const string &name)
+	Value & Sensor::Sense(const string &valueName)
+	{
+
+		return *Sense(vector<string>{ valueName })[valueName];
+	}
+
+	Value & Sensor::operator[](const string &name)
 	{
 		return Sense(name);
 	}
@@ -96,7 +104,7 @@ namespace twirre
 		std::vector<std::string> valueStrings;
 		Helper::split(s, ',', valueStrings);
 
-		for (int i = 0; i < valueStrings.size(); i++)
+		for (size_t i = 0; i < valueStrings.size(); i++)
 		{
 			std::vector<std::string> nameAndType;
 			Helper::split(valueStrings[i], '=', nameAndType);
@@ -112,6 +120,8 @@ namespace twirre
 			if (!nameAndType[1].compare("I64")) value = new ValueImpl<int64_t>(i, nameAndType[0], 0, &_serialRW);
 			if (!nameAndType[1].compare("F")) value = new ValueImpl<float>(i, nameAndType[0], 0, &_serialRW);
 			if (!nameAndType[1].compare("D")) value = new ValueImpl<double>(i, nameAndType[0], 0, &_serialRW);
+
+			if (!nameAndType[1].compare("A:UI16")) value = new ArrayValue<uint16_t>(i, nameAndType[0], &_serialRW);
 
 			_valueList.insert(pair<string, Value*>(nameAndType[0], value));
 		}
