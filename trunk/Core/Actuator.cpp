@@ -74,7 +74,7 @@ void Actuator::Actuate()
 	}
 
 	//overwrite payload size with new value
-	*reinterpret_cast<uint16_t*>(&(message.data()[2])) = static_cast<uint16_t>(message.size());
+	*reinterpret_cast<uint16_t*>(&(message.data()[2])) = static_cast<uint16_t>(message.size() - 4);
 
 	//transmit message
 	_serialRW.writeBytes(message.data(), message.size());
