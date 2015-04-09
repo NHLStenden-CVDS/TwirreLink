@@ -23,8 +23,8 @@ namespace twirre
 {
 class TwirreSerial : public DeviceProvider
 {
-	friend class Sensor;
-	friend class Actuator;
+	friend class SerialSensor;
+	friend class SerialActuator;
 
 public:
 	explicit TwirreSerial(const char* path, const int baudrate = 115200);
@@ -39,7 +39,7 @@ private:
 	std::map<std::string, Sensor*> _sensorList;
 	SerialRW _serial;
 
-	template<typename T> bool _ProcessInitString(const std::string & s, std::map<std::string, T*> &deviceList);
+	template<typename T, typename V> bool _ProcessInitString(const std::string & s, std::map<std::string, T*> &deviceList);
 	bool _InitActuators();
 	bool _InitSensors();
 	std::map<std::string, Value*> _ProcessValuesString(const std::string & s);

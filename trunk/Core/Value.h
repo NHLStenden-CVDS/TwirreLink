@@ -25,7 +25,7 @@ namespace twirre
 		template<typename T> friend class ArrayValue;
 	public:
 
-		Value(const uint8_t ID, const std::string name, SerialRW * serialRW);
+		Value(const uint8_t ID, const std::string name);
 		virtual ~Value()
 		{
 		}
@@ -59,15 +59,15 @@ namespace twirre
 		const std::string& getName();
 
 		virtual uint16_t getSize() const = 0;
+		virtual size_t getElementSize() const = 0;
+		virtual void* getBuffer() = 0;
 
 		virtual bool isValid() const = 0;
 		virtual bool isArray() const = 0;
 	protected:
-		virtual void UpdateFromSerial() = 0;
-		virtual void copyTo(Parameter* const parm) const = 0;
+		virtual void copyTo(Parameter* parm) const = 0;
 		uint8_t _id;
 		std::string _name;
-		SerialRW * _serialRW;
 
 	};
 
@@ -76,7 +76,7 @@ namespace twirre
 		friend class Actuator;
 		template <typename T> friend class ArrayValue;
 	public:
-		Parameter(const uint8_t ID, const std::string name, SerialRW * serialRW);
+		Parameter(const uint8_t ID, const std::string name);
 		virtual ~Parameter()
 		{
 		}
@@ -122,9 +122,10 @@ namespace twirre
 			return *this;
 		}
 
-	protected:
-		virtual void addToMessage(std::vector<unsigned char> &data) const = 0;
+		bool isModified() const;
 		void resetModified();
+
+	protected:
 		bool _modified;
 	};
 
@@ -132,7 +133,7 @@ namespace twirre
 	class ValueImpl: public Parameter
 	{
 	public:
-		ValueImpl(const uint8_t ID, const std::string name, T val, SerialRW * serialRW);
+		ValueImpl(const uint8_t ID, const std::string name, T val);
 		virtual ~ValueImpl()
 		{
 		}
@@ -197,18 +198,18 @@ namespace twirre
 		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
+		virtual size_t getElementSize() const override;
+		virtual void* getBuffer() override;
 	protected:
 		T _val;
 		virtual void copyTo(Parameter* parm) const override;
-		virtual void addToMessage(std::vector<unsigned char> &data) const;
-		virtual void UpdateFromSerial();
 	};
 
 	template<typename T>
 	class ArrayValue: public Parameter
 	{
 	public:
-		ArrayValue(const uint8_t ID, const std::string name, SerialRW * serialRW);
+		ArrayValue(const uint8_t ID, const std::string name);
 		virtual ~ArrayValue() noexcept;
 
 		/* copy, move constructors and operators */
@@ -277,12 +278,12 @@ namespace twirre
 		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
+		virtual size_t getElementSize() const override;
+		virtual void* getBuffer() override;
 	protected:
 		T* _val;
 		uint16_t _size;
 		virtual void copyTo(Parameter* parm) const override;
-		virtual void addToMessage(std::vector<unsigned char> &data) const;
-		virtual void UpdateFromSerial();
 	};
 
 	class ErrorValue: public Parameter
@@ -296,7 +297,7 @@ namespace twirre
 		{
 		} //prevent deletion
 
-		ErrorValue(const uint8_t ID, const std::string name, SerialRW * serialRW);
+		ErrorValue(const uint8_t ID, const std::string name);
 		virtual ~ErrorValue()
 		{
 		}
@@ -363,14 +364,10 @@ namespace twirre
 		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
+		virtual size_t getElementSize() const override;
+		virtual void* getBuffer() override;
 	protected:
 		virtual void copyTo(Parameter*) const override
-		{
-		}
-		virtual void addToMessage(std::vector<unsigned char> &) const
-		{
-		}
-		virtual void UpdateFromSerial()
 		{
 		}
 	};

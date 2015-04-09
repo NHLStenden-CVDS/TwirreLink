@@ -12,7 +12,7 @@ using namespace std;
 namespace twirre
 {
 
-Device::Device(const uint8_t id, const string name, const string description, SerialRW & serialRW) : _id(id), _name(name), _description(description), _serialRW(serialRW)
+Device::Device(const uint8_t id, const string name, const string description) : _id(id), _name(name), _description(description)
 {
 
 }

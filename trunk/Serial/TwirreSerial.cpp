@@ -10,6 +10,8 @@
 #include <chrono>
 
 #include "TwirreSerial.h"
+#include "Serial/SerialActuator.h"
+#include "Serial/SerialSensor.h"
 #include "Support/Helper.h"
 
 using namespace twirre;
@@ -48,7 +50,7 @@ namespace twirre
 		std::string s;
 		if (_serial.readString(s))
 		{
-			if (_ProcessInitString<Actuator>(s, _actuatorList))
+			if (_ProcessInitString<Actuator, SerialActuator>(s, _actuatorList))
 			{
 				return true;
 			}
@@ -69,7 +71,7 @@ namespace twirre
 		std::string s;
 		if (_serial.readString(s))
 		{
-			if (_ProcessInitString<Sensor>(s, _sensorList))
+			if (_ProcessInitString<Sensor, SerialSensor>(s, _sensorList))
 			{
 				return true;
 			}
@@ -77,7 +79,7 @@ namespace twirre
 		return false;
 	}
 
-	template<typename T> bool TwirreSerial::_ProcessInitString(const string & s, map<string, T*> &deviceList)
+	template<typename T, typename V> bool TwirreSerial::_ProcessInitString(const string & s, map<string, T*> &deviceList)
 	{
 		if (s.length() > 1)
 		{
@@ -97,7 +99,7 @@ namespace twirre
 					Helper::split(deviceStrings[i], '|', deviceInformation);
 
 					// input: id, name, description, serial interface
-					T* device = new T(i, deviceInformation[0], deviceInformation[1], _serial, deviceInformation[2]);
+					T* device = new V(i, deviceInformation[0], deviceInformation[1], _serial, deviceInformation[2]);
 
 					cout << device->ToString() << endl;
 

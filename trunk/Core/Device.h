@@ -19,7 +19,7 @@ namespace twirre
 class Device
 {
 public:
-	Device(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW);
+	Device(const uint8_t id, const std::string name, const std::string description);
 	virtual ~Device() {};
 
 	virtual std::string ToString(void);
@@ -27,8 +27,6 @@ protected:
 	const uint8_t _id;
 	const std::string _name;
 	const std::string _description;
-
-	SerialRW & _serialRW;
 };
 
 } /* namespace twirre */

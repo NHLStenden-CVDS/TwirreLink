@@ -5,10 +5,12 @@
  *      Author: root
  */
 
-#include "../Core/Value.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <cstring>
+
+#include "Core/Value.h"
 
 using namespace std;
 
@@ -110,7 +112,7 @@ using namespace std;
 namespace twirre
 {
 
-Value::Value(const uint8_t ID, const string n, SerialRW * serialRW) : _id(ID), _name(n), _serialRW(serialRW)
+Value::Value(const uint8_t ID, const string n) : _id(ID), _name(n)
 { }
 
 uint8_t Value::getId()
@@ -123,8 +125,13 @@ const string& Value::getName()
 	return _name;
 }
 
-Parameter::Parameter(const uint8_t ID, const string n, SerialRW * serialRW) : Value(ID, n, serialRW), _modified(false)
+Parameter::Parameter(const uint8_t ID, const string n) : Value(ID, n), _modified(false)
 { }
+
+bool Parameter::isModified() const
+{
+	return _modified;
+}
 
 void Parameter::resetModified()
 {
@@ -132,25 +139,8 @@ void Parameter::resetModified()
 }
 
 template <typename T>
-ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val, SerialRW * serialRW) : Parameter(ID, n, serialRW),_val(val)
+ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val) : Parameter(ID, n),_val(val)
 { }
-
-template <typename T>
-void ValueImpl<T>::addToMessage(vector<unsigned char> &data) const
-{
-	data.push_back(_id);
-	const unsigned char * bytes = reinterpret_cast<const unsigned char*>(&_val);
-	for(size_t i = 0; i < sizeof(_val); i++)
-	{
-		data.push_back(bytes[i]);
-	}
-}
-
-template <typename T>
-void ValueImpl<T>::UpdateFromSerial()
-{
-	_serialRW->Read<T>(_val);
-}
 
 template <typename T>
 bool ValueImpl<T>::isValid() const
@@ -178,11 +168,23 @@ uint16_t ValueImpl<T>::getSize() const
 }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(const uint8_t ID, const string name, SerialRW * serialRW) : Parameter(ID, name, serialRW), _val(nullptr), _size(0)
+size_t ValueImpl<T>::getElementSize() const
+{
+	return sizeof(T);
+}
+
+template <typename T>
+void * ValueImpl<T>::getBuffer()
+{
+	return reinterpret_cast<void *>(&_val);
+}
+
+template <typename T>
+ArrayValue<T>::ArrayValue(const uint8_t ID, const string name) : Parameter(ID, name), _val(nullptr), _size(0)
 { }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._id, other._name, other._serialRW), _size(other._size)
+ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._id, other._name), _size(other._size)
 {
 	//make a copy of the _value buffer
 	if(_size > 0)
@@ -194,7 +196,7 @@ ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._id, ot
 }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._id, other._name, other._serialRW), _size(other._size)
+ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._id, other._name), _size(other._size)
 {
 	//swap pointers
 	_val = other._val;
@@ -220,7 +222,6 @@ ArrayValue<T> & ArrayValue<T>::operator = (ArrayValue<T> && other) noexcept
 	_size = std::move(other._size);
 	_id = std::move(other._id);
 	_name = std::move(other._name);
-	_serialRW = std::move(other._serialRW);
 
 	return *this;
 }
@@ -230,20 +231,6 @@ template <typename T>
 ArrayValue<T>::~ArrayValue() noexcept
 {
 	delete _val;
-}
-
-template <typename T>
-void ArrayValue<T>::UpdateFromSerial()
-{
-	_serialRW->Read(_size);
-
-	if(_size > 0)
-		_val = reinterpret_cast<T*>(realloc(_val, sizeof(T) * _size));
-
-	for(uint16_t i = 0; i < _size; i++)
-	{
-		_serialRW->Read(_val[i]);
-	}
 }
 
 template <typename T>
@@ -276,29 +263,26 @@ uint16_t ArrayValue<T>::getSize() const
 }
 
 template <typename T>
-void ArrayValue<T>::addToMessage(vector<unsigned char> & data) const
+size_t ArrayValue<T>::getElementSize() const
 {
-	const unsigned char * sizeBytes = reinterpret_cast<const unsigned char *> (&_size);
-	data.push_back(sizeBytes[0]);
-	data.push_back(sizeBytes[1]);
+	return sizeof(T);
+}
 
-	uint16_t byteCount = _size * sizeof(T);
-	const unsigned char * valBytes = reinterpret_cast<const unsigned char *> (&_val);
-	for(uint16_t i = 0; i < byteCount; i++)
-	{
-		data.push_back(valBytes[i]);
-	}
+template <typename T>
+void* ArrayValue<T>::getBuffer()
+{
+	return reinterpret_cast<void*>(_val);
 }
 
 ErrorValue *ErrorValue::_instance = nullptr;
 ErrorValue * ErrorValue::getInstance()
 {
 	if(_instance == nullptr)
-		_instance = new ErrorValue(0xFF, "<error>", nullptr);
+		_instance = new ErrorValue(0xFF, "<error>");
 	return _instance;
 }
 
-ErrorValue::ErrorValue(const uint8_t ID, const string n, SerialRW * serialRW) : Parameter(ID, n, serialRW)
+ErrorValue::ErrorValue(const uint8_t ID, const string n) : Parameter(ID, n)
 { }
 
 bool ErrorValue::isValid() const
@@ -314,6 +298,16 @@ bool ErrorValue::isArray() const
 uint16_t ErrorValue::getSize() const
 {
 	return 0;
+}
+
+size_t ErrorValue::getElementSize() const
+{
+	return 0;
+}
+
+void * ErrorValue::getBuffer()
+{
+	return nullptr;
 }
 
 VALUEIMPL_GETTER(uint8_t)

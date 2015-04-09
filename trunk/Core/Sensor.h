@@ -16,7 +16,7 @@ namespace twirre
 	class Sensor: public Device
 	{
 	public:
-		Sensor(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string valuesString);
+		Sensor(const uint8_t id, const std::string name, const std::string description);
 		virtual ~Sensor();
 
 		/*
@@ -33,18 +33,17 @@ namespace twirre
 		//disable move assignment
 		Sensor& operator=(Sensor&&) = delete;
 
-		std::map<std::string, Value*> SenseAll();
+		virtual std::map<std::string, Value*> SenseAll();
 
-		Value & Sense(const std::string &name);
-		std::map<std::string, Value*> Sense(const std::vector<std::string> &names);
+		virtual Value & Sense(const std::string &name);
+		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) = 0;
 
-		Value & operator[](const std::string &name);
-		std::map<std::string, Value*> operator[](const std::vector<std::string> &names);
+		virtual Value & operator[](const std::string &name);
+		virtual std::map<std::string, Value*> operator[](const std::vector<std::string> &names);
 
 		virtual std::string ToString() override;
 	protected:
 		std::map<std::string, Value*> _valueList;
-		void _ProcessValuesString(const std::string & s);
 	};
 
 } /* namespace twirre */
