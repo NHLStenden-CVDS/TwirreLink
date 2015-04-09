@@ -16,7 +16,6 @@ namespace twirre
 	public:
 		DeviceProvider() {};
 		virtual ~DeviceProvider() {};
-	private:
 		virtual const std::map<std::string, Actuator*> & getActuators() = 0;
 		virtual const std::map<std::string, Sensor*> & getSensors() = 0;
 	};

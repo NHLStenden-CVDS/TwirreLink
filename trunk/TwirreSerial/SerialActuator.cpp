@@ -6,10 +6,11 @@
  */
 #include <vector>
 
-#include "Serial/SerialActuator.h"
-#include "Serial/TwirreSerial.h"
-#include "Serial/SerialValue.h"
+#include "TwirreSerial/TwirreSerial.h"
+#include "TwirreSerial/SerialValue.h"
 #include "Support/Helper.h"
+
+#include "TwirreSerial/SerialActuator.h"
 
 using namespace std;
 

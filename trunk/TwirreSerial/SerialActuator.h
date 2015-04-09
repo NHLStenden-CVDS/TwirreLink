@@ -7,7 +7,6 @@
 #ifndef SERIALACTUATOR_H_
 #define SERIALACTUATOR_H_
 
-
 #include "Core/Actuator.h"
 
 namespace twirre

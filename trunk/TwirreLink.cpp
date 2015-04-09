@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include "TwirreLink.h"
-#include "TwirreSerial.h"
+#include "TwirreSerial/TwirreSerial.h"
 
 
 using namespace std;

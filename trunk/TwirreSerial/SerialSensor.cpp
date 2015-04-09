@@ -10,10 +10,10 @@
 #include <algorithm>
 
 #include "Support/Helper.h"
-#include "Serial/SerialValue.h"
-#include "Serial/TwirreSerial.h"
+#include "TwirreSerial/SerialValue.h"
+#include "TwirreSerial/TwirreSerial.h"
 
-#include "Serial/SerialSensor.h"
+#include "TwirreSerial/SerialSensor.h"
 
 using namespace std;
 

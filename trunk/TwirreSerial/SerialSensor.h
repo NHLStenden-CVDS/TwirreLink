@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include "Device.h"
+#include "Core/Sensor.h"
 
 namespace twirre
 {
