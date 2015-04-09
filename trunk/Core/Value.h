@@ -19,8 +19,6 @@ namespace twirre
 
 	class Value
 	{
-		friend class Sensor;
-		friend class Actuator;
 		template<typename T> friend class ValueImpl;
 		template<typename T> friend class ArrayValue;
 	public:
@@ -73,7 +71,6 @@ namespace twirre
 
 	class Parameter: public Value
 	{
-		friend class Actuator;
 		template <typename T> friend class ArrayValue;
 	public:
 		Parameter(const uint8_t ID, const std::string name);

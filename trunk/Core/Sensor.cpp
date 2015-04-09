@@ -63,9 +63,9 @@ namespace twirre
 		for(const auto& pair : _valueList)
 		{
 			s += "\t";
-			s += to_string(pair.second->_id);
+			s += to_string(pair.second->getId());
 			s += " ";
-			s += pair.second->_name;
+			s += pair.second->getName();
 			s += "\n";
 		}
 

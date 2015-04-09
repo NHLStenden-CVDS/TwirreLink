@@ -28,8 +28,7 @@ int main()
 
 	while (true)
 	{
-		auto imuvals = twirre.getSensor("myAHRS+")[
-		{ "pitch", "yaw", "roll" }];
+		auto imuvals = twirre.getSensor("myAHRS+")[{ "pitch", "yaw", "roll" }];
 		//print the imu values
 		for (auto & val : imuvals)
 		{
