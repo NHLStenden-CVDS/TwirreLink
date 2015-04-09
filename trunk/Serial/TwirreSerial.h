@@ -17,9 +17,11 @@
 
 #include "Serial/SerialRW.h"
 
+#include "DeviceProvider.h"
+
 namespace twirre
 {
-class TwirreSerial
+class TwirreSerial : public DeviceProvider
 {
 	friend class Sensor;
 	friend class Actuator;
@@ -29,12 +31,6 @@ public:
 	~TwirreSerial();
 
 	bool Ping();
-
-	bool HaveSensor(const std::string & sensorName) const;
-	bool HaveActuator(const std::string & actuatorName) const;
-
-	Sensor& GetSensor(const std::string & sensorName);
-	Actuator& GetActuator(const std::string & actuatorName);
 
 private:
 	static bool CheckOk(SerialRW & serialRW);
@@ -47,6 +43,9 @@ private:
 	bool _InitActuators();
 	bool _InitSensors();
 	std::map<std::string, Value*> _ProcessValuesString(const std::string & s);
+
+	virtual const std::map<std::string, Actuator*> & getActuators() override;
+	virtual const std::map<std::string, Sensor*> & getSensors() override;
 
 };
 

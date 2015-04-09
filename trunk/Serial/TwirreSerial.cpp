@@ -15,41 +15,7 @@
 using namespace twirre;
 using namespace std;
 
-int main()
-{
-	TwirreSerial twirre("/dev/ttyACM0");
 
-	bool haveNaza = twirre.HaveActuator("naza");
-
-	while (true)
-	{
-		auto imuvals = twirre.GetSensor("myAHRS+")[{"pitch", "yaw", "roll"}];
-		//print the imu values
-		for (auto & val : imuvals)
-		{
-			std::cout << val.first << ":\t" << val.second->as_int16_t() << "\t";
-		}
-		auto& distvals = twirre.GetSensor("sonar1")["distanceValues"];
-		std::cout << "alt:\t" << distvals.as_int16_t();
-
-		std::cout << std::endl;
-
-		if (haveNaza)
-		{
-
-			auto& naza = twirre.GetActuator("naza");
-
-			 //set the naza actuator values
-			 naza["pitch"] = (imuvals["pitch"]->as_float() / 180.0f);
-			 naza["yaw"] = (imuvals["yaw"]->as_float() / 180.0f);
-			 naza["roll"] = (imuvals["roll"]->as_float() / 180.0f);
-			 naza["gaz"] = (distvals.as_float(0) / 100.0f) - 1.0f;
-			 naza["timeout"] = 10000;
-
-			 naza.Actuate(); //send updated values to the naza actuator
-		}
-	}
-}
 
 namespace twirre
 {
@@ -144,34 +110,6 @@ namespace twirre
 		return true;
 	}
 
-	bool TwirreSerial::HaveSensor(const string & sensorName) const
-	{
-		return (_sensorList.find(sensorName) != _sensorList.end());
-	}
-
-	bool TwirreSerial::HaveActuator(const string & actuatorName) const
-	{
-		return (_actuatorList.find(actuatorName) != _actuatorList.end());
-	}
-
-	Actuator& TwirreSerial::GetActuator(const string & actuatorName)
-	{
-		if (_actuatorList.find(actuatorName) == _actuatorList.end())
-		{
-			throw runtime_error("GetActuator: no actuator with that name");
-		}
-		return *_actuatorList.at(actuatorName);
-	}
-
-	Sensor& TwirreSerial::GetSensor(const string & sensorName)
-	{
-		if (_sensorList.find(sensorName) == _sensorList.end())
-		{
-			throw runtime_error("GetSensor: no sensor with that name");
-		}
-		return *_sensorList.at(sensorName);
-	}
-
 	bool TwirreSerial::Ping()
 	{
 		TwirreSerial::_serial.Write('P');
@@ -201,5 +139,15 @@ namespace twirre
 			serialRW.flush();
 		}
 		return false;
+	}
+
+	const std::map<std::string, Actuator*> & TwirreSerial::getActuators()
+	{
+		return _actuatorList;
+	}
+
+	const std::map<std::string, Sensor*> & TwirreSerial::getSensors()
+	{
+		return _sensorList;
 	}
 } /* namespace twirre */
