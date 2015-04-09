@@ -7,6 +7,8 @@
 
 #include "../Core/Device.h"
 
+using namespace std;
+
 namespace twirre
 {
 

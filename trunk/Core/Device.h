@@ -9,24 +9,24 @@
 
 #include <string>
 #include <map>
+#include <cstdint>
+
 #include "Value.h"
 #include "SerialRW.h"
-
-using namespace std;
 
 namespace twirre
 {
 class Device
 {
 public:
-	Device(const uint8_t id, const string name, const string description, SerialRW & serialRW);
+	Device(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW);
 	virtual ~Device() {};
 
-	virtual string ToString(void);
+	virtual std::string ToString(void);
 protected:
 	const uint8_t _id;
-	const string _name;
-	const string _description;
+	const std::string _name;
+	const std::string _description;
 
 	SerialRW & _serialRW;
 };

@@ -14,17 +14,31 @@ namespace twirre
 class Actuator: public Device
 {
 public:
-	Actuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString);
+	Actuator(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string parametersString);
 	virtual ~Actuator();
 
-	Parameter & GetParameter(const string & name);
-	Parameter & operator[] (const string & name);
+	/*
+	 * This class must never be passed by value
+	 */
+	//disable empty constructor
+	Actuator() = delete;
+	//disable copy
+	Actuator(const Actuator&) = delete;
+	//disable move
+	Actuator(Actuator&&) = delete;
+	//disable assignment
+	Actuator& operator=(const Actuator&) = delete;
+	//disable move assignment
+	Actuator& operator=(Actuator&&) = delete;
+
+	Parameter & GetParameter(const std::string & name);
+	Parameter & operator[] (const std::string & name);
 
 	void Actuate();
 
 protected:
 	std::map<std::string, Parameter*> _parametersList;
-	void _ProcessParametersString(const string & s);
+	void _ProcessParametersString(const std::string & s);
 };
 
 } /* namespace twirre */

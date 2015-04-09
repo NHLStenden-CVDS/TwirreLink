@@ -13,8 +13,6 @@
 #include <vector>
 #include "SerialRW.h"
 
-using namespace std;
-
 namespace twirre
 {
 	class Parameter;
@@ -27,7 +25,7 @@ namespace twirre
 		template<typename T> friend class ArrayValue;
 	public:
 
-		Value(const uint8_t ID, const string name, SerialRW * serialRW);
+		Value(const uint8_t ID, const std::string name, SerialRW * serialRW);
 		virtual ~Value()
 		{
 		}
@@ -58,16 +56,17 @@ namespace twirre
 		virtual double as_double(uint16_t index) = 0;
 
 		uint8_t getId();
-		const string& getName();
+		const std::string& getName();
 
 		virtual uint16_t getSize() const = 0;
 
-		virtual bool isValid() = 0;
+		virtual bool isValid() const = 0;
+		virtual bool isArray() const = 0;
 	protected:
 		virtual void UpdateFromSerial() = 0;
 		virtual void copyTo(Parameter* const parm) const = 0;
-		const uint8_t _id;
-		const string _name;
+		uint8_t _id;
+		std::string _name;
 		SerialRW * _serialRW;
 
 	};
@@ -75,8 +74,9 @@ namespace twirre
 	class Parameter: public Value
 	{
 		friend class Actuator;
+		template <typename T> friend class ArrayValue;
 	public:
-		Parameter(const uint8_t ID, const string name, SerialRW * serialRW);
+		Parameter(const uint8_t ID, const std::string name, SerialRW * serialRW);
 		virtual ~Parameter()
 		{
 		}
@@ -93,6 +93,28 @@ namespace twirre
 		virtual void set(const double val) = 0;
 		virtual void set(const Value& val) = 0;
 
+		virtual void set(const uint8_t * vals, const uint16_t size) = 0;
+		virtual void set(const int8_t * vals, const uint16_t size) = 0;
+		virtual void set(const uint16_t * vals, const uint16_t size) = 0;
+		virtual void set(const int16_t * vals, const uint16_t size) = 0;
+		virtual void set(const uint32_t * vals, const uint16_t size) = 0;
+		virtual void set(const int32_t * vals, const uint16_t size) = 0;
+		virtual void set(const uint64_t * vals, const uint16_t size) = 0;
+		virtual void set(const int64_t * vals, const uint16_t size) = 0;
+		virtual void set(const float * vals, const uint16_t size) = 0;
+		virtual void set(const double * vals, const uint16_t size) = 0;
+
+		virtual void set(const std::vector<uint8_t>& vals) = 0;
+		virtual void set(const std::vector<int8_t>& vals) = 0;
+		virtual void set(const std::vector<uint16_t>& vals) = 0;
+		virtual void set(const std::vector<int16_t>& vals) = 0;
+		virtual void set(const std::vector<uint32_t>& vals) = 0;
+		virtual void set(const std::vector<int32_t>& vals) = 0;
+		virtual void set(const std::vector<uint64_t>& vals) = 0;
+		virtual void set(const std::vector<int64_t>& vals) = 0;
+		virtual void set(const std::vector<float>& vals) = 0;
+		virtual void set(const std::vector<double>& vals) = 0;
+
 		template<typename T>
 		Parameter& operator =(const T & value)
 		{
@@ -101,7 +123,7 @@ namespace twirre
 		}
 
 	protected:
-		virtual void addToMessage(vector<unsigned char> &data) const = 0;
+		virtual void addToMessage(std::vector<unsigned char> &data) const = 0;
 		void resetModified();
 		bool _modified;
 	};
@@ -110,7 +132,7 @@ namespace twirre
 	class ValueImpl: public Parameter
 	{
 	public:
-		ValueImpl(const uint8_t ID, const string name, T val, SerialRW * serialRW);
+		ValueImpl(const uint8_t ID, const std::string name, T val, SerialRW * serialRW);
 		virtual ~ValueImpl()
 		{
 		}
@@ -149,13 +171,36 @@ namespace twirre
 		virtual void set(const double val) override;
 		virtual void set(const Value& val) override;
 
-		virtual bool isValid() override;
+		virtual void set(const uint8_t * vals, const uint16_t size) override;
+		virtual void set(const int8_t * vals, const uint16_t size) override;
+		virtual void set(const uint16_t * vals, const uint16_t size) override;
+		virtual void set(const int16_t * vals, const uint16_t size) override;
+		virtual void set(const uint32_t * vals, const uint16_t size) override;
+		virtual void set(const int32_t * vals, const uint16_t size) override;
+		virtual void set(const uint64_t * vals, const uint16_t size) override;
+		virtual void set(const int64_t * vals, const uint16_t size) override;
+		virtual void set(const float * vals, const uint16_t size) override;
+		virtual void set(const double * vals, const uint16_t size) override;
+
+		virtual void set(const std::vector<uint8_t>& vals) override;
+		virtual void set(const std::vector<int8_t>& vals) override;
+		virtual void set(const std::vector<uint16_t>& vals) override;
+		virtual void set(const std::vector<int16_t>& vals) override;
+		virtual void set(const std::vector<uint32_t>& vals) override;
+		virtual void set(const std::vector<int32_t>& vals) override;
+		virtual void set(const std::vector<uint64_t>& vals) override;
+		virtual void set(const std::vector<int64_t>& vals) override;
+		virtual void set(const std::vector<float>& vals) override;
+		virtual void set(const std::vector<double>& vals) override;
+
+		virtual bool isValid() const override;
+		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
 	protected:
 		T _val;
 		virtual void copyTo(Parameter* parm) const override;
-		virtual void addToMessage(vector<unsigned char> &data) const;
+		virtual void addToMessage(std::vector<unsigned char> &data) const;
 		virtual void UpdateFromSerial();
 	};
 
@@ -163,10 +208,14 @@ namespace twirre
 	class ArrayValue: public Parameter
 	{
 	public:
-		ArrayValue(const uint8_t ID, const string name, SerialRW * serialRW);
-		virtual ~ArrayValue()
-		{
-		}
+		ArrayValue(const uint8_t ID, const std::string name, SerialRW * serialRW);
+		virtual ~ArrayValue() noexcept;
+
+		/* copy, move constructors and operators */
+		ArrayValue(const ArrayValue<T> & val);
+		ArrayValue(ArrayValue<T> && val) noexcept;
+		ArrayValue<T> & operator = (const ArrayValue<T> & other);
+		ArrayValue<T> & operator = (ArrayValue<T> && other) noexcept;
 
 		virtual uint8_t as_uint8_t() override;
 		virtual int8_t as_int8_t() override;
@@ -202,14 +251,37 @@ namespace twirre
 		virtual void set(const double val) override;
 		virtual void set(const Value& val) override;
 
-		virtual bool isValid() override;
+		virtual void set(const uint8_t * vals, const uint16_t size) override;
+		virtual void set(const int8_t * vals, const uint16_t size) override;
+		virtual void set(const uint16_t * vals, const uint16_t size) override;
+		virtual void set(const int16_t * vals, const uint16_t size) override;
+		virtual void set(const uint32_t * vals, const uint16_t size) override;
+		virtual void set(const int32_t * vals, const uint16_t size) override;
+		virtual void set(const uint64_t * vals, const uint16_t size) override;
+		virtual void set(const int64_t * vals, const uint16_t size) override;
+		virtual void set(const float * vals, const uint16_t size) override;
+		virtual void set(const double * vals, const uint16_t size) override;
+
+		virtual void set(const std::vector<uint8_t>& vals) override;
+		virtual void set(const std::vector<int8_t>& vals) override;
+		virtual void set(const std::vector<uint16_t>& vals) override;
+		virtual void set(const std::vector<int16_t>& vals) override;
+		virtual void set(const std::vector<uint32_t>& vals) override;
+		virtual void set(const std::vector<int32_t>& vals) override;
+		virtual void set(const std::vector<uint64_t>& vals) override;
+		virtual void set(const std::vector<int64_t>& vals) override;
+		virtual void set(const std::vector<float>& vals) override;
+		virtual void set(const std::vector<double>& vals) override;
+
+		virtual bool isValid() const override;
+		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
 	protected:
 		T* _val;
 		uint16_t _size;
 		virtual void copyTo(Parameter* parm) const override;
-		virtual void addToMessage(vector<unsigned char> &data) const;
+		virtual void addToMessage(std::vector<unsigned char> &data) const;
 		virtual void UpdateFromSerial();
 	};
 
@@ -224,7 +296,7 @@ namespace twirre
 		{
 		} //prevent deletion
 
-		ErrorValue(const uint8_t ID, const string name, SerialRW * serialRW);
+		ErrorValue(const uint8_t ID, const std::string name, SerialRW * serialRW);
 		virtual ~ErrorValue()
 		{
 		}
@@ -264,22 +336,68 @@ namespace twirre
 		virtual void set(const Value&) override
 		{
 		}
-		;
 
-		virtual bool isValid() override;
+		virtual void set(const uint8_t * vals, const uint16_t size) override;
+		virtual void set(const int8_t * vals, const uint16_t size) override;
+		virtual void set(const uint16_t * vals, const uint16_t size) override;
+		virtual void set(const int16_t * vals, const uint16_t size) override;
+		virtual void set(const uint32_t * vals, const uint16_t size) override;
+		virtual void set(const int32_t * vals, const uint16_t size) override;
+		virtual void set(const uint64_t * vals, const uint16_t size) override;
+		virtual void set(const int64_t * vals, const uint16_t size) override;
+		virtual void set(const float * vals, const uint16_t size) override;
+		virtual void set(const double * vals, const uint16_t size) override;
+
+		virtual void set(const std::vector<uint8_t>& vals) override;
+		virtual void set(const std::vector<int8_t>& vals) override;
+		virtual void set(const std::vector<uint16_t>& vals) override;
+		virtual void set(const std::vector<int16_t>& vals) override;
+		virtual void set(const std::vector<uint32_t>& vals) override;
+		virtual void set(const std::vector<int32_t>& vals) override;
+		virtual void set(const std::vector<uint64_t>& vals) override;
+		virtual void set(const std::vector<int64_t>& vals) override;
+		virtual void set(const std::vector<float>& vals) override;
+		virtual void set(const std::vector<double>& vals) override;
+
+		virtual bool isValid() const override;
+		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
 	protected:
 		virtual void copyTo(Parameter*) const override
 		{
 		}
-		virtual void addToMessage(vector<unsigned char> &) const
+		virtual void addToMessage(std::vector<unsigned char> &) const
 		{
 		}
 		virtual void UpdateFromSerial()
 		{
 		}
 	};
+
+	/* explicit template instantiations of ValueImpl */
+	extern template class ValueImpl<uint8_t>;
+	extern template class ValueImpl<int8_t>;
+	extern template class ValueImpl<uint16_t>;
+	extern template class ValueImpl<int16_t>;
+	extern template class ValueImpl<uint32_t>;
+	extern template class ValueImpl<int32_t>;
+	extern template class ValueImpl<uint64_t>;
+	extern template class ValueImpl<int64_t>;
+	extern template class ValueImpl<float>;
+	extern template class ValueImpl<double>;
+
+	/* explicit template instantiations of ArrayValue */
+	extern template class ArrayValue<uint8_t>;
+	extern template class ArrayValue<int8_t>;
+	extern template class ArrayValue<uint16_t>;
+	extern template class ArrayValue<int16_t>;
+	extern template class ArrayValue<uint32_t>;
+	extern template class ArrayValue<int32_t>;
+	extern template class ArrayValue<uint64_t>;
+	extern template class ArrayValue<int64_t>;
+	extern template class ArrayValue<float>;
+	extern template class ArrayValue<double>;
 
 } /* namespace twirre */
 

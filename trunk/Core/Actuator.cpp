@@ -7,9 +7,10 @@
 
 #include "../Core/Actuator.h"
 #include <vector>
-#include "TwirreLib.h"
+#include "TwirreSerial.h"
 #include "Helper.h"
 
+using namespace std;
 
 namespace twirre
 {
@@ -80,7 +81,7 @@ void Actuator::Actuate()
 	_serialRW.writeBytes(message.data(), message.size());
 
 	//check response
-	TwirreLib::CheckOk(_serialRW);
+	TwirreSerial::CheckOk(_serialRW);
 }
 
 void Actuator::_ProcessParametersString(const string & s)

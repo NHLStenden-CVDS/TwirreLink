@@ -9,7 +9,7 @@
 
 namespace twirre
 {
-void Helper::split(const std::string& s, char c, std::vector<std::string>& v)
+void Helper::split(const std::string& s, const char c, std::vector<std::string>& v)
 {
 	std::string::size_type i = 0;
 	std::string::size_type j = s.find(c);

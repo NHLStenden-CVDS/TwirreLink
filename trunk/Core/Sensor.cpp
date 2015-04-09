@@ -9,7 +9,9 @@
 #include <vector>
 #include <algorithm>
 #include "Helper.h"
-#include "TwirreLib.h"
+#include "TwirreSerial.h"
+
+using namespace std;
 
 namespace twirre
 {
@@ -26,6 +28,16 @@ namespace twirre
 		{
 			delete valuePair.second;
 		}
+	}
+
+	map<string, Value*> Sensor::SenseAll()
+	{
+		vector<string> names;
+		for(const auto & vals : _valueList)
+		{
+			names.push_back(vals.first);
+		}
+		return Sense(names);
 	}
 
 	Value & Sensor::Sense(const string &valueName)
@@ -83,7 +95,7 @@ namespace twirre
 
 		delete message;
 
-		if (TwirreLib::CheckOk(_serialRW))
+		if (TwirreSerial::CheckOk(_serialRW))
 		{
 			for (const auto& val : values)
 			{
@@ -121,7 +133,16 @@ namespace twirre
 			if (!nameAndType[1].compare("F")) value = new ValueImpl<float>(i, nameAndType[0], 0, &_serialRW);
 			if (!nameAndType[1].compare("D")) value = new ValueImpl<double>(i, nameAndType[0], 0, &_serialRW);
 
+			if (!nameAndType[1].compare("A:UI8")) value = new ArrayValue<uint8_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:I8")) value = new ArrayValue<int8_t>(i, nameAndType[0], &_serialRW);
 			if (!nameAndType[1].compare("A:UI16")) value = new ArrayValue<uint16_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:I16")) value = new ArrayValue<int16_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:UI32")) value = new ArrayValue<uint32_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:I32")) value = new ArrayValue<int32_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:UI64")) value = new ArrayValue<uint64_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:I64")) value = new ArrayValue<int64_t>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:F")) value = new ArrayValue<float>(i, nameAndType[0], &_serialRW);
+			if (!nameAndType[1].compare("A:D")) value = new ArrayValue<double>(i, nameAndType[0], &_serialRW);
 
 			_valueList.insert(pair<string, Value*>(nameAndType[0], value));
 		}
