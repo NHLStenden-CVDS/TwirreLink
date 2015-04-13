@@ -31,6 +31,10 @@ public:
 	//disable move assignment
 	Actuator& operator=(Actuator&&) = delete;
 
+	std::vector<std::string> getAvailableParameters();
+	bool haveParameter(std::string name);
+	bool haveParameters(std::vector<std::string> names);
+
 	virtual Parameter & GetParameter(const std::string & name);
 	virtual Parameter & operator[] (const std::string & name);
 

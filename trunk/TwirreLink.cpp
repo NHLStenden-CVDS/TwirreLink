@@ -64,6 +64,17 @@ namespace twirre
 
 	}
 
+	const std::map<string, Actuator*> & TwirreLink::getActuators()
+	{
+		return _actuatorList;
+	}
+
+
+	const std::map<string, Sensor*> & TwirreLink::getSensors()
+	{
+		return _sensorList;
+	}
+
 	void TwirreLink::addProvider(DeviceProvider& prov)
 	{
 		auto& sensors = prov.getSensors();
@@ -107,6 +118,11 @@ namespace twirre
 		}
 	}
 
+	/**
+	 *
+	 * @param sensorName
+	 * @return
+	 */
 	bool TwirreLink::haveSensor(const string & sensorName) const
 	{
 		return (_sensorList.find(sensorName) != _sensorList.end());

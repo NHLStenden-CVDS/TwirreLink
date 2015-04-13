@@ -40,6 +40,34 @@ namespace twirre
 		return Sense(names);
 	}
 
+	vector<string> Sensor::getAvailableValues()
+	{
+		vector<string> ret;
+
+		for(const auto& pair : _valueList)
+		{
+			ret.push_back(pair.first);
+		}
+
+		return ret;
+	}
+
+	bool Sensor::haveValue(string name)
+	{
+		return haveValues({name});
+	}
+
+	bool Sensor::haveValues(vector<string> names)
+	{
+		for(const auto& name : names)
+		{
+			if(_valueList.find(name) == _valueList.end())
+				return false;
+		}
+
+		return true;
+	}
+
 	Value & Sensor::Sense(const string &valueName)
 	{
 

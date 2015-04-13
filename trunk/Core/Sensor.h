@@ -35,6 +35,10 @@ namespace twirre
 
 		virtual std::map<std::string, Value*> SenseAll();
 
+		virtual std::vector<std::string> getAvailableValues();
+		virtual bool haveValue(std::string name);
+		virtual bool haveValues(std::vector<std::string>);
+
 		virtual Value & Sense(const std::string &name);
 		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) = 0;
 

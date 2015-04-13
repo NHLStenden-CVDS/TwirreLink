@@ -12,7 +12,6 @@ namespace twirre
 {
 	class DeviceProvider
 	{
-		friend class TwirreLink;
 	public:
 		DeviceProvider() {};
 		virtual ~DeviceProvider() {};

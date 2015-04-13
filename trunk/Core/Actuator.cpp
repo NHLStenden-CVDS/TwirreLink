@@ -30,6 +30,33 @@ namespace twirre
 		}
 	}
 
+	vector<string> Actuator::getAvailableParameters()
+	{
+		vector<string> ret;
+
+		for (const auto& pair : _parametersList)
+		{
+			ret.push_back(pair.first);
+		}
+
+		return ret;
+	}
+
+	bool Actuator::haveParameter(string name)
+	{
+		return haveParameters({ name });
+	}
+
+	bool Actuator::haveParameters(vector<string> names)
+	{
+		for (const auto& name : names)
+		{
+			if (_parametersList.find(name) == _parametersList.end()) return false;
+		}
+
+		return true;
+	}
+
 	Parameter & Actuator::GetParameter(const string & name)
 	{
 		if (_parametersList.find(name) == _parametersList.end())
