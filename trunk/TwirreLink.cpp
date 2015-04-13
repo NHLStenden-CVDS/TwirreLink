@@ -14,21 +14,20 @@
 #include "TwirreLink.h"
 #include "TwirreSerial/TwirreSerial.h"
 
-
 using namespace std;
 using namespace twirre;
 
 int main()
 {
-	TwirreLink twirre;
 	TwirreSerial ifx("/dev/ttyACM0");
-	twirre.addProvider(ifx);
+	TwirreLink twirre(ifx);
 
 	bool haveNaza = twirre.haveActuator("naza");
 
 	while (true)
 	{
-		auto imuvals = twirre.getSensor("myAHRS+")[{ "pitch", "yaw", "roll" }];
+		auto imuvals = twirre.getSensor("myAHRS+")[
+		{ "pitch", "yaw", "roll" }];
 		//print the imu values
 		for (auto & val : imuvals)
 		{
@@ -64,11 +63,23 @@ namespace twirre
 
 	}
 
+	TwirreLink::TwirreLink(DeviceProvider& prov)
+	{
+		addProvider(prov);
+	}
+
+	TwirreLink::TwirreLink(const std::vector<DeviceProvider*>& provs)
+	{
+		for(const auto prov: provs)
+		{
+			if(prov) addProvider(*prov);
+		}
+	}
+
 	const std::map<string, Actuator*> & TwirreLink::getActuators()
 	{
 		return _actuatorList;
 	}
-
 
 	const std::map<string, Sensor*> & TwirreLink::getSensors()
 	{
@@ -132,7 +143,7 @@ namespace twirre
 	{
 		return (_actuatorList.find(actuatorName) != _actuatorList.end());
 	}
-
+	
 	Actuator& TwirreLink::getActuator(const string & actuatorName)
 	{
 		if (_actuatorList.find(actuatorName) == _actuatorList.end())

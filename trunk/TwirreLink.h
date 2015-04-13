@@ -9,6 +9,7 @@
 #define TWIRRELINK_H_
 
 #include <map>
+#include <initializer_list>
 
 #include "Core/Actuator.h"
 #include "Core/Sensor.h"
@@ -16,6 +17,9 @@
 
 namespace twirre
 {
+	/**
+	 * Registry for sensors and actuators.
+	 */
 	class TwirreLink
 	{
 	public:
@@ -23,6 +27,20 @@ namespace twirre
 		 * Create an empty TwirreLink
 		 */
 		TwirreLink();
+
+		/**
+		 * Create a TwirreLink, immediately adding a DeviceProvider
+		 * @param prov the provider to add
+		 */
+		TwirreLink(DeviceProvider& prov);
+
+		/**
+		 * Create a Twirrelink, immediately adding all DeviceProviders
+		 * @param provs a vector of pointers to DeviceProviders. May contain nullptrs, which are ignored.
+		 */
+		TwirreLink(const std::vector<DeviceProvider *> & provs);
+
+
 
 		/**
 		 * Register all sensors and actuators of the given provider.
