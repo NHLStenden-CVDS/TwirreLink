@@ -11,7 +11,7 @@
 #include <string>
 #include <cstdint>
 #include <vector>
-#include "SerialRW.h"
+#include <Serial/SerialRW.h>
 
 namespace twirre
 {

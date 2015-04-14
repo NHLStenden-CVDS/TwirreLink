@@ -12,7 +12,6 @@
 #include <cstdint>
 
 #include "Value.h"
-#include "SerialRW.h"
 
 namespace twirre
 {

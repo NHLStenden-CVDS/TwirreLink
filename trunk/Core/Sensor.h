@@ -39,6 +39,9 @@ namespace twirre
 		virtual bool haveValue(std::string name);
 		virtual bool haveValues(std::vector<std::string>);
 
+		virtual Value & peekValue(std::string name);
+		virtual std::map<std::string, Value*> peekValues(const std::vector<std::string> &names);
+
 		virtual Value & Sense(const std::string &name);
 		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) = 0;
 

@@ -68,6 +68,38 @@ namespace twirre
 		return true;
 	}
 
+	Value& Sensor::peekValue(std::string name)
+	{
+		if(_valueList.find(name) == _valueList.end())
+			return *ErrorValue::getInstance();
+
+		return *_valueList.at(name);
+	}
+
+	std::map<std::string, Value*> Sensor::peekValues(const std::vector<std::string>& names)
+	{
+		std::map<string, Value*> returnvalues;
+
+		for(const auto& name : names)
+		{
+			//skip duplicate names
+			if(returnvalues.find(name) == returnvalues.end())
+			{
+				if(_valueList.find(name) == _valueList.end())
+				{
+					returnvalues[name] = ErrorValue::getInstance();
+				}
+				else
+				{
+					returnvalues[name] = _valueList.at(name);
+				}
+			}
+		}
+
+		return returnvalues;
+	}
+
+
 	Value & Sensor::Sense(const string &valueName)
 	{
 
@@ -102,3 +134,4 @@ namespace twirre
 	}
 
 } /* namespace twirre */
+
