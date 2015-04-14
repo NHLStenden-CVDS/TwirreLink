@@ -11,4 +11,4 @@ include_directories ( "${PROJECT_SOURCE_DIR}/TwirreSerial" )
 
 file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/*.cpp" )
 
-add_executable(Twirre-v2-Library ${SRC_FILES} )	
+add_library(twirrelink STATIC ${SRC_FILES} )	

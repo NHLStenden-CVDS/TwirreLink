@@ -17,6 +17,7 @@
 using namespace std;
 using namespace twirre;
 
+#ifdef TWIRRELINK_DEBUG_MAIN
 int main()
 {
 	TwirreSerial ifx("/dev/ttyACM0");
@@ -54,6 +55,7 @@ int main()
 		}
 	}
 }
+#endif
 
 namespace twirre
 {
@@ -129,11 +131,6 @@ namespace twirre
 		}
 	}
 
-	/**
-	 *
-	 * @param sensorName
-	 * @return
-	 */
 	bool TwirreLink::haveSensor(const string & sensorName) const
 	{
 		return (_sensorList.find(sensorName) != _sensorList.end());

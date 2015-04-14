@@ -22,6 +22,9 @@ public:
 	Device(const uint8_t id, const std::string name, const std::string description);
 	virtual ~Device() {};
 
+	virtual const std::string & getName() const;
+	virtual const std::string & getDescription() const;
+
 	virtual std::string ToString(void);
 protected:
 	const uint8_t _id;

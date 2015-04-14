@@ -14,6 +14,11 @@ namespace twirre
 class Actuator: public Device
 {
 public:
+	/**
+	 * Create an actuator
+	 * @param name
+	 * @param description
+	 */
 	Actuator(const uint8_t id, const std::string name, const std::string description);
 	virtual ~Actuator();
 
@@ -31,13 +36,45 @@ public:
 	//disable move assignment
 	Actuator& operator=(Actuator&&) = delete;
 
+	/**
+	 * Get the names of all available parameters
+	 *
+	 * @return an array with all available parameter names
+	 */
 	std::vector<std::string> getAvailableParameters();
+
+	/**
+	 * Check if a parameter exists
+	 *
+	 * @param name the name of the parameter to check
+	 *
+	 * @return true if a parameter with that name exists, false otherwise
+	 */
 	bool haveParameter(std::string name);
+
+	/**
+	 * Check if multiple parameters exist
+	 *
+	 * @param names the names of the parameters to check
+	 *
+	 * @return true if all names exist, false otherwise
+	 */
 	bool haveParameters(std::vector<std::string> names);
 
+	/**
+	 * Get a parameter by name
+	 *
+	 * @param name the name of the parameter to get
+	 *
+	 * @return a reference to the requested parameter (if name is valid), a reference to ErrorValue otherwise
+	 */
 	virtual Parameter & GetParameter(const std::string & name);
+	//this forwards to GetParameter(name)
 	virtual Parameter & operator[] (const std::string & name);
 
+	/**
+	 * Update this Actuator using the modified parameters
+	 */
 	virtual void Actuate() = 0;
 
 protected:

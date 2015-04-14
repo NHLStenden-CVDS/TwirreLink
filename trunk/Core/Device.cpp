@@ -17,6 +17,16 @@ Device::Device(const uint8_t id, const string name, const string description) : 
 
 }
 
+const std::string & Device::getName() const
+{
+	return _name;
+}
+
+const std::string & Device::getDescription() const
+{
+	return _description;
+}
+
 std::string Device::ToString()
 {
 	char str[1024];
