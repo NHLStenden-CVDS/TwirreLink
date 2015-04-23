@@ -8,6 +8,11 @@
 #ifndef DEVICEPROVIDER_H_
 #define DEVICEPROVIDER_H_
 
+#include <map>
+#include "Core/Actuator.h"
+#include "Core/Sensor.h"
+#include "Core/Value.h"
+
 namespace twirre
 {
 	class DeviceProvider
