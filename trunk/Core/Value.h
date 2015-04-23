@@ -23,7 +23,7 @@ namespace twirre
 		template<typename T> friend class ArrayValue;
 	public:
 
-		Value(const uint8_t ID, const std::string name);
+		Value(const std::string name);
 		virtual ~Value()
 		{
 		}
@@ -53,7 +53,6 @@ namespace twirre
 		virtual float as_float(uint16_t index) = 0;
 		virtual double as_double(uint16_t index) = 0;
 
-		uint8_t getId();
 		const std::string& getName();
 
 		virtual uint16_t getSize() const = 0;
@@ -64,7 +63,6 @@ namespace twirre
 		virtual bool isArray() const = 0;
 	protected:
 		virtual void copyTo(Parameter* parm) const = 0;
-		uint8_t _id;
 		std::string _name;
 
 	};
@@ -73,7 +71,7 @@ namespace twirre
 	{
 		template <typename T> friend class ArrayValue;
 	public:
-		Parameter(const uint8_t ID, const std::string name);
+		Parameter(const std::string name);
 		virtual ~Parameter()
 		{
 		}
@@ -130,7 +128,7 @@ namespace twirre
 	class ValueImpl: public Parameter
 	{
 	public:
-		ValueImpl(const uint8_t ID, const std::string name, T val);
+		ValueImpl(const std::string name, T val);
 		virtual ~ValueImpl()
 		{
 		}
@@ -206,7 +204,7 @@ namespace twirre
 	class ArrayValue: public Parameter
 	{
 	public:
-		ArrayValue(const uint8_t ID, const std::string name);
+		ArrayValue(const std::string name);
 		virtual ~ArrayValue() noexcept;
 
 		/* copy, move constructors and operators */
@@ -271,12 +269,17 @@ namespace twirre
 		virtual void set(const std::vector<float>& vals) override;
 		virtual void set(const std::vector<double>& vals) override;
 
+
+
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
 		virtual uint16_t getSize() const override;
 		virtual size_t getElementSize() const override;
 		virtual void* getBuffer() override;
+		virtual T* getNativeBuffer();
+		virtual void setSize(uint16_t size);
+		virtual void setNative(T* data, uint16_t size);
 	protected:
 		T* _val;
 		uint16_t _size;
@@ -294,7 +297,7 @@ namespace twirre
 		{
 		} //prevent deletion
 
-		ErrorValue(const uint8_t ID, const std::string name);
+		ErrorValue(const std::string name);
 		virtual ~ErrorValue()
 		{
 		}

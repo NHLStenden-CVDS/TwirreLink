@@ -20,8 +20,8 @@ using namespace std;
 namespace twirre
 {
 
-	SerialSensor::SerialSensor(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string valuesString) :
-			Sensor(id, name, description), _serial(serialRW)
+	SerialSensor::SerialSensor(const int id, const string name, const string description, SerialRW & serialRW, const string valuesString) :
+			Sensor(name, description), SerialDevice(id), _serial(serialRW)
 	{
 		_ProcessValuesString(valuesString);
 	}
@@ -68,7 +68,7 @@ namespace twirre
 		int nextId = 4;
 		for (const auto& val : values)
 		{
-			message[nextId++] = val->getId();
+			message[nextId++] = dynamic_cast<SerialValue *>(val)->getID();
 		}
 
 		_serial.writeBytes(message, values.size() + 4);

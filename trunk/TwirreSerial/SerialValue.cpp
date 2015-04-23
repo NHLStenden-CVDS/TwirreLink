@@ -17,21 +17,26 @@ using namespace std;
 
 namespace twirre
 {
-	SerialValue::SerialValue(SerialRW & srw) :
-			_serial(srw)
+	SerialValue::SerialValue(uint8_t ID, SerialRW & srw) :
+			_id(ID), _serial(srw)
 	{
+	}
+
+	uint8_t SerialValue::getID() const
+	{
+		return _id;
 	}
 
 	template<typename T>
 	SerialValueImpl<T>::SerialValueImpl(const uint8_t ID, const std::string name, T val, SerialRW & srw) :
-			ValueImpl<T>(ID, name, val), SerialValue(srw)
+			ValueImpl<T>(name, val), SerialValue(ID, srw)
 	{
 
 	}
 
 	template<typename T>
 	SerialArrayValue<T>::SerialArrayValue(const uint8_t ID, const std::string name, SerialRW & srw) :
-			ArrayValue<T>(ID, name), SerialValue(srw)
+			ArrayValue<T>(name), SerialValue(ID, srw)
 	{
 
 	}

@@ -112,20 +112,15 @@ using namespace std;
 namespace twirre
 {
 
-Value::Value(const uint8_t ID, const string n) : _id(ID), _name(n)
+Value::Value(const string n) : _name(n)
 { }
-
-uint8_t Value::getId()
-{
-	return _id;
-}
 
 const string& Value::getName()
 {
 	return _name;
 }
 
-Parameter::Parameter(const uint8_t ID, const string n) : Value(ID, n), _modified(false)
+Parameter::Parameter(const string n) : Value(n), _modified(false)
 { }
 
 bool Parameter::isModified() const
@@ -139,7 +134,7 @@ void Parameter::resetModified()
 }
 
 template <typename T>
-ValueImpl<T>::ValueImpl(const uint8_t ID, const string n, T val) : Parameter(ID, n),_val(val)
+ValueImpl<T>::ValueImpl(const string n, T val) : Parameter(n),_val(val)
 { }
 
 template <typename T>
@@ -157,7 +152,6 @@ bool ValueImpl<T>::isArray() const
 template <typename T>
 void ValueImpl<T>::copyTo(Parameter * parm) const
 {
-	//TODO: handle copy to array
 	parm->set(_val);
 }
 
@@ -180,11 +174,11 @@ void * ValueImpl<T>::getBuffer()
 }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(const uint8_t ID, const string name) : Parameter(ID, name), _val(nullptr), _size(0)
+ArrayValue<T>::ArrayValue(const string name) : Parameter(name), _val(nullptr), _size(0)
 { }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._id, other._name), _size(other._size)
+ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._name), _size(other._size)
 {
 	//make a copy of the _value buffer
 	if(_size > 0)
@@ -196,7 +190,7 @@ ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._id, ot
 }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._id, other._name), _size(other._size)
+ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._name), _size(other._size)
 {
 	//swap pointers
 	_val = other._val;
@@ -220,7 +214,6 @@ ArrayValue<T> & ArrayValue<T>::operator = (ArrayValue<T> && other) noexcept
 
 	//can move other stuff
 	_size = std::move(other._size);
-	_id = std::move(other._id);
 	_name = std::move(other._name);
 
 	return *this;
@@ -274,15 +267,36 @@ void* ArrayValue<T>::getBuffer()
 	return reinterpret_cast<void*>(_val);
 }
 
+template <typename T>
+T* ArrayValue<T>::getNativeBuffer()
+{
+	return _val;
+}
+
+template <typename T>
+void ArrayValue<T>::setSize(uint16_t size)
+{
+	_size = size;
+	_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
+}
+
+template <typename T>
+void ArrayValue<T>::setNative(T* data, uint16_t size)
+{
+	_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
+	_size = size;
+	memcpy(_val, data, size * sizeof(T));
+}
+
 ErrorValue *ErrorValue::_instance = nullptr;
 ErrorValue * ErrorValue::getInstance()
 {
 	if(_instance == nullptr)
-		_instance = new ErrorValue(0xFF, "<error>");
+		_instance = new ErrorValue("<error>");
 	return _instance;
 }
 
-ErrorValue::ErrorValue(const uint8_t ID, const string n) : Parameter(ID, n)
+ErrorValue::ErrorValue( const string n) : Parameter(n)
 { }
 
 bool ErrorValue::isValid() const

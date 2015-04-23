@@ -18,7 +18,7 @@ namespace twirre
 class Device
 {
 public:
-	Device(const uint8_t id, const std::string name, const std::string description);
+	Device(const std::string name, const std::string description);
 	virtual ~Device() {};
 
 	virtual const std::string & getName() const;
@@ -26,7 +26,6 @@ public:
 
 	virtual std::string ToString(void);
 protected:
-	const uint8_t _id;
 	const std::string _name;
 	const std::string _description;
 };

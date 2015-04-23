@@ -16,7 +16,7 @@ namespace twirre
 	class Sensor: public Device
 	{
 	public:
-		Sensor(const uint8_t id, const std::string name, const std::string description);
+		Sensor(const std::string name, const std::string description);
 		virtual ~Sensor();
 
 		/*

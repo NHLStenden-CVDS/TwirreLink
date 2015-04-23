@@ -5,42 +5,36 @@
  *      Author: Jasper
  */
 
-#include "TwirreLidar.h"
+#include "TwirreLidar/RPLidarSensor.h"
+#include "TwirreLidar/TwirreLidar.h"
 
 using namespace twirre;
 using namespace std;
 
-
-
 namespace twirre
 {
-	TwirreLidar::TwirreLidar(const char * device, const int baudrate)
-	{
+TwirreLidar::TwirreLidar()
+{
 
-	}
+}
 
-	TwirreLidar::~TwirreLidar()
-	{
+TwirreLidar::~TwirreLidar()
+{
 
-	}
+}
 
-	bool TwirreLidar::_InitActuators()
-	{
+void TwirreLidar::ConnectRPLidar(const char* path, std::string name)
+{
+	_sensorList[name] = new RPLidarSensor(path, name);
+}
 
-	}
+const std::map<std::string, Actuator*> & TwirreLidar::getActuators()
+{
+	return _actuatorList;
+}
 
-	bool TwirreLidar::_InitSensors()
-	{
-
-	}
-
-	const std::map<std::string, Actuator*> & TwirreLidar::getActuators()
-	{
-		return _actuatorList;
-	}
-
-	const std::map<std::string, Sensor*> & TwirreLidar::getSensors()
-	{
-		return _sensorList;
-	}
+const std::map<std::string, Sensor*> & TwirreLidar::getSensors()
+{
+	return _sensorList;
+}
 } /* namespace twirre */

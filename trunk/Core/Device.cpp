@@ -12,7 +12,7 @@ using namespace std;
 namespace twirre
 {
 
-Device::Device(const uint8_t id, const string name, const string description) : _id(id), _name(name), _description(description)
+Device::Device(const string name, const string description) :_name(name), _description(description)
 {
 
 }
@@ -29,10 +29,7 @@ const std::string & Device::getDescription() const
 
 std::string Device::ToString()
 {
-	char str[1024];
-	sprintf(str, "%d", _id);
-	std::string buf = str;
-	buf.append(": ");
+	std::string buf = "";
 	buf.append(_name);
 	buf.append(" -> ");
 	buf.append(_description);

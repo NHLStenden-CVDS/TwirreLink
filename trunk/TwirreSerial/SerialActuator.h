@@ -8,10 +8,11 @@
 #define SERIALACTUATOR_H_
 
 #include "Core/Actuator.h"
+#include "TwirreSerial/SerialDevice.h"
 
 namespace twirre
 {
-class SerialActuator: public Actuator
+class SerialActuator: public Actuator, public SerialDevice
 {
 public:
 	SerialActuator(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string parametersString);

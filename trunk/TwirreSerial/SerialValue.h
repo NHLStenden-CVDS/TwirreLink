@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "TwirreSerial/SerialDevice.h"
 #include "Serial/SerialRW.h"
 
 #include "Core/Value.h"
@@ -23,12 +24,13 @@ namespace twirre
 		friend class SerialActuator;
 		friend class SerialSensor;
 	public:
-		SerialValue(SerialRW & srw);
+		SerialValue(uint8_t ID, SerialRW & srw);
 		virtual ~SerialValue() {};
-
+		uint8_t getID() const;
 	protected:
 		virtual void updateFromSerial() = 0;
 		virtual void addToMessage(std::vector<unsigned char> & data) const = 0;
+		const uint8_t _id;
 		SerialRW & _serial;
 	};
 

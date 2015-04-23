@@ -13,10 +13,10 @@
 
 namespace twirre
 {
-	class SerialSensor: public Sensor
+	class SerialSensor: public Sensor, public SerialDevice
 	{
 	public:
-		SerialSensor(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string valuesString);
+		SerialSensor(const int id, const std::string name, const std::string description, SerialRW & serialRW, const std::string valuesString);
 		virtual ~SerialSensor();
 
 		/*

@@ -16,8 +16,8 @@ using namespace std;
 namespace twirre
 {
 
-	Actuator::Actuator(const uint8_t id, const string name, const string description) :
-			Device(id, name, description)
+	Actuator::Actuator(const string name, const string description) :
+			Device(name, description)
 	{
 
 	}

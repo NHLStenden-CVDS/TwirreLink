@@ -17,8 +17,8 @@ using namespace std;
 namespace twirre
 {
 
-	Sensor::Sensor(const uint8_t id, const string name, const string description) :
-			Device(id, name, description)
+	Sensor::Sensor(const string name, const string description) :
+			Device(name, description)
 	{
 	}
 
@@ -124,8 +124,6 @@ namespace twirre
 		for(const auto& pair : _valueList)
 		{
 			s += "\t";
-			s += to_string(pair.second->getId());
-			s += " ";
 			s += pair.second->getName();
 			s += "\n";
 		}

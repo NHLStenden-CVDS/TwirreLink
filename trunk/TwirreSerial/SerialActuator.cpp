@@ -18,7 +18,7 @@ namespace twirre
 {
 
 	SerialActuator::SerialActuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString) :
-			Actuator(id, name, description), _serial(serialRW)
+			Actuator(name, description), SerialDevice(id), _serial(serialRW)
 	{
 		_ProcessParametersString(parametersString);
 	}

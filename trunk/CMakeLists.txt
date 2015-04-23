@@ -1,7 +1,7 @@
 cmake_minimum_required ( VERSION 2.6 ) 
 project ( Twirre-v2-Library )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -msse4 -pedantic -Wall -Wextra" )
+set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -msse4 -pedantic -Wall -Wextra" )
 
 include_directories ( ${PROJECT_SOURCE_DIR} )
 include_directories ( "${PROJECT_SOURCE_DIR}/Core" )
@@ -9,7 +9,8 @@ include_directories ( "${PROJECT_SOURCE_DIR}/Serial" )
 include_directories ( "${PROJECT_SOURCE_DIR}/Support" )
 include_directories ( "${PROJECT_SOURCE_DIR}/TwirreSerial" )
 include_directories ( "${PROJECT_SOURCE_DIR}/TwirreLidar" )
+include_directories ( "${PROJECT_SOURCE_DIR}/TwirreLidar/RPLidar" )
 
-file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/*.cpp" )
+file( GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/*.cpp" )
 
-add_library(twirrelink STATIC ${SRC_FILES} )	
+add_library( twirrelink_raw STATIC ${SRC_FILES} )	

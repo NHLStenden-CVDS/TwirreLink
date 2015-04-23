@@ -19,15 +19,14 @@ class TwirreLidar : public DeviceProvider
 {
 
 public:
-	explicit TwirreLidar(const char* path, const int baudrate = 115200);
+	explicit TwirreLidar();
 	~TwirreLidar();
+
+	void ConnectRPLidar(const char * path, std::string name);
 
 private:
 	std::map<std::string, Actuator*> _actuatorList;
 	std::map<std::string, Sensor*> _sensorList;
-
-	bool _InitActuators();
-	bool _InitSensors();
 
 	virtual const std::map<std::string, Actuator*> & getActuators() override;
 	virtual const std::map<std::string, Sensor*> & getSensors() override;

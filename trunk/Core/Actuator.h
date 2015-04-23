@@ -19,7 +19,7 @@ public:
 	 * @param name
 	 * @param description
 	 */
-	Actuator(const uint8_t id, const std::string name, const std::string description);
+	Actuator(const std::string name, const std::string description);
 	virtual ~Actuator();
 
 	/*
