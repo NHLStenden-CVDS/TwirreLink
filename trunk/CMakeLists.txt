@@ -10,6 +10,8 @@ include_directories ( "${PROJECT_SOURCE_DIR}/Support" )
 include_directories ( "${PROJECT_SOURCE_DIR}/TwirreSerial" )
 include_directories ( "${PROJECT_SOURCE_DIR}/TwirreLidar" )
 include_directories ( "${PROJECT_SOURCE_DIR}/TwirreLidar/RPLidar" )
+include_directories ( "${PROJECT_SOURCE_DIR}/TwirreLidar/HokuyoLidar" )
+
 
 file( GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/*.cpp" )
 
