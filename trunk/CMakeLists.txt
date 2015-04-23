@@ -1,7 +1,7 @@
 cmake_minimum_required ( VERSION 2.6 ) 
 project ( Twirre-v2-Library )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -mavx -pedantic -Wall -Wextra" )
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -msse4 -pedantic -Wall -Wextra" )
 
 include_directories ( ${PROJECT_SOURCE_DIR} )
 include_directories ( "${PROJECT_SOURCE_DIR}/Core" )
