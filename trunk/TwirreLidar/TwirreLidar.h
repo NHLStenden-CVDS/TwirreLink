@@ -23,7 +23,7 @@ public:
 	~TwirreLidar();
 
 	void ConnectRPLidar(const char * path, std::string name);
-
+	void ConnectHokuyoLidar(const char * path, std::string name);
 private:
 	std::map<std::string, Actuator*> _actuatorList;
 	std::map<std::string, Sensor*> _sensorList;

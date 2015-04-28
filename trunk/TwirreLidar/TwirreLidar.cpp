@@ -6,6 +6,7 @@
  */
 
 #include "TwirreLidar/RPLidarSensor.h"
+#include "TwirreLidar/HokuyoLidarSensor.h"
 #include "TwirreLidar/TwirreLidar.h"
 
 using namespace twirre;
@@ -26,6 +27,11 @@ TwirreLidar::~TwirreLidar()
 void TwirreLidar::ConnectRPLidar(const char* path, std::string name)
 {
 	_sensorList[name] = new RPLidarSensor(path, name);
+}
+
+void TwirreLidar::ConnectHokuyoLidar(const char* path, std::string name)
+{
+	_sensorList[name] = new HokuyoLidarSensor(path, name);
 }
 
 const std::map<std::string, Actuator*> & TwirreLidar::getActuators()

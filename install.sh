@@ -17,11 +17,13 @@ mkdir build/mergelib
 
 cp build/libtwirrelink_raw.a build/mergelib/
 cp trunk/TwirreLidar/RPLidar/librplidar_sdk.a build/mergelib/
+cp trunk/TwirreLidar/HokuyoLidar/liburg_c.a build/mergelib/
 
 cd build/mergelib
 
 ar -x libtwirrelink_raw.a
 ar -x librplidar_sdk.a
+ar -x liburg_c.a
 ar -qc libtwirrelink.a  *.o 
 
 cd ../..
