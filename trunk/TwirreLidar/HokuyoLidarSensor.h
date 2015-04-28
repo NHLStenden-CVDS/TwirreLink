@@ -8,6 +8,11 @@
 #ifndef HOKUYOLIDARSENSOR_H_
 #define HOKUYOLIDARSENSOR_H_
 
+//C++11 threading
+#include <thread>
+#include <mutex>
+#include <atomic>
+
 #include <string>
 #include "Sensor.h"
 
@@ -30,14 +35,24 @@ private:
 	urg_t urg;
 	int urgMaxDataCount;
 
-	//parameters
-	URGLidarSnapMode autoSnapMode;
-	int mmPerPixel;
+	int measurementCount;
+	int measurementCount_buf;
+	long * urgMeasurementData;
+	long * urgMeasurementData_buf;
+
+	ArrayValue<int64_t> * _distanceVals;
 
 
-	ArrayValue<float> * _angleVals;
+	bool _freshImage;
+	std::atomic<bool> _threadRun;
 
-	unsigned long int _measurementCount;
+	std::thread * _thread = nullptr;
+	std::mutex * _mutex = nullptr;
+
+
+	//thread functions
+	int updateReading();
+	void thread_main();
 };
 
 }

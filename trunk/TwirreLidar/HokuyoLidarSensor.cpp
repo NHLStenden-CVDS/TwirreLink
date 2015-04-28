@@ -8,6 +8,8 @@
 #include <HokuyoLidarSensor.h>
 #include <Value.h>
 #include <map>
+#include <cstring>
+#include <iostream>
 
 //URG library
 //http://urgnetwork.sourceforge.net/html/
@@ -24,35 +26,62 @@ HokuyoLidarSensor::HokuyoLidarSensor(const char* path, string name) :
 {
 
 	uint32_t opt_com_baudrate = 115200;
+	int ret;
 
-	// make connection...
-	if (IS_FAIL(drv->connect(path, opt_com_baudrate)))
+	// create the driver instance
+	ret = urg_open(&urg, URG_SERIAL, path, opt_com_baudrate);
+
+	if (ret < 0)
 	{
-		throw std::runtime_error("Failed to bind to serial port");
+		fprintf(stderr, "error opening URG device\n");
+		throw runtime_error("[URGLidar] error opening URG device");
 	}
 
-	// check health...
-	//if (!checkRPLIDARHealth(drv))
-	//{
-	//	throw Error("RPLidar health check failed");
-	//}
+	//allocate data field for measurements
+	urgMaxDataCount = urg_max_data_size(&urg);
+	urgMeasurementData = (long *) malloc(sizeof(long) * urgMaxDataCount);
+	urgMeasurementData_buf = (long *) malloc(sizeof(long) * urgMaxDataCount);
+	measurementCount = 0;
+	measurementCount_buf = 0;
 
-	// start scan...
-	drv->startScan();
+	//get min and max step number
+	int minstep;
+	int maxstep;
+	urg_step_min_max(&urg, &minstep, &maxstep);
 
-	_distanceVals = new ArrayValue<float>("distances");
-	_angleVals = new ArrayValue<float>("angles");
+	ret = urg_set_scanning_parameter(&urg, minstep, maxstep, 0);
+	if (ret < 0)
+	{
+		std::cerr << "Failed to set URG scanning parameters: " << ret << std::endl;
+	}
+
+
+	_distanceVals = new ArrayValue<int64_t>("distances");
 
 	_valueList[_distanceVals->getName()] = _distanceVals;
-	_valueList[_angleVals->getName()] = _angleVals;
+
+	//start the thread
+	_threadRun = true;
+	_freshImage = false;
+	_mutex = new std::mutex();
+	_thread = new std::thread(&HokuyoLidarSensor::thread_main, this);
 }
 
-RPLidarSensor::~RPLidarSensor()
+HokuyoLidarSensor::~HokuyoLidarSensor()
 {
-	RPlidarDriver::DisposeDriver(drv);
+	_threadRun = false;
+	_thread->join();
+
+	delete _mutex;
+	delete _thread;
+
+	free(urgMeasurementData_buf);
+	free(urgMeasurementData);
+
+	urg_close(&urg);
 }
 
-map<string, Value*> RPLidarSensor::Sense(const std::vector<std::string> &names)
+map<string, Value*> HokuyoLidarSensor::Sense(const std::vector<std::string> &names)
 {
 	map<string, Value*> valuesMap;
 
@@ -64,41 +93,78 @@ map<string, Value*> RPLidarSensor::Sense(const std::vector<std::string> &names)
 			wantNew = true;
 			valuesMap[_distanceVals->getName()] = _distanceVals;
 		}
-		else if (!name.compare(_angleVals->getName()))
-		{
-			valuesMap[_angleVals->getName()] = _angleVals;
-			wantNew = true;
-		}
 		else
 			valuesMap[name] = ErrorValue::getInstance();
 	}
 
 	if (wantNew)
 	{
-		_measurementCount = RPLIDAR_MEASUREMENT_COUNT;
-		uint32_t op_result = drv->grabScanData(_measurementBuffer,
-				_measurementCount);
+		std::lock_guard<mutex> lock(*_mutex);
 
-		if (IS_OK(op_result))
+		if(_freshImage)
 		{
-			drv->ascendScanData(_measurementBuffer, _measurementCount);
-		}
-
-		_distanceVals->setSize(_measurementCount);
-		_angleVals->setSize(_measurementCount);
-
-		float* distBuf = _distanceVals->getNativeBuffer();
-		float* angleBuf = _angleVals->getNativeBuffer();
-
-		for(unsigned int i = 0; i < _measurementCount; i++)
-		{
-			distBuf[i] = _measurementBuffer[i].distance_q2 / 4.0f;
-			angleBuf[i] = (_measurementBuffer[i].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT) / 64.0f;
+			_distanceVals->setSize(measurementCount);
+			int64_t * distBuf = _distanceVals->getNativeBuffer();
+			memcpy(distBuf, urgMeasurementData, sizeof(int64_t) * measurementCount);
 		}
 	}
 
 	return valuesMap;
 }
+
+int HokuyoLidarSensor::updateReading()
+{
+	measurementCount_buf = urg_get_distance(&urg, urgMeasurementData_buf, NULL);
+
+	if (measurementCount_buf < 0)
+	{
+		urg_stop_measurement(&urg);
+		int ret = urg_start_measurement(&urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
+		if (ret < 0)
+		{
+			fprintf(stderr, "failed to restart measurements with URG device\n");
+		}
+		return -1;
+	}
+
+	return 1;
+}
+
+void HokuyoLidarSensor::thread_main()
+	{
+		std::cout << "thread started" << std::endl;
+
+		//init
+		// start scan...
+		int ret = urg_start_measurement(&urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
+
+		std::cout << "start measurement done" << std::endl;
+
+		if (ret < 0)
+		{
+			fprintf(stderr, "failed to start measurements with URG device\n");
+			_threadRun = false;
+		}
+
+		//mainloop
+		while (_threadRun)
+		{
+			updateReading();
+
+			if (measurementCount_buf > 0)
+			{
+				std::lock_guard<std::mutex> lock(*_mutex);
+				measurementCount = measurementCount_buf;
+				std::memcpy(urgMeasurementData, urgMeasurementData_buf, sizeof(long) * measurementCount_buf);
+				_freshImage = true;
+			}
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		}
+
+		//exit
+		urg_stop_measurement(&urg);
+	}
 
 }
 
