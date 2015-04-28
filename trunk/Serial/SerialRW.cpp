@@ -66,6 +66,9 @@ int SerialRW::Initialize(const char *serialPort, int baud)
 		case 115200:
 			brate = B115200;
 			break;
+		case 1000000:
+			brate = B1000000;
+			break;
 	}
 	cfsetispeed(&toptions, brate);
 	cfsetospeed(&toptions, brate);
