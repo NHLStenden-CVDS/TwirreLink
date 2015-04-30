@@ -28,7 +28,7 @@ int main()
 	while (true)
 	{
 		auto imuvals = twirre.getSensor("myAHRS+")[
-		{ "pitch", "yaw", "roll" }];
+		{	"pitch", "yaw", "roll"}];
 		//print the imu values
 		for (auto & val : imuvals)
 		{
@@ -51,7 +51,7 @@ int main()
 			naza["gaz"] = (distvals.as_float(0) / 100.0f) - 1.0f;
 			naza["timeout"] = 10000;
 
-			naza.Actuate(); //send updated values to the naza actuator
+			naza.Actuate();//send updated values to the naza actuator
 		}
 	}
 }
@@ -65,6 +65,15 @@ namespace twirre
 
 	}
 
+	TwirreLink::~TwirreLink()
+	{
+		//remove all links
+		for (auto prov : _providers)
+		{
+			prov->removeLink(this);
+		}
+	}
+
 	TwirreLink::TwirreLink(DeviceProvider& prov)
 	{
 		addProvider(prov);
@@ -72,10 +81,69 @@ namespace twirre
 
 	TwirreLink::TwirreLink(const std::vector<DeviceProvider*>& provs)
 	{
-		for(const auto prov: provs)
+		for (const auto prov : provs)
 		{
-			if(prov) addProvider(*prov);
+			if (prov) addProvider(*prov, false);
 		}
+		notifyChange();
+	}
+
+	TwirreLink::TwirreLink(const TwirreLink & other)
+	{
+		for (const auto prov : other._providers)
+		{
+			addProvider(*prov, false);
+		}
+		notifyChange();
+	}
+
+	TwirreLink::TwirreLink(TwirreLink && other)
+	{
+		for (const auto prov : other._providers)
+		{
+			addProvider(*prov, false);
+		}
+		notifyChange();
+	}
+
+	TwirreLink & TwirreLink::operator =(const TwirreLink & other)
+	{
+		//remove all links
+		for (auto prov : _providers)
+		{
+			prov->removeLink(this);
+		}
+
+		_providers = other._providers;
+
+		//build new links
+		for (auto prov : _providers)
+		{
+			prov->addLink(this);
+		}
+		notifyChange();
+
+		return *this;
+	}
+
+	TwirreLink & TwirreLink::operator =(TwirreLink && other)
+	{
+		//remove all links
+		for (auto prov : _providers)
+		{
+			prov->removeLink(this);
+		}
+
+		_providers = other._providers;
+
+		//build new links
+		for (auto prov : _providers)
+		{
+			prov->addLink(this);
+		}
+		notifyChange();
+
+		return *this;
 	}
 
 	const std::map<string, Actuator*> & TwirreLink::getActuators()
@@ -88,47 +156,28 @@ namespace twirre
 		return _sensorList;
 	}
 
-	void TwirreLink::addProvider(DeviceProvider& prov)
+	void TwirreLink::addProvider(DeviceProvider& prov, bool update)
 	{
-		auto& sensors = prov.getSensors();
-		for (const auto& pair : sensors)
-		{
-			const string basename = pair.first;
-			string name = basename;
-			int ctr = 1;
+		//prevent duplicate insertion
+		if(_providers.find(&prov) != _providers.end()) return;
 
-			//append a number to the name when a sensor with that name already exists
-			while (haveSensor(name))
-			{
-				string name = basename;
+		//create bidirectional link
+		prov.addLink(this);
+		_providers.insert(&prov);
 
-				char buf[64];
-				sprintf(buf, "_%d", ctr++);
-				name.append(buf);
-			}
+		if (update) notifyChange();
+	}
 
-			_sensorList[name] = pair.second;
-		}
+	void TwirreLink::removeProvider(DeviceProvider& prov)
+	{
+		//check if provider was actually added
+		if(_providers.find(&prov) == _providers.end()) return;
 
-		auto& actuators = prov.getActuators();
-		for (const auto& pair : actuators)
-		{
-			const string basename = pair.first;
-			string name = basename;
-			int ctr = 1;
+		//break bidirectional link
+		prov.removeLink(this);
+		removeLink(&prov);
 
-			//append a number to the name when an actuator with that name already exists
-			while (haveActuator(name))
-			{
-				string name = basename;
-
-				char buf[64];
-				sprintf(buf, "_%d", ctr++);
-				name.append(buf);
-			}
-
-			_actuatorList[name] = pair.second;
-		}
+		notifyChange();
 	}
 
 	bool TwirreLink::haveSensor(const string & sensorName) const
@@ -140,7 +189,7 @@ namespace twirre
 	{
 		return (_actuatorList.find(actuatorName) != _actuatorList.end());
 	}
-	
+
 	Actuator& TwirreLink::getActuator(const string & actuatorName)
 	{
 		if (_actuatorList.find(actuatorName) == _actuatorList.end())
@@ -157,6 +206,24 @@ namespace twirre
 			throw runtime_error("GetSensor: no sensor with that name");
 		}
 		return *_sensorList.at(sensorName);
+	}
+
+	void TwirreLink::notifyChange()
+	{
+		_actuatorList.clear();
+		_sensorList.clear();
+		for (const auto prov : _providers)
+		{
+			auto& actuators = prov->getActuators();
+			_actuatorList.insert(actuators.begin(), actuators.end());
+			auto& sensors = prov->getSensors();
+			_sensorList.insert(sensors.begin(), sensors.end());
+		}
+	}
+
+	void TwirreLink::removeLink(DeviceProvider * which)
+	{
+		_providers.erase(which);
 	}
 
 } /* namespace twirre */

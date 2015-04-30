@@ -19,11 +19,12 @@ class TwirreLidar : public DeviceProvider
 {
 
 public:
-	explicit TwirreLidar();
+	TwirreLidar();
 	~TwirreLidar();
 
 	void ConnectRPLidar(const char * path, std::string name);
 	void ConnectHokuyoLidar(const char * path, std::string name);
+	void DisconnectLidar(std::string name);
 private:
 	std::map<std::string, Actuator*> _actuatorList;
 	std::map<std::string, Sensor*> _sensorList;

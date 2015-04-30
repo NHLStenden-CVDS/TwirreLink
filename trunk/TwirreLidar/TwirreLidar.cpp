@@ -21,17 +21,31 @@ TwirreLidar::TwirreLidar()
 
 TwirreLidar::~TwirreLidar()
 {
-
+	for(const auto & pair : _sensorList)
+	{
+		delete pair.second;
+	}
 }
 
 void TwirreLidar::ConnectRPLidar(const char* path, std::string name)
 {
+	if(_sensorList.find(name) != _sensorList.end()) delete _sensorList[name];
 	_sensorList[name] = new RPLidarSensor(path, name);
+	doNotifyChange();
 }
 
 void TwirreLidar::ConnectHokuyoLidar(const char* path, std::string name)
 {
+	if(_sensorList.find(name) != _sensorList.end()) delete _sensorList[name];
 	_sensorList[name] = new HokuyoLidarSensor(path, name);
+	doNotifyChange();
+}
+
+void TwirreLidar::DisconnectLidar(std::string name)
+{
+	if(_sensorList.find(name) != _sensorList.end()) delete _sensorList[name];
+	_sensorList.erase(name);
+	doNotifyChange();
 }
 
 const std::map<std::string, Actuator*> & TwirreLidar::getActuators()

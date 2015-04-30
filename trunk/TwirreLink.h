@@ -9,6 +9,7 @@
 #define TWIRRELINK_H_
 
 #include <map>
+#include <set>
 #include <initializer_list>
 
 #include "Core/Actuator.h"
@@ -22,17 +23,20 @@ namespace twirre
 	 */
 	class TwirreLink
 	{
+		friend class DeviceProvider;
 	public:
 		/**
 		 * Create an empty TwirreLink
 		 */
 		TwirreLink();
 
+		~TwirreLink();
+
 		/**
 		 * Create a TwirreLink, immediately adding a DeviceProvider
 		 * @param prov the provider to add
 		 */
-		TwirreLink(DeviceProvider& prov);
+		explicit TwirreLink(DeviceProvider& prov);
 
 		/**
 		 * Create a Twirrelink, immediately adding all DeviceProviders
@@ -40,6 +44,25 @@ namespace twirre
 		 */
 		TwirreLink(const std::vector<DeviceProvider *> & provs);
 
+		/**
+		 * Copy constructor
+		 */
+		TwirreLink(const TwirreLink & other);
+
+		/**
+		 * Move constructor
+		 */
+		TwirreLink(TwirreLink && other);
+
+		/**
+		 * Copy assignment operator
+		 */
+		TwirreLink& operator = (const TwirreLink & other);
+
+		/**
+		 * Move assignment operator
+		 */
+		TwirreLink& operator = (TwirreLink && other);
 
 
 		/**
@@ -49,7 +72,9 @@ namespace twirre
 		 *
 		 * @param prov the device provider to register
 		 */
-		void addProvider(DeviceProvider& prov);
+		void addProvider(DeviceProvider& prov, bool update = true);
+
+		void removeProvider(DeviceProvider& prov);
 
 		/**
 		 * Get all registered actuators
@@ -107,6 +132,10 @@ namespace twirre
 		Actuator& getActuator(const std::string & actuatorName);
 
 	private:
+		void notifyChange();
+		void removeLink(DeviceProvider * which); //called by DeviceProvider's destructor
+
+		std::set<DeviceProvider *> _providers;
 		std::map<std::string, Actuator*> _actuatorList;
 		std::map<std::string, Sensor*> _sensorList;
 	};
