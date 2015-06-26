@@ -35,7 +35,7 @@ namespace twirre
 		_waitLock.wait(lock, [this](){return !_isOwned;});
 
 		//update ownership
-		_ownerId == std::this_thread::get_id();
+		_ownerId = std::this_thread::get_id();
 		_isOwned = true;
 	}
 
