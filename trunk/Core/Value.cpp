@@ -56,6 +56,7 @@ using namespace std;
 	template <typename T>																		\
 	void ValueImpl<T>::set(const SET_T val ) 													\
 	{ 																							\
+		if(_actuatorMutex) _actuatorMutex->lock();												\
 		_modified = true;																		\
 		_val = static_cast<T>(val);																\
 	}																							\
@@ -70,6 +71,7 @@ using namespace std;
 	template <typename T>																		\
 	void ValueImpl<T>::set(const SET_T * vals, const uint16_t size)								\
 	{																							\
+		if(_actuatorMutex) _actuatorMutex->lock();												\
 		if(size > 0)																			\
 			_val = static_cast<T>(vals[0]);														\
 		_modified = true;																		\
@@ -78,6 +80,7 @@ using namespace std;
 	template <typename T>																		\
 	void ArrayValue<T>::set(const SET_T * vals, const uint16_t size)							\
 	{																							\
+		if(_actuatorMutex) _actuatorMutex->lock();												\
 		_modified = true;																		\
 		_size = size;																			\
 		if(_size != 0)																			\
@@ -120,7 +123,10 @@ const string& Value::getName()
 	return _name;
 }
 
-Parameter::Parameter(const string n) : Value(n), _modified(false)
+Parameter::Parameter(const string n) : Parameter(n, nullptr)
+{ }
+
+Parameter::Parameter(const string n, owned_mutex * actuatorMutex) : Value(n), _modified(false), _actuatorMutex(actuatorMutex)
 { }
 
 bool Parameter::isModified() const
@@ -135,6 +141,10 @@ void Parameter::resetModified()
 
 template <typename T>
 ValueImpl<T>::ValueImpl(const string n, T val) : Parameter(n),_val(val)
+{ }
+
+template <typename T>
+ValueImpl<T>::ValueImpl(const string n, T val, owned_mutex * actuatorMutex) : Parameter(n, actuatorMutex),_val(val)
 { }
 
 template <typename T>
@@ -178,7 +188,11 @@ ArrayValue<T>::ArrayValue(const string name) : Parameter(name), _val(nullptr), _
 { }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._name), _size(other._size)
+ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex) : Parameter(name, actuatorMutex), _val(nullptr), _size(0)
+{ }
+
+template <typename T>
+ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._name, other._actuatorMutex), _size(other._size)
 {
 	//make a copy of the _value buffer
 	if(_size > 0)
@@ -190,7 +204,7 @@ ArrayValue<T>::ArrayValue(const ArrayValue<T> & other) : Parameter(other._name),
 }
 
 template <typename T>
-ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._name), _size(other._size)
+ArrayValue<T>::ArrayValue(ArrayValue<T> && other) noexcept : Parameter(other._name, other._actuatorMutex), _size(other._size)
 {
 	//swap pointers
 	_val = other._val;
@@ -209,12 +223,17 @@ ArrayValue<T> & ArrayValue<T>::operator = (const ArrayValue<T> & other)
 template <typename T>
 ArrayValue<T> & ArrayValue<T>::operator = (ArrayValue<T> && other) noexcept
 {
+	if(_actuatorMutex) _actuatorMutex->lock();
+
 	//need to swap data
 	std::swap(_val, other._val);
 
 	//can move other stuff
 	_size = std::move(other._size);
 	_name = std::move(other._name);
+
+	//set modified
+	_modified = true;
 
 	return *this;
 }
@@ -246,7 +265,10 @@ void ArrayValue<T>::copyTo(Parameter * parm) const
 	else if(_size > 0)
 		parm->set(_val[0]);
 	else
+	{
+		if(parm->_actuatorMutex) parm->_actuatorMutex->lock();
 		parm->_modified = true;
+	}
 }
 
 template <typename T>
@@ -276,16 +298,20 @@ T* ArrayValue<T>::getNativeBuffer()
 template <typename T>
 void ArrayValue<T>::setSize(uint16_t size)
 {
+	if(_actuatorMutex) _actuatorMutex->lock();
 	_size = size;
 	_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
+	_modified = true;
 }
 
 template <typename T>
 void ArrayValue<T>::setNative(T* data, uint16_t size)
 {
+	if(_actuatorMutex) _actuatorMutex->lock();
 	_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
 	_size = size;
 	memcpy(_val, data, size * sizeof(T));
+	_modified = true;
 }
 
 ErrorValue *ErrorValue::_instance = nullptr;

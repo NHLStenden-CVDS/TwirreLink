@@ -7,7 +7,11 @@
 #ifndef ACTUATOR_H_
 #define ACTUATOR_H_
 
+
+#include <mutex>
+
 #include "Device.h"
+#include "owned_mutex.h"
 
 namespace twirre
 {
@@ -72,13 +76,16 @@ public:
 	//this forwards to GetParameter(name)
 	virtual Parameter & operator[] (const std::string & name);
 
+	void Actuate() final;
+
 	/**
 	 * Update this Actuator using the modified parameters
 	 */
-	virtual void Actuate() = 0;
+	virtual void ActuateImpl() = 0;
 
 protected:
 	std::map<std::string, Parameter*> _parametersList;
+	owned_mutex _actuateMutex; //lock actuator from first value set until actuation
 };
 
 } /* namespace twirre */

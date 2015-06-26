@@ -13,6 +13,8 @@
 #include <vector>
 #include <Serial/SerialRW.h>
 
+#include "Core/owned_mutex.h"
+
 namespace twirre
 {
 	class Parameter;
@@ -72,6 +74,7 @@ namespace twirre
 		template <typename T> friend class ArrayValue;
 	public:
 		Parameter(const std::string name);
+		Parameter(const std::string name, owned_mutex * actuatorMutex);
 		virtual ~Parameter()
 		{
 		}
@@ -122,6 +125,7 @@ namespace twirre
 
 	protected:
 		bool _modified;
+		owned_mutex * _actuatorMutex;
 	};
 
 	template<typename T>
@@ -129,6 +133,7 @@ namespace twirre
 	{
 	public:
 		ValueImpl(const std::string name, T val);
+		ValueImpl(const std::string name, T val, owned_mutex * actuatorMutex);
 		virtual ~ValueImpl()
 		{
 		}
@@ -205,6 +210,7 @@ namespace twirre
 	{
 	public:
 		ArrayValue(const std::string name);
+		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
 		virtual ~ArrayValue() noexcept;
 
 		/* copy, move constructors and operators */

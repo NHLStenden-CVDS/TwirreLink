@@ -74,4 +74,16 @@ namespace twirre
 		return GetParameter(name);
 	}
 
+	void Actuator::Actuate()
+	{
+		//lock the owned_mutex
+		_actuateMutex.lock();
+
+		//call actuation implementation
+		ActuateImpl();
+
+		//unlock the owned mutex
+		_actuateMutex.unlock();
+	}
+
 } /* namespace twirre */
