@@ -15,7 +15,7 @@ namespace twirre
 class SerialActuator: public Actuator, public SerialDevice
 {
 public:
-	SerialActuator(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string parametersString);
+	SerialActuator(const uint8_t id, const std::string name, const std::string description, SerialRW & serialRW, const std::string parametersString, std::mutex & mutex);
 	~SerialActuator();
 
 	/*
@@ -37,6 +37,7 @@ public:
 protected:
 	void _ProcessParametersString(const std::string & s);
 	SerialRW& _serial;
+	std::mutex & _serialMutex;
 };
 
 } /* namespace twirre */

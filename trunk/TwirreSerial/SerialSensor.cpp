@@ -20,8 +20,8 @@ using namespace std;
 namespace twirre
 {
 
-	SerialSensor::SerialSensor(const int id, const string name, const string description, SerialRW & serialRW, const string valuesString) :
-			Sensor(name, description), SerialDevice(id), _serial(serialRW)
+	SerialSensor::SerialSensor(const int id, const string name, const string description, SerialRW & serialRW, const string valuesString, std::mutex & mutex) :
+			Sensor(name, description), SerialDevice(id), _serial(serialRW), _serialMutex(mutex)
 	{
 		_ProcessValuesString(valuesString);
 	}
@@ -71,17 +71,22 @@ namespace twirre
 			message[nextId++] = dynamic_cast<SerialValue *>(val)->getID();
 		}
 
-		_serial.writeBytes(message, values.size() + 4);
-
-		delete message;
-
-		if (TwirreSerial::CheckOk(_serial))
+		//serial comm block
 		{
-			for (const auto& val : values)
+			std::lock_guard lock(_serialMutex);
+
+			_serial.writeBytes(message, values.size() + 4);
+
+			if (TwirreSerial::CheckOk(_serial))
 			{
-				dynamic_cast<SerialValue*>(val)->updateFromSerial();
+				for (const auto& val : values)
+				{
+					dynamic_cast<SerialValue*>(val)->updateFromSerial();
+				}
 			}
 		}
+
+		delete message;
 
 		return valuesMap;
 	}

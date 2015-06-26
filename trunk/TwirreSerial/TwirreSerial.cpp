@@ -115,7 +115,9 @@ namespace twirre
 
 	bool TwirreSerial::Ping()
 	{
-		TwirreSerial::_serial.Write('P');
+		std::lock_guard lock(_serialMutex);
+
+		_serial.Write('P');
 		return _serial.Read<char>() == 'P';
 	}
 

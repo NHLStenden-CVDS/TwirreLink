@@ -5,6 +5,7 @@
  *      Author: root
  */
 #include <vector>
+#include <mutex>
 
 #include "TwirreSerial/TwirreSerial.h"
 #include "TwirreSerial/SerialValue.h"
@@ -17,8 +18,8 @@ using namespace std;
 namespace twirre
 {
 
-	SerialActuator::SerialActuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString) :
-			Actuator(name, description), SerialDevice(id), _serial(serialRW)
+	SerialActuator::SerialActuator(const uint8_t id, const string name, const string description, SerialRW & serialRW, const string parametersString, std::mutex & mutex) :
+			Actuator(name, description), SerialDevice(id), _serial(serialRW), _serialMutex(mutex)
 	{
 		_ProcessParametersString(parametersString);
 	}
@@ -61,11 +62,16 @@ namespace twirre
 		//overwrite payload size with new value
 		*reinterpret_cast<uint16_t*>(&(message.data()[2])) = static_cast<uint16_t>(message.size() - 4);
 
-		//transmit message
-		_serial.writeBytes(message.data(), message.size());
+		//serial comm block
+		{
+			std::lock_guard lock(_serialMutex);
 
-		//check response
-		TwirreSerial::CheckOk(_serial);
+			//transmit message
+			_serial.writeBytes(message.data(), message.size());
+
+			//check response
+			TwirreSerial::CheckOk(_serial);
+		}
 	}
 
 	void SerialActuator::_ProcessParametersString(const string & s)

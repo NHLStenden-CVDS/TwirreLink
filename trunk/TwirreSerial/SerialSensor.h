@@ -8,6 +8,7 @@
 #define SERIALSENSOR_H_
 
 #include <vector>
+#include <mutex>
 
 #include "Core/Sensor.h"
 
@@ -16,7 +17,7 @@ namespace twirre
 	class SerialSensor: public Sensor, public SerialDevice
 	{
 	public:
-		SerialSensor(const int id, const std::string name, const std::string description, SerialRW & serialRW, const std::string valuesString);
+		SerialSensor(const int id, const std::string name, const std::string description, SerialRW & serialRW, const std::string valuesString, std::mutex & mutex);
 		virtual ~SerialSensor();
 
 		/*
@@ -36,6 +37,7 @@ namespace twirre
 		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) override;
 	protected:
 		SerialRW & _serial;
+		std::mutex & _serialMutex;
 		void _ProcessValuesString(const std::string & s);
 	};
 

@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "Core/Actuator.h"
 #include "Core/Sensor.h"
@@ -38,6 +39,7 @@ private:
 	std::map<std::string, Actuator*> _actuatorList;
 	std::map<std::string, Sensor*> _sensorList;
 	SerialRW _serial;
+	std::mutex _serialMutex; //mutex for all post-init serial actions
 
 	template<typename T, typename V> bool _ProcessInitString(const std::string & s, std::map<std::string, T*> &deviceList);
 	bool _InitActuators();
