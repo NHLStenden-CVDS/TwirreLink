@@ -16,6 +16,8 @@
 #include "Serial/SerialRW.h"
 
 #include "Core/Value.h"
+#include "Core/owned_mutex.h"
+
 
 namespace twirre
 {
@@ -38,7 +40,7 @@ namespace twirre
 	class SerialValueImpl: public ValueImpl<T>, public SerialValue
 	{
 	public:
-		SerialValueImpl(const uint8_t ID, const std::string name, T val, SerialRW & srw);
+		SerialValueImpl(const uint8_t ID, const std::string name, T val, SerialRW & srw, owned_mutex * actuateMutex = nullptr);
 		virtual ~SerialValueImpl() {};
 	protected:
 		virtual void updateFromSerial() override;
@@ -49,7 +51,7 @@ namespace twirre
 	class SerialArrayValue: public ArrayValue<T>, public SerialValue
 	{
 	public:
-		SerialArrayValue(const uint8_t ID, const std::string name, SerialRW & srw);
+		SerialArrayValue(const uint8_t ID, const std::string name, SerialRW & srw, owned_mutex * actuateMutex = nullptr);
 		virtual ~SerialArrayValue() {};
 	protected:
 		virtual void updateFromSerial() override;

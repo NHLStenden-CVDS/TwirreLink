@@ -28,15 +28,15 @@ namespace twirre
 	}
 
 	template<typename T>
-	SerialValueImpl<T>::SerialValueImpl(const uint8_t ID, const std::string name, T val, SerialRW & srw) :
-			ValueImpl<T>(name, val), SerialValue(ID, srw)
+	SerialValueImpl<T>::SerialValueImpl(const uint8_t ID, const std::string name, T val, SerialRW & srw, owned_mutex * mutex) :
+			ValueImpl<T>(name, val, mutex), SerialValue(ID, srw)
 	{
 
 	}
 
 	template<typename T>
-	SerialArrayValue<T>::SerialArrayValue(const uint8_t ID, const std::string name, SerialRW & srw) :
-			ArrayValue<T>(name), SerialValue(ID, srw)
+	SerialArrayValue<T>::SerialArrayValue(const uint8_t ID, const std::string name, SerialRW & srw, owned_mutex * mutex) :
+			ArrayValue<T>(name, mutex), SerialValue(ID, srw)
 	{
 
 	}

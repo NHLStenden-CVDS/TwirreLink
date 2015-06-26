@@ -32,7 +32,7 @@ public:
 	//disable move assignment
 	SerialActuator& operator=(SerialActuator&&) = delete;
 
-	virtual void Actuate() override;
+	virtual void ActuateImpl() override;
 
 protected:
 	void _ProcessParametersString(const std::string & s);

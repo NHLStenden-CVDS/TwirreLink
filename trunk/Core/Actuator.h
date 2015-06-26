@@ -76,7 +76,7 @@ public:
 	//this forwards to GetParameter(name)
 	virtual Parameter & operator[] (const std::string & name);
 
-	void Actuate() final;
+	void Actuate();
 
 	/**
 	 * Update this Actuator using the modified parameters

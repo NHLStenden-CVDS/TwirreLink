@@ -100,7 +100,7 @@ namespace twirre
 					Helper::split(deviceStrings[i], '|', deviceInformation);
 
 					// input: id, name, description, serial interface
-					T* device = new V(i, deviceInformation[0], deviceInformation[1], _serial, deviceInformation[2]);
+					T* device = new V(i, deviceInformation[0], deviceInformation[1], _serial, deviceInformation[2], _serialMutex);
 
 					cout << device->ToString() << endl;
 
@@ -115,7 +115,7 @@ namespace twirre
 
 	bool TwirreSerial::Ping()
 	{
-		std::lock_guard lock(_serialMutex);
+		std::lock_guard<std::mutex> lock(_serialMutex);
 
 		_serial.Write('P');
 		return _serial.Read<char>() == 'P';

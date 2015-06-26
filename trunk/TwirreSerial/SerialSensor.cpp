@@ -73,7 +73,7 @@ namespace twirre
 
 		//serial comm block
 		{
-			std::lock_guard lock(_serialMutex);
+			std::lock_guard<std::mutex> lock(_serialMutex);
 
 			_serial.writeBytes(message, values.size() + 4);
 
