@@ -43,7 +43,7 @@ namespace twirre
 		virtual std::map<std::string, Value*> peekValues(const std::vector<std::string> &names);
 
 		virtual Value & Sense(const std::string &name);
-		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) = 0;
+		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names);
 
 		virtual Value & operator[](const std::string &name);
 		virtual std::map<std::string, Value*> operator[](const std::vector<std::string> &names);
@@ -51,6 +51,8 @@ namespace twirre
 		virtual std::string ToString() override;
 	protected:
 		std::map<std::string, Value*> _valueList;
+	private:
+		void registerValue(Value* T);
 	};
 
 } /* namespace twirre */

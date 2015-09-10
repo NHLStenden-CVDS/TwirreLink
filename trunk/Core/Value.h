@@ -138,6 +138,8 @@ namespace twirre
 		{
 		}
 
+		T& nativeValue();
+
 		virtual uint8_t as_uint8_t() override;
 		virtual int8_t as_int8_t() override;
 		virtual uint16_t as_uint16_t() override;
@@ -212,6 +214,8 @@ namespace twirre
 		ArrayValue(const std::string name);
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
 		virtual ~ArrayValue() noexcept;
+
+		T*& nativeValue();
 
 		/* copy, move constructors and operators */
 		ArrayValue(const ArrayValue<T> & val);

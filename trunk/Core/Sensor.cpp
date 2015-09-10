@@ -106,6 +106,30 @@ namespace twirre
 		return *Sense(vector<string>{ valueName })[valueName];
 	}
 
+	std::map<std::string, Value*> Sensor::Sense(const std::vector<std::string> &names)
+	{
+		std::map<std::string, Value*> returnValues;
+
+		for(auto & name : names)
+		{
+			//Add each requested value if it exists, and hasn't been added yet
+			if(_valueList.find(name) != _valueList.end())
+			{
+				if(returnValues.find(name) == _valueList.end())
+				{
+					returnValues[name] = _valueList[name];
+				}
+			}
+			else
+			{
+				//The requested value does not exist, add a pointer to ErrorValue instead
+				returnValues[name] = ErrorValue::getInstance();
+			}
+		}
+
+		return returnValues;
+	}
+
 	Value & Sensor::operator[](const string &name)
 	{
 		return Sense(name);
@@ -131,5 +155,11 @@ namespace twirre
 		return s;
 	}
 
+	void Sensor::registerValue(Value* val)
+	{
+		_valueList[val->getName()] = val;
+	}
+
 } /* namespace twirre */
+
 

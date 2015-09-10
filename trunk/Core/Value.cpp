@@ -140,6 +140,12 @@ void Parameter::resetModified()
 }
 
 template <typename T>
+T& ValueImpl<T>::nativeValue()
+{
+	return _val;
+}
+
+template <typename T>
 ValueImpl<T>::ValueImpl(const string n, T val) : Parameter(n),_val(val)
 { }
 
@@ -181,6 +187,12 @@ template <typename T>
 void * ValueImpl<T>::getBuffer()
 {
 	return reinterpret_cast<void *>(&_val);
+}
+
+template <typename T>
+T*& ArrayValue<T>::nativeValue()
+{
+	return _val;
 }
 
 template <typename T>
