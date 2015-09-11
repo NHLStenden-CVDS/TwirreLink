@@ -86,4 +86,9 @@ namespace twirre
 		_actuateMutex.unlock();
 	}
 
+	void Actuator::registerParameter(Parameter* val)
+	{
+		_parametersList[val->getName()] = val;
+	}
+
 } /* namespace twirre */
