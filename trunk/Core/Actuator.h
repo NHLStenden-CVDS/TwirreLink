@@ -81,6 +81,7 @@ namespace twirre
 		std::map<std::string, Parameter*> _parametersList;
 		owned_mutex _actuateMutex; //lock actuator from first value set until actuation
 		void registerParameter(Parameter* val);
+		void registerParameters(std::vector<Parameter *> parms);
 
 		/**
 		 * Update this Actuator using the modified parameters

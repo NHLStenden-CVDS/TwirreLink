@@ -86,9 +86,17 @@ namespace twirre
 		_actuateMutex.unlock();
 	}
 
-	void Actuator::registerParameter(Parameter* val)
+	void Actuator::registerParameter(Parameter* parm)
 	{
-		_parametersList[val->getName()] = val;
+		_parametersList[parm->getName()] = parm;
+	}
+
+	void Actuator::registerParameters(std::vector<Parameter *> parms)
+	{
+		for(auto parm : parms)
+		{
+			registerParameter(parm);
+		}
 	}
 
 } /* namespace twirre */

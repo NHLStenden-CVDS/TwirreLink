@@ -160,6 +160,14 @@ namespace twirre
 		_valueList[val->getName()] = val;
 	}
 
+	void Sensor::registerValues(std::vector<Value*> vals)
+	{
+		for(auto val : vals)
+		{
+			registerValue(val);
+		}
+	}
+
 } /* namespace twirre */
 
 

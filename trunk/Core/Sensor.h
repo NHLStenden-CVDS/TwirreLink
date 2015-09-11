@@ -52,7 +52,8 @@ namespace twirre
 	protected:
 		std::map<std::string, Value*> _valueList;
 	private:
-		void registerValue(Value* T);
+		void registerValue(Value* val);
+		void registerValues(std::vector<Value *> vals);
 	};
 
 } /* namespace twirre */
