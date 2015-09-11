@@ -26,7 +26,10 @@ namespace twirre
 
 	SerialActuator::~SerialActuator()
 	{
-
+		for(auto & pair : _parametersList)
+		{
+			delete pair.second;
+		}
 	}
 
 	void SerialActuator::ActuateImpl()
@@ -108,7 +111,7 @@ namespace twirre
 			if (!nameAndType[1].compare("A:F")) value = new SerialArrayValue<float>(i, nameAndType[0], _serial, &_actuateMutex);
 			if (!nameAndType[1].compare("A:D")) value = new SerialArrayValue<double>(i, nameAndType[0], _serial, &_actuateMutex);
 
-			_parametersList.insert(pair<string, Parameter*>(nameAndType[0], value));
+			registerParameter(value);
 		}
 	}
 

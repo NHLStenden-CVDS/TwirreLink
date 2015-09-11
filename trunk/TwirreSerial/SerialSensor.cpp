@@ -28,6 +28,10 @@ namespace twirre
 
 	SerialSensor::~SerialSensor()
 	{
+		for(auto & pair : _valueList)
+		{
+			delete pair.second;
+		}
 	}
 
 	/**
@@ -124,7 +128,7 @@ namespace twirre
 			if (!nameAndType[1].compare("A:F")) value = new SerialArrayValue<float>(i, nameAndType[0], _serial);
 			if (!nameAndType[1].compare("A:D")) value = new SerialArrayValue<double>(i, nameAndType[0], _serial);
 
-			_valueList.insert(pair<string, Value*>(nameAndType[0], value));
+			registerValue(value);
 		}
 	}
 } /* namespace twirre */

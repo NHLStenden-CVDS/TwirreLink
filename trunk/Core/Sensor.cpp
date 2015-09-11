@@ -24,10 +24,7 @@ namespace twirre
 
 	Sensor::~Sensor()
 	{
-		for(const auto & valuePair : _valueList)
-		{
-			delete valuePair.second;
-		}
+
 	}
 
 	map<string, Value*> Sensor::SenseAll()

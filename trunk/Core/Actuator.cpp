@@ -24,10 +24,7 @@ namespace twirre
 
 	Actuator::~Actuator()
 	{
-		for (auto & paramPair : _parametersList)
-		{
-			delete paramPair.second;
-		}
+
 	}
 
 	vector<string> Actuator::getAvailableParameters()
