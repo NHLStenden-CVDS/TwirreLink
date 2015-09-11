@@ -19,6 +19,21 @@ namespace twirre
 {
 	class Parameter;
 
+	enum class NativeType
+	{
+		type_void,
+		type_int8,
+		type_uint8,
+		type_int16,
+		type_uint16,
+		type_int32,
+		type_uint32,
+		type_int64,
+		type_uint64,
+		type_float,
+		type_double
+	};
+
 	class Value
 	{
 		template<typename T> friend class ValueImpl;
@@ -32,6 +47,8 @@ namespace twirre
 
 		int GetSize();
 		void SetBuffer(unsigned char *buffer);
+
+		virtual NativeType getNativeType() = 0;
 
 		virtual uint8_t as_uint8_t() = 0;
 		virtual int8_t as_int8_t() = 0;
@@ -138,6 +155,7 @@ namespace twirre
 		{
 		}
 
+		virtual NativeType getNativeType() override;
 		T& nativeValue();
 
 		virtual uint8_t as_uint8_t() override;
@@ -215,6 +233,7 @@ namespace twirre
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
 		virtual ~ArrayValue() noexcept;
 
+		virtual NativeType getNativeType() override;
 		T*& nativeValue();
 
 		/* copy, move constructors and operators */
@@ -312,6 +331,8 @@ namespace twirre
 		{
 		}
 	public:
+		virtual NativeType getNativeType() override;
+
 		virtual uint8_t as_uint8_t() override;
 		virtual int8_t as_int8_t() override;
 		virtual uint16_t as_uint16_t() override;
