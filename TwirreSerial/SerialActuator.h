@@ -7,8 +7,8 @@
 #ifndef SERIALACTUATOR_H_
 #define SERIALACTUATOR_H_
 
-#include "Core/Actuator.h"
-#include "TwirreSerial/SerialDevice.h"
+#include "../Core/Actuator.h"
+#include "../TwirreSerial/SerialDevice.h"
 
 namespace twirre
 {

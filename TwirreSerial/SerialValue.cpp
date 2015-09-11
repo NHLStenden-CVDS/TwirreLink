@@ -8,9 +8,9 @@
 #include <stdexcept>
 #include <cstring>
 
-#include "Core/Value.h"
+#include "../Core/Value.h"
 
-#include "TwirreSerial/SerialValue.h"
+#include "../TwirreSerial/SerialValue.h"
 
 
 using namespace std;

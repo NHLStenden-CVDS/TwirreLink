@@ -1,6 +1,2 @@
-.cproject
-.settings/
-build/
-cmakeit
-Debug/
-*~
+/Release
+

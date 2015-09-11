@@ -12,11 +12,11 @@
 #include <cstdint>
 #include <vector>
 
-#include "TwirreSerial/SerialDevice.h"
-#include "Serial/SerialRW.h"
+#include "../TwirreSerial/SerialDevice.h"
+#include "../Serial/SerialRW.h"
 
-#include "Core/Value.h"
-#include "Core/owned_mutex.h"
+#include "../Core/Value.h"
+#include "../Core/owned_mutex.h"
 
 
 namespace twirre

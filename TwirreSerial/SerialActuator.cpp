@@ -7,11 +7,11 @@
 #include <vector>
 #include <mutex>
 
-#include "TwirreSerial/TwirreSerial.h"
-#include "TwirreSerial/SerialValue.h"
-#include "Support/Helper.h"
+#include "TwirreSerial.h"
+#include "SerialValue.h"
+#include "../Support/Helper.h"
 
-#include "TwirreSerial/SerialActuator.h"
+#include "../TwirreSerial/SerialActuator.h"
 
 using namespace std;
 

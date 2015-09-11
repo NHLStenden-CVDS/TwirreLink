@@ -9,11 +9,11 @@
 #include <vector>
 #include <algorithm>
 
-#include "Support/Helper.h"
-#include "TwirreSerial/SerialValue.h"
-#include "TwirreSerial/TwirreSerial.h"
+#include "../Support/Helper.h"
+#include "../TwirreSerial/SerialValue.h"
+#include "../TwirreSerial/TwirreSerial.h"
 
-#include "TwirreSerial/SerialSensor.h"
+#include "../TwirreSerial/SerialSensor.h"
 
 using namespace std;
 

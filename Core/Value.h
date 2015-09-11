@@ -11,9 +11,9 @@
 #include <string>
 #include <cstdint>
 #include <vector>
-#include <Serial/SerialRW.h>
+#include "../Serial/SerialRW.h"
 
-#include "Core/owned_mutex.h"
+#include "../Core/owned_mutex.h"
 
 namespace twirre
 {

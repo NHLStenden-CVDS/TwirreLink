@@ -7,9 +7,9 @@
 
 #include <vector>
 
-#include "Support/Helper.h"
+#include "../Support/Helper.h"
 
-#include "Core/Actuator.h"
+#include "../Core/Actuator.h"
 
 using namespace std;
 

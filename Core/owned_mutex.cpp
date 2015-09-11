@@ -5,7 +5,7 @@
  *      Author: m-r-d
  */
 
-#include <owned_mutex.h>
+#include "owned_mutex.h"
 #include <stdexcept>
 
 

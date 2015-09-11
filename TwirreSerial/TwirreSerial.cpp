@@ -9,11 +9,11 @@
 #include <iostream>
 #include <chrono>
 
-#include "TwirreSerial/SerialActuator.h"
-#include "TwirreSerial/SerialSensor.h"
-#include "Support/Helper.h"
+#include "../TwirreSerial/SerialActuator.h"
+#include "../TwirreSerial/SerialSensor.h"
+#include "../Support/Helper.h"
 
-#include "TwirreSerial/TwirreSerial.h"
+#include "../TwirreSerial/TwirreSerial.h"
 
 using namespace twirre;
 using namespace std;

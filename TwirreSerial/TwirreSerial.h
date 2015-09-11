@@ -12,13 +12,13 @@
 #include <string>
 #include <mutex>
 
-#include "Core/Actuator.h"
-#include "Core/Sensor.h"
-#include "Core/Value.h"
+#include "../Core/Actuator.h"
+#include "../Core/Sensor.h"
+#include "../Core/Value.h"
 
-#include "Serial/SerialRW.h"
+#include "../Serial/SerialRW.h"
 
-#include "DeviceProvider.h"
+#include "../DeviceProvider.h"
 
 namespace twirre
 {

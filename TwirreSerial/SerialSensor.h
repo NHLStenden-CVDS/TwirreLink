@@ -10,7 +10,7 @@
 #include <vector>
 #include <mutex>
 
-#include "Core/Sensor.h"
+#include "../Core/Sensor.h"
 
 namespace twirre
 {

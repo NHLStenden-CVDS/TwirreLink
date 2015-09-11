@@ -8,9 +8,9 @@
 
 #include <vector>
 #include <algorithm>
-#include "Helper.h"
+#include "../Support/Helper.h"
 
-#include "Core/Sensor.h"
+#include "../Core/Sensor.h"
 
 using namespace std;
 

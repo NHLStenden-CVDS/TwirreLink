@@ -12,9 +12,9 @@ mkdir $INC_DIR/Core
 mkdir $INC_DIR/TwirreSerial
 mkdir $INC_DIR/Serial
 
-cp build/libtwirrelink.so $LIB_DIR/
-cp trunk/*.h $INC_DIR/
-cp trunk/Core/*.h $INC_DIR/Core/
-cp trunk/TwirreSerial/TwirreSerial.h $INC_DIR/TwirreSerial/
-cp trunk/Serial/SerialRW.h $INC_DIR/Serial/
+cp Release/libtwirrelink.so $LIB_DIR/
+cp *.h $INC_DIR/
+cp Core/*.h $INC_DIR/Core/
+cp TwirreSerial/TwirreSerial.h $INC_DIR/TwirreSerial/
+cp Serial/SerialRW.h $INC_DIR/Serial/
 
