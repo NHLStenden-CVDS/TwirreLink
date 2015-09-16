@@ -11,6 +11,7 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include <shared_mutex>
 #include "../Serial/SerialRW.h"
 
 #include "../Core/owned_mutex.h"
@@ -83,7 +84,7 @@ namespace twirre
 	protected:
 		virtual void copyTo(Parameter* parm) const = 0;
 		std::string _name;
-
+		std::shared_timed_mutex _rwMutex;
 	};
 
 	class Parameter: public Value
@@ -156,7 +157,8 @@ namespace twirre
 		}
 
 		virtual NativeType getNativeType() override;
-		T& nativeValue();
+		T getNativeValue();
+		void setNativeValue(T val);
 
 		virtual uint8_t as_uint8_t() override;
 		virtual int8_t as_int8_t() override;
@@ -234,7 +236,7 @@ namespace twirre
 		virtual ~ArrayValue() noexcept;
 
 		virtual NativeType getNativeType() override;
-		T*& nativeValue();
+		T* nativeValue();
 
 		/* copy, move constructors and operators */
 		ArrayValue(const ArrayValue<T> & val);
