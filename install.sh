@@ -16,3 +16,4 @@ cp Core/*.h $INC_DIR/Core/
 cp TwirreSerial/TwirreSerial.h $INC_DIR/TwirreSerial/
 cp Serial/SerialRW.h $INC_DIR/Serial/
 
+ldconfig
