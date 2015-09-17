@@ -35,20 +35,20 @@ using namespace std;
 	}																							\
 																								\
 	template <typename T>																		\
-	GET_T ValueImpl<T>::as_##GET_T (uint16_t id)												\
+	GET_T ValueImpl<T>::as_##GET_T (uint32_t id)												\
 	{																							\
 		if(id > 0) throw std::out_of_range("index out of bounds on single-element value"); 		\
 		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		return as_##GET_T ();																	\
 	}																							\
 	template <typename T>																		\
-	GET_T ArrayValue<T>::as_##GET_T (uint16_t id)												\
+	GET_T ArrayValue<T>::as_##GET_T (uint32_t id)												\
 	{																							\
 		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		if(id >= _size) throw std::out_of_range("index out of bounds on value array"); 			\
 		return static_cast<GET_T>(_val[id]);													\
 	}																							\
-	GET_T ErrorValue::as_##GET_T (uint16_t)														\
+	GET_T ErrorValue::as_##GET_T (uint32_t)														\
 	{																							\
 		throw std::out_of_range("tried to access ErrorValue by index"); 						\
 		return GET_T(0); /*keep compiler happy*/												\
@@ -73,7 +73,7 @@ using namespace std;
 	{}																							\
 																								\
 	template <typename T>																		\
-	void ValueImpl<T>::set(const SET_T * vals, const uint16_t size)								\
+	void ValueImpl<T>::set(const SET_T * vals, const uint32_t size)								\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
 		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
@@ -83,7 +83,7 @@ using namespace std;
 		std::cerr << "warning: tried to use array set on single-element value" << std::endl;	\
 	}																							\
 	template <typename T>																		\
-	void ArrayValue<T>::set(const SET_T * vals, const uint16_t size)							\
+	void ArrayValue<T>::set(const SET_T * vals, const uint32_t size)							\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
 		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
@@ -103,7 +103,7 @@ using namespace std;
 			_val = nullptr;																		\
 		}																						\
 	}																							\
-	void ErrorValue::set(const SET_T *, const uint16_t)											\
+	void ErrorValue::set(const SET_T *, const uint32_t)											\
 	{																							\
 		std::cerr << "warning: tried to use array set on error value" << std::endl;				\
 	}																							\
@@ -111,16 +111,16 @@ using namespace std;
 	template <typename T>																		\
 	void ValueImpl<T>::set(const vector<SET_T>& vals)											\
 	{																							\
-		set(vals.data(), static_cast<const uint16_t>(vals.size()));								\
+		set(vals.data(), static_cast<const uint32_t>(vals.size()));								\
 	}																							\
 	template <typename T>																		\
 	void ArrayValue<T>::set(const vector<SET_T>& vals)											\
 	{																							\
-		set(vals.data(), static_cast<const uint16_t>(vals.size()));								\
+		set(vals.data(), static_cast<const uint32_t>(vals.size()));								\
 	}																							\
 	void ErrorValue::set(const vector<SET_T>& vals)												\
 	{																							\
-		set(vals.data(), static_cast<const uint16_t>(vals.size()));								\
+		set(vals.data(), static_cast<const uint32_t>(vals.size()));								\
 	}
 
 namespace twirre
@@ -260,7 +260,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	uint16_t ValueImpl<T>::getSize() const
+	uint32_t ValueImpl<T>::getSize() const
 	{
 		return 1;
 	}
@@ -384,7 +384,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	uint16_t ArrayValue<T>::getSize() const
+	uint32_t ArrayValue<T>::getSize() const
 	{
 		return _size;
 	}
@@ -408,7 +408,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	void ArrayValue<T>::setSize(uint16_t size)
+	void ArrayValue<T>::setSize(uint32_t size)
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
 		_size = size;
@@ -417,7 +417,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	void ArrayValue<T>::setNative(T* data, uint16_t size)
+	void ArrayValue<T>::setNative(T* data, uint32_t size)
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
 		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
@@ -454,7 +454,7 @@ namespace twirre
 		return false;
 	}
 
-	uint16_t ErrorValue::getSize() const
+	uint32_t ErrorValue::getSize() const
 	{
 		return 0;
 	}

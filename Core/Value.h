@@ -62,20 +62,20 @@ namespace twirre
 		virtual float as_float() = 0;
 		virtual double as_double() = 0;
 
-		virtual uint8_t as_uint8_t(uint16_t index) = 0;
-		virtual int8_t as_int8_t(uint16_t index) = 0;
-		virtual uint16_t as_uint16_t(uint16_t index) = 0;
-		virtual int16_t as_int16_t(uint16_t index) = 0;
-		virtual uint32_t as_uint32_t(uint16_t index) = 0;
-		virtual int32_t as_int32_t(uint16_t index) = 0;
-		virtual uint64_t as_uint64_t(uint16_t index) = 0;
-		virtual int64_t as_int64_t(uint16_t index) = 0;
-		virtual float as_float(uint16_t index) = 0;
-		virtual double as_double(uint16_t index) = 0;
+		virtual uint8_t as_uint8_t(uint32_t index) = 0;
+		virtual int8_t as_int8_t(uint32_t index) = 0;
+		virtual uint16_t as_uint16_t(uint32_t index) = 0;
+		virtual int16_t as_int16_t(uint32_t index) = 0;
+		virtual uint32_t as_uint32_t(uint32_t index) = 0;
+		virtual int32_t as_int32_t(uint32_t index) = 0;
+		virtual uint64_t as_uint64_t(uint32_t index) = 0;
+		virtual int64_t as_int64_t(uint32_t index) = 0;
+		virtual float as_float(uint32_t index) = 0;
+		virtual double as_double(uint32_t index) = 0;
 
 		const std::string& getName();
 
-		virtual uint16_t getSize() const = 0;
+		virtual uint32_t getSize() const = 0;
 		virtual size_t getElementSize() const = 0;
 		virtual void* getBuffer() = 0;
 
@@ -109,16 +109,16 @@ namespace twirre
 		virtual void set(const double val) = 0;
 		virtual void set(const Value& val) = 0;
 
-		virtual void set(const uint8_t * vals, const uint16_t size) = 0;
-		virtual void set(const int8_t * vals, const uint16_t size) = 0;
-		virtual void set(const uint16_t * vals, const uint16_t size) = 0;
-		virtual void set(const int16_t * vals, const uint16_t size) = 0;
-		virtual void set(const uint32_t * vals, const uint16_t size) = 0;
-		virtual void set(const int32_t * vals, const uint16_t size) = 0;
-		virtual void set(const uint64_t * vals, const uint16_t size) = 0;
-		virtual void set(const int64_t * vals, const uint16_t size) = 0;
-		virtual void set(const float * vals, const uint16_t size) = 0;
-		virtual void set(const double * vals, const uint16_t size) = 0;
+		virtual void set(const uint8_t * vals, const uint32_t size) = 0;
+		virtual void set(const int8_t * vals, const uint32_t size) = 0;
+		virtual void set(const uint16_t * vals, const uint32_t size) = 0;
+		virtual void set(const int16_t * vals, const uint32_t size) = 0;
+		virtual void set(const uint32_t * vals, const uint32_t size) = 0;
+		virtual void set(const int32_t * vals, const uint32_t size) = 0;
+		virtual void set(const uint64_t * vals, const uint32_t size) = 0;
+		virtual void set(const int64_t * vals, const uint32_t size) = 0;
+		virtual void set(const float * vals, const uint32_t size) = 0;
+		virtual void set(const double * vals, const uint32_t size) = 0;
 
 		virtual void set(const std::vector<uint8_t>& vals) = 0;
 		virtual void set(const std::vector<int8_t>& vals) = 0;
@@ -171,16 +171,16 @@ namespace twirre
 		virtual float as_float() override;
 		virtual double as_double() override;
 
-		virtual uint8_t as_uint8_t(uint16_t index) override;
-		virtual int8_t as_int8_t(uint16_t index) override;
-		virtual uint16_t as_uint16_t(uint16_t index) override;
-		virtual int16_t as_int16_t(uint16_t index) override;
-		virtual uint32_t as_uint32_t(uint16_t index) override;
-		virtual int32_t as_int32_t(uint16_t index) override;
-		virtual uint64_t as_uint64_t(uint16_t index) override;
-		virtual int64_t as_int64_t(uint16_t index) override;
-		virtual float as_float(uint16_t index) override;
-		virtual double as_double(uint16_t index) override;
+		virtual uint8_t as_uint8_t(uint32_t index) override;
+		virtual int8_t as_int8_t(uint32_t index) override;
+		virtual uint16_t as_uint16_t(uint32_t index) override;
+		virtual int16_t as_int16_t(uint32_t index) override;
+		virtual uint32_t as_uint32_t(uint32_t index) override;
+		virtual int32_t as_int32_t(uint32_t index) override;
+		virtual uint64_t as_uint64_t(uint32_t index) override;
+		virtual int64_t as_int64_t(uint32_t index) override;
+		virtual float as_float(uint32_t index) override;
+		virtual double as_double(uint32_t index) override;
 
 		virtual void set(const uint8_t val) override;
 		virtual void set(const int8_t val) override;
@@ -194,16 +194,16 @@ namespace twirre
 		virtual void set(const double val) override;
 		virtual void set(const Value& val) override;
 
-		virtual void set(const uint8_t * vals, const uint16_t size) override;
-		virtual void set(const int8_t * vals, const uint16_t size) override;
-		virtual void set(const uint16_t * vals, const uint16_t size) override;
-		virtual void set(const int16_t * vals, const uint16_t size) override;
-		virtual void set(const uint32_t * vals, const uint16_t size) override;
-		virtual void set(const int32_t * vals, const uint16_t size) override;
-		virtual void set(const uint64_t * vals, const uint16_t size) override;
-		virtual void set(const int64_t * vals, const uint16_t size) override;
-		virtual void set(const float * vals, const uint16_t size) override;
-		virtual void set(const double * vals, const uint16_t size) override;
+		virtual void set(const uint8_t * vals, const uint32_t size) override;
+		virtual void set(const int8_t * vals, const uint32_t size) override;
+		virtual void set(const uint16_t * vals, const uint32_t size) override;
+		virtual void set(const int16_t * vals, const uint32_t size) override;
+		virtual void set(const uint32_t * vals, const uint32_t size) override;
+		virtual void set(const int32_t * vals, const uint32_t size) override;
+		virtual void set(const uint64_t * vals, const uint32_t size) override;
+		virtual void set(const int64_t * vals, const uint32_t size) override;
+		virtual void set(const float * vals, const uint32_t size) override;
+		virtual void set(const double * vals, const uint32_t size) override;
 
 		virtual void set(const std::vector<uint8_t>& vals) override;
 		virtual void set(const std::vector<int8_t>& vals) override;
@@ -219,7 +219,7 @@ namespace twirre
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
-		virtual uint16_t getSize() const override;
+		virtual uint32_t getSize() const override;
 		virtual size_t getElementSize() const override;
 		virtual void* getBuffer() override;
 	protected:
@@ -255,16 +255,16 @@ namespace twirre
 		virtual float as_float() override;
 		virtual double as_double() override;
 
-		virtual uint8_t as_uint8_t(uint16_t index) override;
-		virtual int8_t as_int8_t(uint16_t index) override;
-		virtual uint16_t as_uint16_t(uint16_t index) override;
-		virtual int16_t as_int16_t(uint16_t index) override;
-		virtual uint32_t as_uint32_t(uint16_t index) override;
-		virtual int32_t as_int32_t(uint16_t index) override;
-		virtual uint64_t as_uint64_t(uint16_t index) override;
-		virtual int64_t as_int64_t(uint16_t index) override;
-		virtual float as_float(uint16_t index) override;
-		virtual double as_double(uint16_t index) override;
+		virtual uint8_t as_uint8_t(uint32_t index) override;
+		virtual int8_t as_int8_t(uint32_t index) override;
+		virtual uint16_t as_uint16_t(uint32_t index) override;
+		virtual int16_t as_int16_t(uint32_t index) override;
+		virtual uint32_t as_uint32_t(uint32_t index) override;
+		virtual int32_t as_int32_t(uint32_t index) override;
+		virtual uint64_t as_uint64_t(uint32_t index) override;
+		virtual int64_t as_int64_t(uint32_t index) override;
+		virtual float as_float(uint32_t index) override;
+		virtual double as_double(uint32_t index) override;
 
 		virtual void set(const uint8_t val) override;
 		virtual void set(const int8_t val) override;
@@ -278,16 +278,16 @@ namespace twirre
 		virtual void set(const double val) override;
 		virtual void set(const Value& val) override;
 
-		virtual void set(const uint8_t * vals, const uint16_t size) override;
-		virtual void set(const int8_t * vals, const uint16_t size) override;
-		virtual void set(const uint16_t * vals, const uint16_t size) override;
-		virtual void set(const int16_t * vals, const uint16_t size) override;
-		virtual void set(const uint32_t * vals, const uint16_t size) override;
-		virtual void set(const int32_t * vals, const uint16_t size) override;
-		virtual void set(const uint64_t * vals, const uint16_t size) override;
-		virtual void set(const int64_t * vals, const uint16_t size) override;
-		virtual void set(const float * vals, const uint16_t size) override;
-		virtual void set(const double * vals, const uint16_t size) override;
+		virtual void set(const uint8_t * vals, const uint32_t size) override;
+		virtual void set(const int8_t * vals, const uint32_t size) override;
+		virtual void set(const uint16_t * vals, const uint32_t size) override;
+		virtual void set(const int16_t * vals, const uint32_t size) override;
+		virtual void set(const uint32_t * vals, const uint32_t size) override;
+		virtual void set(const int32_t * vals, const uint32_t size) override;
+		virtual void set(const uint64_t * vals, const uint32_t size) override;
+		virtual void set(const int64_t * vals, const uint32_t size) override;
+		virtual void set(const float * vals, const uint32_t size) override;
+		virtual void set(const double * vals, const uint32_t size) override;
 
 		virtual void set(const std::vector<uint8_t>& vals) override;
 		virtual void set(const std::vector<int8_t>& vals) override;
@@ -305,15 +305,15 @@ namespace twirre
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
-		virtual uint16_t getSize() const override;
+		virtual uint32_t getSize() const override;
 		virtual size_t getElementSize() const override;
 		virtual void* getBuffer() override;
 		virtual T* getNativeBuffer();
-		virtual void setSize(uint16_t size);
-		virtual void setNative(T* data, uint16_t size);
+		virtual void setSize(uint32_t size);
+		virtual void setNative(T* data, uint32_t size);
 	protected:
 		T* _val;
-		uint16_t _size;
+		uint32_t _size;
 		virtual void copyTo(Parameter* parm) const override;
 	};
 
@@ -346,16 +346,16 @@ namespace twirre
 		virtual float as_float() override;
 		virtual double as_double() override;
 
-		virtual uint8_t as_uint8_t(uint16_t index) override;
-		virtual int8_t as_int8_t(uint16_t index) override;
-		virtual uint16_t as_uint16_t(uint16_t index) override;
-		virtual int16_t as_int16_t(uint16_t index) override;
-		virtual uint32_t as_uint32_t(uint16_t index) override;
-		virtual int32_t as_int32_t(uint16_t index) override;
-		virtual uint64_t as_uint64_t(uint16_t index) override;
-		virtual int64_t as_int64_t(uint16_t index) override;
-		virtual float as_float(uint16_t index) override;
-		virtual double as_double(uint16_t index) override;
+		virtual uint8_t as_uint8_t(uint32_t index) override;
+		virtual int8_t as_int8_t(uint32_t index) override;
+		virtual uint16_t as_uint16_t(uint32_t index) override;
+		virtual int16_t as_int16_t(uint32_t index) override;
+		virtual uint32_t as_uint32_t(uint32_t index) override;
+		virtual int32_t as_int32_t(uint32_t index) override;
+		virtual uint64_t as_uint64_t(uint32_t index) override;
+		virtual int64_t as_int64_t(uint32_t index) override;
+		virtual float as_float(uint32_t index) override;
+		virtual double as_double(uint32_t index) override;
 
 		virtual void set(const uint8_t val) override;
 		virtual void set(const int8_t val) override;
@@ -371,16 +371,16 @@ namespace twirre
 		{
 		}
 
-		virtual void set(const uint8_t * vals, const uint16_t size) override;
-		virtual void set(const int8_t * vals, const uint16_t size) override;
-		virtual void set(const uint16_t * vals, const uint16_t size) override;
-		virtual void set(const int16_t * vals, const uint16_t size) override;
-		virtual void set(const uint32_t * vals, const uint16_t size) override;
-		virtual void set(const int32_t * vals, const uint16_t size) override;
-		virtual void set(const uint64_t * vals, const uint16_t size) override;
-		virtual void set(const int64_t * vals, const uint16_t size) override;
-		virtual void set(const float * vals, const uint16_t size) override;
-		virtual void set(const double * vals, const uint16_t size) override;
+		virtual void set(const uint8_t * vals, const uint32_t size) override;
+		virtual void set(const int8_t * vals, const uint32_t size) override;
+		virtual void set(const uint16_t * vals, const uint32_t size) override;
+		virtual void set(const int16_t * vals, const uint32_t size) override;
+		virtual void set(const uint32_t * vals, const uint32_t size) override;
+		virtual void set(const int32_t * vals, const uint32_t size) override;
+		virtual void set(const uint64_t * vals, const uint32_t size) override;
+		virtual void set(const int64_t * vals, const uint32_t size) override;
+		virtual void set(const float * vals, const uint32_t size) override;
+		virtual void set(const double * vals, const uint32_t size) override;
 
 		virtual void set(const std::vector<uint8_t>& vals) override;
 		virtual void set(const std::vector<int8_t>& vals) override;
@@ -396,7 +396,7 @@ namespace twirre
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
-		virtual uint16_t getSize() const override;
+		virtual uint32_t getSize() const override;
 		virtual size_t getElementSize() const override;
 		virtual void* getBuffer() override;
 	protected:
