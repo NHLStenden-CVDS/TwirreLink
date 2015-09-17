@@ -19,11 +19,13 @@ using namespace std;
 	template <typename T>																		\
 	GET_T ValueImpl<T>::as_##GET_T () 															\
 	{ 																							\
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		return static_cast<GET_T>(_val); 														\
 	}																							\
 	template <typename T>																		\
 	GET_T ArrayValue<T>::as_##GET_T ()															\
 	{																							\
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		if(_size == 0) return GET_T(0);															\
 		return static_cast<GET_T>(_val[0]);														\
 	}																							\
@@ -36,11 +38,13 @@ using namespace std;
 	GET_T ValueImpl<T>::as_##GET_T (uint16_t id)												\
 	{																							\
 		if(id > 0) throw std::out_of_range("index out of bounds on single-element value"); 		\
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		return as_##GET_T ();																	\
 	}																							\
 	template <typename T>																		\
 	GET_T ArrayValue<T>::as_##GET_T (uint16_t id)												\
 	{																							\
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
 		if(id >= _size) throw std::out_of_range("index out of bounds on value array"); 			\
 		return static_cast<GET_T>(_val[id]);													\
 	}																							\
@@ -56,6 +60,7 @@ using namespace std;
 	void ValueImpl<T>::set(const SET_T val ) 													\
 	{ 																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
 		_modified = true;																		\
 		_val = static_cast<T>(val);																\
 	}																							\
@@ -71,6 +76,7 @@ using namespace std;
 	void ValueImpl<T>::set(const SET_T * vals, const uint16_t size)								\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
 		if(size > 0)																			\
 			_val = static_cast<T>(vals[0]);														\
 		_modified = true;																		\
@@ -80,6 +86,7 @@ using namespace std;
 	void ArrayValue<T>::set(const SET_T * vals, const uint16_t size)							\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
 		_modified = true;																		\
 		_size = size;																			\
 		if(_size != 0)																			\
@@ -89,6 +96,11 @@ using namespace std;
 			{																					\
 				_val[i] = static_cast<T>(vals[i]);												\
 			}																					\
+		}																						\
+		else																					\
+		{																						\
+			free(_val);																			\
+			_val = nullptr;																		\
 		}																						\
 	}																							\
 	void ErrorValue::set(const SET_T *, const uint16_t)											\
@@ -205,9 +217,16 @@ namespace twirre
 	}
 
 	template<typename T>
-	T& ValueImpl<T>::nativeValue()
+	T ValueImpl<T>::getNativeValue()
 	{
 		return _val;
+	}
+
+	template<typename T>
+	void ValueImpl<T>::setNativeValue(T val)
+	{
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		_val = val;
 	}
 
 	template<typename T>
@@ -265,7 +284,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	T*& ArrayValue<T>::nativeValue()
+	T* ArrayValue<T>::nativeValue()
 	{
 		return _val;
 	}
@@ -317,6 +336,7 @@ namespace twirre
 	ArrayValue<T> & ArrayValue<T>::operator =(ArrayValue<T> && other) noexcept
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 
 		//need to swap data
 		std::swap(_val, other._val);
@@ -400,6 +420,7 @@ namespace twirre
 	void ArrayValue<T>::setNative(T* data, uint16_t size)
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 		_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
 		_size = size;
 		memcpy(_val, data, size * sizeof(T));
