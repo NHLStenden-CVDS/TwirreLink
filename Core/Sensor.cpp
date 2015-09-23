@@ -112,7 +112,7 @@ namespace twirre
 			//Add each requested value if it exists, and hasn't been added yet
 			if(_valueList.find(name) != _valueList.end())
 			{
-				if(returnValues.find(name) == _valueList.end())
+				if(returnValues.find(name) == returnValues.end())
 				{
 					returnValues[name] = _valueList[name];
 				}
