@@ -131,6 +131,8 @@ namespace twirre
 		virtual void set(const std::vector<float>& vals) = 0;
 		virtual void set(const std::vector<double>& vals) = 0;
 
+		virtual void setActuatorMutex(owned_mutex * actuatorMutex);
+
 		template<typename T>
 		Parameter& operator =(const T & value)
 		{
@@ -152,6 +154,7 @@ namespace twirre
 	public:
 		ValueImpl(const std::string name, T val);
 		ValueImpl(const std::string name, T val, owned_mutex * actuatorMutex);
+
 		virtual ~ValueImpl()
 		{
 		}
@@ -232,7 +235,9 @@ namespace twirre
 	{
 	public:
 		ArrayValue(const std::string name);
+		ArrayValue(const std::string name, uint32_t size, T defaultValue);
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
+		ArrayValue(const std::string name, owned_mutex * actuatorMutex, uint32_t size, T defaultValue);
 		virtual ~ArrayValue() noexcept;
 
 		virtual NativeType getNativeType() override;

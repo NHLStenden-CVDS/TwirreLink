@@ -210,6 +210,11 @@ namespace twirre
 		_modified = false;
 	}
 
+	void Parameter::setActuatorMutex(owned_mutex * actuatorMutex)
+	{
+		_actuatorMutex = actuatorMutex;
+	}
+
 	template<typename T>
 	NativeType ValueImpl<T>::getNativeType()
 	{
@@ -219,6 +224,7 @@ namespace twirre
 	template<typename T>
 	T ValueImpl<T>::getNativeValue()
 	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
 		return _val;
 	}
 
@@ -296,9 +302,29 @@ namespace twirre
 	}
 
 	template<typename T>
+	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T defaultValue) :
+			Parameter(name), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			_val[i] = defaultValue;
+		}
+	}
+
+	template<typename T>
 	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex) :
 			Parameter(name, actuatorMutex), _val(nullptr), _size(0)
 	{
+	}
+
+	template<typename T>
+	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, uint32_t size, T defaultValue) :
+			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			_val[i] = defaultValue;
+		}
 	}
 
 	template<typename T>

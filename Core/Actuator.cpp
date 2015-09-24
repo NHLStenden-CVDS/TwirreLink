@@ -85,6 +85,7 @@ namespace twirre
 
 	void Actuator::registerParameter(Parameter* parm)
 	{
+		parm->setActuatorMutex(&_actuateMutex);
 		_parametersList[parm->getName()] = parm;
 	}
 
