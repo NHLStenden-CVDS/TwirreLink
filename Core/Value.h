@@ -316,6 +316,8 @@ namespace twirre
 		virtual T* getNativeBuffer();
 		virtual void setSize(uint32_t size);
 		virtual void setNative(T* data, uint32_t size);
+		virtual T getNative(uint32_t id);
+		virtual T operator[] (uint32_t id);
 	protected:
 		T* _val;
 		uint32_t _size;

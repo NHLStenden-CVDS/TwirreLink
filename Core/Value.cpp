@@ -453,6 +453,19 @@ namespace twirre
 		_modified = true;
 	}
 
+	template<typename T>
+	T ArrayValue<T>::getNative(uint32_t id)
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		return _val[id];
+	}
+
+	template<typename T>
+	T ArrayValue<T>::operator [](uint32_t id)
+	{
+		return getNative(id);
+	}
+
 	ErrorValue *ErrorValue::_instance = nullptr;
 	ErrorValue * ErrorValue::getInstance()
 	{
