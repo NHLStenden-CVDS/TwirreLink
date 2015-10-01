@@ -7,6 +7,9 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <iostream>
+
+#include <chrono>
 
 #include "../Core/Value.h"
 
@@ -65,9 +68,12 @@ namespace twirre
 
 		if (this->_size > 0) this->_val = reinterpret_cast<T*>(realloc(this->_val, sizeof(T) * this->_size));
 
-		for (uint16_t i = 0; i < this->_size; i++)
+		int bytesToRead = this->_size * sizeof(T);
+		int bytesRead = 0;
+
+		while(bytesRead < bytesToRead)
 		{
-			_serial.Read(this->_val[i]);
+			bytesRead += _serial.readNBytes((reinterpret_cast<unsigned char*>(this->_val)) + bytesRead, bytesToRead - bytesRead);
 		}
 	}
 
