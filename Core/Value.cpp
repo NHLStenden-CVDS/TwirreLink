@@ -298,18 +298,20 @@ namespace twirre
 
 	template<typename T>
 	ArrayValue<T>::ArrayValue(const string name) :
-			Parameter(name), _val(nullptr), _size(0)
+			ArrayValue(name, nullptr)
 	{
 	}
 
 	template<typename T>
 	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T defaultValue) :
-			Parameter(name), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+			ArrayValue(name, nullptr, size, defaultValue)
 	{
-		for (int i = 0; i < size; i++)
-		{
-			_val[i] = defaultValue;
-		}
+	}
+
+	template<typename T>
+	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T* defaultArray):
+			ArrayValue(name, nullptr, size, defaultArray)
+	{
 	}
 
 	template<typename T>
@@ -326,6 +328,13 @@ namespace twirre
 		{
 			_val[i] = defaultValue;
 		}
+	}
+
+	template<typename T>
+	ArrayValue<T>::ArrayValue(const std::string name, owned_mutex * actuatorMutex, uint32_t size, T* defaultArray) :
+			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+	{
+		std::memcpy(_val, defaultArray, size * sizeof(T));
 	}
 
 	template<typename T>
