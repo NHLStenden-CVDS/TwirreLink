@@ -262,6 +262,7 @@ namespace twirre
 	template<typename T>
 	void ValueImpl<T>::copyTo(Parameter * parm) const
 	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
 		parm->set(_val);
 	}
 
@@ -483,6 +484,11 @@ namespace twirre
 		return NativeType::type_void;
 	}
 
+	std::string ErrorValue::as_string()
+	{
+		return "<error>";
+	}
+
 	bool ErrorValue::isValid() const
 	{
 		return false;
@@ -519,6 +525,27 @@ namespace twirre
 	VALUEIMPL_GETTER(float)
 	VALUEIMPL_GETTER(double)
 
+	template<typename T>
+	std::string ValueImpl<T>::as_string()
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		return to_string(_val);
+	}
+
+	template<typename T>
+	std::string ArrayValue<T>::as_string()
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		//for now, get underlying pointer, treat it as char* (forcing last byte to 0), and return that as string (restoring the last byte of the original value)
+		char* str = reinterpret_cast<char*>(_val);
+		size_t bytes = _size * (sizeof(T) / sizeof(char));
+		char lastByte = str[bytes - 1];
+		str[bytes - 1] = 0;
+		std::string retStr(str);
+		str[bytes - 1] = lastByte;
+		return retStr;
+	}
+
 	VALUEIMPL_SETTER(uint8_t)
 	VALUEIMPL_SETTER(int8_t)
 	VALUEIMPL_SETTER(uint16_t)
@@ -533,6 +560,7 @@ namespace twirre
 	template<typename T>
 	void ValueImpl<T>::set(const Value& val)
 	{
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);
@@ -541,6 +569,7 @@ namespace twirre
 	template<typename T>
 	void ArrayValue<T>::set(const Value& val)
 	{
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);

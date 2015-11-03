@@ -61,6 +61,7 @@ namespace twirre
 		virtual int64_t as_int64_t() = 0;
 		virtual float as_float() = 0;
 		virtual double as_double() = 0;
+		virtual std::string as_string() = 0;
 
 		virtual uint8_t as_uint8_t(uint32_t index) = 0;
 		virtual int8_t as_int8_t(uint32_t index) = 0;
@@ -72,6 +73,7 @@ namespace twirre
 		virtual int64_t as_int64_t(uint32_t index) = 0;
 		virtual float as_float(uint32_t index) = 0;
 		virtual double as_double(uint32_t index) = 0;
+		//virtual std::string as_string(uint32_t index) = 0;
 
 		const std::string& getName();
 
@@ -173,6 +175,7 @@ namespace twirre
 		virtual int64_t as_int64_t() override;
 		virtual float as_float() override;
 		virtual double as_double() override;
+		virtual std::string as_string() override;
 
 		virtual uint8_t as_uint8_t(uint32_t index) override;
 		virtual int8_t as_int8_t(uint32_t index) override;
@@ -259,6 +262,7 @@ namespace twirre
 		virtual int64_t as_int64_t() override;
 		virtual float as_float() override;
 		virtual double as_double() override;
+		virtual std::string as_string() override;
 
 		virtual uint8_t as_uint8_t(uint32_t index) override;
 		virtual int8_t as_int8_t(uint32_t index) override;
@@ -352,6 +356,7 @@ namespace twirre
 		virtual int64_t as_int64_t() override;
 		virtual float as_float() override;
 		virtual double as_double() override;
+		virtual std::string as_string() override;
 
 		virtual uint8_t as_uint8_t(uint32_t index) override;
 		virtual int8_t as_int8_t(uint32_t index) override;
