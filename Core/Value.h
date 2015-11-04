@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 #include <shared_mutex>
+#include <type_traits>
 #include "../Serial/SerialRW.h"
 
 #include "../Core/owned_mutex.h"
@@ -243,6 +244,22 @@ namespace twirre
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T defaultValue);
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T* defaultArray);
+
+		//disambiguation constructor for passing an int as defaultValue
+		template<typename U = T>
+		ArrayValue(const std::string name, const uint32_t size, typename std::enable_if<!std::is_same<U, int>::value, const int>::type defaultValue) :
+		ArrayValue(name, size, static_cast<T>(defaultValue))
+		{
+
+		}
+		//disambiguation constructor for passing an int as defaultValue
+		template<typename U = T>
+		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, typename std::enable_if<!std::is_same<U, int>::value, const int>::type defaultValue) :
+		ArrayValue(name, size, static_cast<T>(defaultValue))
+		{
+
+		}
+
 		virtual ~ArrayValue() noexcept;
 
 		virtual NativeType getNativeType() override;
