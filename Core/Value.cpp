@@ -303,13 +303,13 @@ namespace twirre
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T defaultValue) :
+	ArrayValue<T>::ArrayValue(const string name, const uint32_t size, const T defaultValue) :
 			ArrayValue(name, nullptr, size, defaultValue)
 	{
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T* defaultArray):
+	ArrayValue<T>::ArrayValue(const string name, const uint32_t size, const T* defaultArray):
 			ArrayValue(name, nullptr, size, defaultArray)
 	{
 	}
@@ -321,7 +321,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, uint32_t size, T defaultValue) :
+	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, const uint32_t size, const T defaultValue) :
 			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
 	{
 		for (int i = 0; i < size; i++)
@@ -331,7 +331,7 @@ namespace twirre
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const std::string name, owned_mutex * actuatorMutex, uint32_t size, T* defaultArray) :
+	ArrayValue<T>::ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T* defaultArray) :
 			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
 	{
 		std::memcpy(_val, defaultArray, size * sizeof(T));

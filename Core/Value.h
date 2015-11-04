@@ -238,11 +238,11 @@ namespace twirre
 	{
 	public:
 		ArrayValue(const std::string name);
-		ArrayValue(const std::string name, uint32_t size, T defaultValue);
-		ArrayValue(const std::string name, uint32_t size, T* defaultArray);
+		ArrayValue(const std::string name, const uint32_t size, const T defaultValue);
+		ArrayValue(const std::string name, const uint32_t size, const T* defaultArray);
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex);
-		ArrayValue(const std::string name, owned_mutex * actuatorMutex, uint32_t size, T defaultValue);
-		ArrayValue(const std::string name, owned_mutex * actuatorMutex, uint32_t size, T* defaultArray);
+		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T defaultValue);
+		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T* defaultArray);
 		virtual ~ArrayValue() noexcept;
 
 		virtual NativeType getNativeType() override;
