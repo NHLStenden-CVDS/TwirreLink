@@ -23,20 +23,32 @@ namespace twirre
 
 	enum class NativeType
 	{
-		type_void,
-		type_int8,
-		type_uint8,
-		type_int16,
-		type_uint16,
-		type_int32,
-		type_uint32,
-		type_int64,
-		type_uint64,
-		type_float,
-		type_double
+		type_void, type_int8, type_uint8, type_int16, type_uint16, type_int32, type_uint32, type_int64, type_uint64, type_float, type_double
 	};
 
-	class Value
+	class Scalar
+	{
+	public:
+		virtual ~Scalar()
+		{
+		}
+
+		virtual NativeType getNativeType() = 0;
+
+		virtual uint8_t as_uint8_t() = 0;
+		virtual int8_t as_int8_t() = 0;
+		virtual uint16_t as_uint16_t() = 0;
+		virtual int16_t as_int16_t() = 0;
+		virtual uint32_t as_uint32_t() = 0;
+		virtual int32_t as_int32_t() = 0;
+		virtual uint64_t as_uint64_t() = 0;
+		virtual int64_t as_int64_t() = 0;
+		virtual float as_float() = 0;
+		virtual double as_double() = 0;
+		virtual std::string as_string() = 0;
+	};
+
+	class Value: public Scalar
 	{
 		template<typename T> friend class ValueImpl;
 		template<typename T> friend class ArrayValue;
@@ -92,7 +104,7 @@ namespace twirre
 
 	class Parameter: public Value
 	{
-		template <typename T> friend class ArrayValue;
+		template<typename T> friend class ArrayValue;
 	public:
 		Parameter(const std::string name);
 		Parameter(const std::string name, owned_mutex * actuatorMutex);
@@ -136,6 +148,9 @@ namespace twirre
 
 		virtual void setActuatorMutex(owned_mutex * actuatorMutex);
 
+		virtual Scalar& getMin() = 0;
+		virtual Scalar& getMax() = 0;
+
 		template<typename T>
 		Parameter& operator =(const T & value)
 		{
@@ -152,11 +167,47 @@ namespace twirre
 	};
 
 	template<typename T>
+	class ScalarImpl: public Scalar
+	{
+	public:
+		ScalarImpl()
+		{
+		}
+		explicit ScalarImpl(const T val);
+
+		virtual ~ScalarImpl()
+		{
+		}
+
+		virtual NativeType getNativeType() override;
+
+		virtual uint8_t as_uint8_t() override;
+		virtual int8_t as_int8_t() override;
+		virtual uint16_t as_uint16_t() override;
+		virtual int16_t as_int16_t() override;
+		virtual uint32_t as_uint32_t() override;
+		virtual int32_t as_int32_t() override;
+		virtual uint64_t as_uint64_t() override;
+		virtual int64_t as_int64_t() override;
+		virtual float as_float() override;
+		virtual double as_double() override;
+		virtual std::string as_string() override;
+
+		virtual void set(const T val);
+
+	protected:
+		std::shared_timed_mutex _rwMutex;
+		T _val;
+	};
+
+	template<typename T>
 	class ValueImpl: public Parameter
 	{
 	public:
-		ValueImpl(const std::string name, T val);
-		ValueImpl(const std::string name, T val, owned_mutex * actuatorMutex);
+		ValueImpl(const std::string name, const T val);
+		ValueImpl(const std::string name, const T val, const T min, const T max);
+		ValueImpl(const std::string name, const T val, owned_mutex * actuatorMutex);
+		ValueImpl(const std::string name, const T val, const T min, const T max, owned_mutex * actuatorMutex);
 
 		virtual ~ValueImpl()
 		{
@@ -223,6 +274,9 @@ namespace twirre
 		virtual void set(const std::vector<float>& vals) override;
 		virtual void set(const std::vector<double>& vals) override;
 
+		virtual Scalar& getMin() override;
+		virtual Scalar& getMax() override;
+
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
@@ -231,6 +285,8 @@ namespace twirre
 		virtual void* getBuffer() override;
 	protected:
 		T _val;
+		ScalarImpl<T> _min;
+		ScalarImpl<T> _max;
 		virtual void copyTo(Parameter* parm) const override;
 	};
 
@@ -248,14 +304,14 @@ namespace twirre
 		//disambiguation constructor for passing an int as defaultValue
 		template<typename U = T>
 		ArrayValue(const std::string name, const uint32_t size, typename std::enable_if<!std::is_same<U, int>::value, const int>::type defaultValue) :
-		ArrayValue(name, size, static_cast<T>(defaultValue))
+				ArrayValue(name, size, static_cast<T>(defaultValue))
 		{
 
 		}
 		//disambiguation constructor for passing an int as defaultValue
 		template<typename U = T>
 		ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, typename std::enable_if<!std::is_same<U, int>::value, const int>::type defaultValue) :
-		ArrayValue(name, size, static_cast<T>(defaultValue))
+				ArrayValue(name, size, static_cast<T>(defaultValue))
 		{
 
 		}
@@ -268,8 +324,8 @@ namespace twirre
 		/* copy, move constructors and operators */
 		ArrayValue(const ArrayValue<T> & val);
 		ArrayValue(ArrayValue<T> && val) noexcept;
-		ArrayValue<T> & operator = (const ArrayValue<T> & other);
-		ArrayValue<T> & operator = (ArrayValue<T> && other) noexcept;
+		ArrayValue<T> & operator =(const ArrayValue<T> & other);
+		ArrayValue<T> & operator =(ArrayValue<T> && other) noexcept;
 
 		virtual uint8_t as_uint8_t() override;
 		virtual int8_t as_int8_t() override;
@@ -328,10 +384,11 @@ namespace twirre
 		virtual void set(const std::vector<float>& vals) override;
 		virtual void set(const std::vector<double>& vals) override;
 
-
-
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
+
+		virtual Scalar& getMin() override;
+		virtual Scalar& getMax() override;
 
 		virtual uint32_t getSize() const override;
 		virtual size_t getElementSize() const override;
@@ -340,10 +397,12 @@ namespace twirre
 		virtual void setSize(uint32_t size);
 		virtual void setNative(T* data, uint32_t size);
 		virtual T getNative(uint32_t id);
-		virtual T operator[] (uint32_t id);
+		virtual T operator[](uint32_t id);
 	protected:
 		T* _val;
 		uint32_t _size;
+		ScalarImpl<T> _min;
+		ScalarImpl<T> _max;
 		virtual void copyTo(Parameter* parm) const override;
 	};
 
@@ -424,6 +483,9 @@ namespace twirre
 		virtual void set(const std::vector<float>& vals) override;
 		virtual void set(const std::vector<double>& vals) override;
 
+		virtual Scalar& getMin() override;
+		virtual Scalar& getMax() override;
+
 		virtual bool isValid() const override;
 		virtual bool isArray() const override;
 
@@ -431,34 +493,37 @@ namespace twirre
 		virtual size_t getElementSize() const override;
 		virtual void* getBuffer() override;
 	protected:
+		ScalarImpl<uint8_t> _min;
+		ScalarImpl<uint8_t> _max;
+
 		virtual void copyTo(Parameter*) const override
 		{
 		}
 	};
 
 	/* explicit template instantiations of ValueImpl */
-	extern template class ValueImpl<uint8_t>;
-	extern template class ValueImpl<int8_t>;
-	extern template class ValueImpl<uint16_t>;
-	extern template class ValueImpl<int16_t>;
-	extern template class ValueImpl<uint32_t>;
-	extern template class ValueImpl<int32_t>;
-	extern template class ValueImpl<uint64_t>;
-	extern template class ValueImpl<int64_t>;
-	extern template class ValueImpl<float>;
-	extern template class ValueImpl<double>;
+	extern template class ValueImpl<uint8_t> ;
+	extern template class ValueImpl<int8_t> ;
+	extern template class ValueImpl<uint16_t> ;
+	extern template class ValueImpl<int16_t> ;
+	extern template class ValueImpl<uint32_t> ;
+	extern template class ValueImpl<int32_t> ;
+	extern template class ValueImpl<uint64_t> ;
+	extern template class ValueImpl<int64_t> ;
+	extern template class ValueImpl<float> ;
+	extern template class ValueImpl<double> ;
 
 	/* explicit template instantiations of ArrayValue */
-	extern template class ArrayValue<uint8_t>;
-	extern template class ArrayValue<int8_t>;
-	extern template class ArrayValue<uint16_t>;
-	extern template class ArrayValue<int16_t>;
-	extern template class ArrayValue<uint32_t>;
-	extern template class ArrayValue<int32_t>;
-	extern template class ArrayValue<uint64_t>;
-	extern template class ArrayValue<int64_t>;
-	extern template class ArrayValue<float>;
-	extern template class ArrayValue<double>;
+	extern template class ArrayValue<uint8_t> ;
+	extern template class ArrayValue<int8_t> ;
+	extern template class ArrayValue<uint16_t> ;
+	extern template class ArrayValue<int16_t> ;
+	extern template class ArrayValue<uint32_t> ;
+	extern template class ArrayValue<int32_t> ;
+	extern template class ArrayValue<uint64_t> ;
+	extern template class ArrayValue<int64_t> ;
+	extern template class ArrayValue<float> ;
+	extern template class ArrayValue<double> ;
 
 } /* namespace twirre */
 
