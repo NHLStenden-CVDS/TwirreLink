@@ -52,6 +52,13 @@ using namespace std;
 	{																							\
 		throw std::out_of_range("tried to access ErrorValue by index"); 						\
 		return GET_T(0); /*keep compiler happy*/												\
+	}																							\
+																								\
+	template <typename T>																		\
+	GET_T ScalarImpl<T>::as_##GET_T ()															\
+	{																							\
+		std::shared_lock<decltype(_rwMutex)>(_rwMutex);											\
+		return static_cast<GET_T>(_val);														\
 	}
 
 //set(...) functions for the Value implementations
@@ -180,6 +187,25 @@ namespace twirre
 		return NativeType::type_double;
 	}
 
+	template<typename T>
+	ScalarImpl<T>::ScalarImpl(const T val) :
+			_val(val)
+	{
+
+	}
+
+	template<typename T>
+	NativeType ScalarImpl<T>::getNativeType()
+	{
+		return _getNativeType<T>();
+	}
+
+	template<typename T>
+	void ScalarImpl<T>::set(const T val)
+	{
+		_val = val;
+	}
+
 	Value::Value(const string n) :
 			_name(n)
 	{
@@ -236,14 +262,26 @@ namespace twirre
 	}
 
 	template<typename T>
-	ValueImpl<T>::ValueImpl(const string n, T val) :
-			Parameter(n), _val(val)
+	ValueImpl<T>::ValueImpl(const string n, const T val) :
+			ValueImpl(n, val, nullptr)
 	{
 	}
 
 	template<typename T>
-	ValueImpl<T>::ValueImpl(const string n, T val, owned_mutex * actuatorMutex) :
-			Parameter(n, actuatorMutex), _val(val)
+	ValueImpl<T>::ValueImpl(const string n, const T val, const T min, const T max) :
+			ValueImpl(n, val, min, max, nullptr)
+	{
+	}
+
+	template<typename T>
+	ValueImpl<T>::ValueImpl(const string n, const T val, owned_mutex * actuatorMutex) :
+			ValueImpl(n, val, std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max(), actuatorMutex)
+	{
+	}
+
+	template<typename T>
+	ValueImpl<T>::ValueImpl(const string n, const T val, const T min, const T max, owned_mutex * actuatorMutex) :
+			Parameter(n, actuatorMutex), _val(val), _min(min), _max(max)
 	{
 	}
 
@@ -262,7 +300,20 @@ namespace twirre
 	template<typename T>
 	void ValueImpl<T>::copyTo(Parameter * parm) const
 	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
 		parm->set(_val);
+	}
+
+	template<typename T>
+	Scalar& ValueImpl<T>::getMin()
+	{
+		return _min;
+	}
+
+	template<typename T>
+	Scalar& ValueImpl<T>::getMax()
+	{
+		return _max;
 	}
 
 	template<typename T>
@@ -297,18 +348,20 @@ namespace twirre
 
 	template<typename T>
 	ArrayValue<T>::ArrayValue(const string name) :
-			Parameter(name), _val(nullptr), _size(0)
+			ArrayValue(name, nullptr)
 	{
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const string name, uint32_t size, T defaultValue) :
-			Parameter(name), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+	ArrayValue<T>::ArrayValue(const string name, const uint32_t size, const T defaultValue) :
+			ArrayValue(name, nullptr, size, defaultValue)
 	{
-		for (int i = 0; i < size; i++)
-		{
-			_val[i] = defaultValue;
-		}
+	}
+
+	template<typename T>
+	ArrayValue<T>::ArrayValue(const string name, const uint32_t size, const T* defaultArray) :
+			ArrayValue(name, nullptr, size, defaultArray)
+	{
 	}
 
 	template<typename T>
@@ -318,13 +371,20 @@ namespace twirre
 	}
 
 	template<typename T>
-	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, uint32_t size, T defaultValue) :
+	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, const uint32_t size, const T defaultValue) :
 			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
 	{
 		for (int i = 0; i < size; i++)
 		{
 			_val[i] = defaultValue;
 		}
+	}
+
+	template<typename T>
+	ArrayValue<T>::ArrayValue(const std::string name, owned_mutex * actuatorMutex, const uint32_t size, const T* defaultArray) :
+			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
+	{
+		std::memcpy(_val, defaultArray, size * sizeof(T));
 	}
 
 	template<typename T>
@@ -410,6 +470,18 @@ namespace twirre
 	}
 
 	template<typename T>
+	Scalar& ArrayValue<T>::getMin()
+	{
+		return _min;
+	}
+
+	template<typename T>
+	Scalar& ArrayValue<T>::getMax()
+	{
+		return _max;
+	}
+
+	template<typename T>
 	uint32_t ArrayValue<T>::getSize() const
 	{
 		return _size;
@@ -474,13 +546,18 @@ namespace twirre
 	}
 
 	ErrorValue::ErrorValue(const string n) :
-			Parameter(n)
+			Parameter(n), _min(0), _max(0)
 	{
 	}
 
 	NativeType ErrorValue::getNativeType()
 	{
 		return NativeType::type_void;
+	}
+
+	std::string ErrorValue::as_string()
+	{
+		return "<error>";
 	}
 
 	bool ErrorValue::isValid() const
@@ -491,6 +568,16 @@ namespace twirre
 	bool ErrorValue::isArray() const
 	{
 		return false;
+	}
+
+	Scalar& ErrorValue::getMin()
+	{
+		return _min;
+	}
+
+	Scalar& ErrorValue::getMax()
+	{
+		return _max;
 	}
 
 	uint32_t ErrorValue::getSize() const
@@ -519,6 +606,34 @@ namespace twirre
 	VALUEIMPL_GETTER(float)
 	VALUEIMPL_GETTER(double)
 
+	template<typename T>
+	std::string ScalarImpl<T>::as_string()
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		return to_string(_val);
+	}
+
+	template<typename T>
+	std::string ValueImpl<T>::as_string()
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		return to_string(_val);
+	}
+
+	template<typename T>
+	std::string ArrayValue<T>::as_string()
+	{
+		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		//for now, get underlying pointer, treat it as char* (forcing last byte to 0), and return that as string (restoring the last byte of the original value)
+		char* str = reinterpret_cast<char*>(_val);
+		size_t bytes = _size * (sizeof(T) / sizeof(char));
+		char lastByte = str[bytes - 1];
+		str[bytes - 1] = 0;
+		std::string retStr(str);
+		str[bytes - 1] = lastByte;
+		return retStr;
+	}
+
 	VALUEIMPL_SETTER(uint8_t)
 	VALUEIMPL_SETTER(int8_t)
 	VALUEIMPL_SETTER(uint16_t)
@@ -533,6 +648,7 @@ namespace twirre
 	template<typename T>
 	void ValueImpl<T>::set(const Value& val)
 	{
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);
@@ -541,10 +657,23 @@ namespace twirre
 	template<typename T>
 	void ArrayValue<T>::set(const Value& val)
 	{
+		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);
 	}
+
+	/* explicit template instantiations of ScalarImpl */
+	template class ScalarImpl<uint8_t> ;
+	template class ScalarImpl<int8_t> ;
+	template class ScalarImpl<uint16_t> ;
+	template class ScalarImpl<int16_t> ;
+	template class ScalarImpl<uint32_t> ;
+	template class ScalarImpl<int32_t> ;
+	template class ScalarImpl<uint64_t> ;
+	template class ScalarImpl<int64_t> ;
+	template class ScalarImpl<float> ;
+	template class ScalarImpl<double> ;
 
 	/* explicit template instantiations of ValueImpl */
 	template class ValueImpl<uint8_t> ;
