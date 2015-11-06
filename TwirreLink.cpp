@@ -203,7 +203,7 @@ namespace twirre
 	{
 		if (_sensorList.find(sensorName) == _sensorList.end())
 		{
-			throw runtime_error("GetSensor: no sensor with that name");
+			throw runtime_error("GetSensor: no sensor with name: " + sensorName);
 		}
 		return *_sensorList.at(sensorName);
 	}
