@@ -501,6 +501,18 @@ namespace twirre
 		}
 	};
 
+	/* explicit template instantiations of ScalarImpl */
+	extern template class ScalarImpl<uint8_t> ;
+	extern template class ScalarImpl<int8_t> ;
+	extern template class ScalarImpl<uint16_t> ;
+	extern template class ScalarImpl<int16_t> ;
+	extern template class ScalarImpl<uint32_t> ;
+	extern template class ScalarImpl<int32_t> ;
+	extern template class ScalarImpl<uint64_t> ;
+	extern template class ScalarImpl<int64_t> ;
+	extern template class ScalarImpl<float> ;
+	extern template class ScalarImpl<double> ;
+
 	/* explicit template instantiations of ValueImpl */
 	extern template class ValueImpl<uint8_t> ;
 	extern template class ValueImpl<int8_t> ;
