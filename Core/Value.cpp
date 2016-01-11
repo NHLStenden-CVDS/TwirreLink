@@ -9,15 +9,13 @@
 #include <iostream>
 #include <cstring>
 
-#define INCLUDE_VALUE_H_LITE
 #include "../Core/Value.h"
-#undef INCLUDE_VALUE_H_LITE
 
 using namespace std;
 
 //copy paste machine
 //as_... functions for the Value implementations
-#define VALUE_GETTER(GET_T) 																\
+#define VALUE_GETTER(GET_T) 																	\
 	GET_T ErrorValue::as_##GET_T ()																\
 	{																							\
 		return GET_T(0);																		\
@@ -37,7 +35,7 @@ using namespace std;
 	}
 
 //set(...) functions for the Value implementations
-#define VALUE_SETTER(SET_T) 																\
+#define VALUE_SETTER(SET_T) 																	\
 	void ErrorValue::set(const SET_T )															\
 	{}																							\
 																								\
