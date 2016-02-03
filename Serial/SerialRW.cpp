@@ -17,6 +17,16 @@
 
 using namespace std;
 
+
+const int READ_TIMEOUT = 1 * 1000 * 1000;		//time in microseconds to wait for incoming data
+
+#define BAUD_CASE(RATE)							\
+		case RATE:								\
+			brate = B##RATE ;					\
+			break;
+
+
+
 SerialRW::SerialRW() : _fd(0), bytesToRead(1)
 {
 }
@@ -42,33 +52,48 @@ int SerialRW::Initialize(const char *serialPort, int baud)
 	speed_t brate = baud; // let you override switch below if needed
 	switch (baud)
 	{
-		case 4800:
-			brate = B4800;
-			break;
-		case 9600:
-			brate = B9600;
-			break;
+		BAUD_CASE(0)
+		BAUD_CASE(50)
+		BAUD_CASE(75)
+		BAUD_CASE(110)
+		BAUD_CASE(134)
+		BAUD_CASE(150)
+		BAUD_CASE(200)
+		BAUD_CASE(300)
+		BAUD_CASE(600)
+		BAUD_CASE(1200)
+		BAUD_CASE(1800)
+		BAUD_CASE(2400)
+		BAUD_CASE(4800)
+		BAUD_CASE(9600)
+		BAUD_CASE(19200)
+		BAUD_CASE(38400)
+		BAUD_CASE(57600)
+		BAUD_CASE(115200)
+		BAUD_CASE(230400)
+		BAUD_CASE(460800)
+		BAUD_CASE(500000)
+		BAUD_CASE(576000)
+		BAUD_CASE(921600)
+		BAUD_CASE(1000000)
+		BAUD_CASE(1152000)
+		BAUD_CASE(1500000)
+		BAUD_CASE(2000000)
+		BAUD_CASE(2500000)
+		BAUD_CASE(3000000)
+		BAUD_CASE(3500000)
+		BAUD_CASE(4000000)
 #ifdef B14400
-			case 14400: brate=B14400; break;
+			BAUD_CASE(14400)
 #endif
-		case 19200:
-			brate = B19200;
-			break;
 #ifdef B28800
-			case 28800: brate=B28800; break;
+			BAUD_CASE(28800)
 #endif
-		case 38400:
-			brate = B38400;
-			break;
-		case 57600:
-			brate = B57600;
-			break;
-		case 115200:
-			brate = B115200;
-			break;
-		case 1000000:
-			brate = B1000000;
-			break;
+
+	default:
+		throw std::runtime_error("invalid baud rate selected");
+
+
 	}
 	cfsetispeed(&toptions, brate);
 	cfsetospeed(&toptions, brate);
@@ -94,7 +119,7 @@ int SerialRW::Initialize(const char *serialPort, int baud)
 	// see: http://unixwiz.net/techtips/termios-vmin-vtime.html
 	toptions.c_cc[VMIN] = 16;
 	bytesToRead = 16;
-	toptions.c_cc[VTIME] = 0;
+	toptions.c_cc[VTIME] = 10;
 
 	/* commit flags */
 	if (tcsetattr(_fd, TCSANOW, &toptions) < 0)
@@ -144,7 +169,7 @@ int SerialRW::readNBytes(unsigned char *buf, int n)
 	_changeNrOfBytesNeeded(n);
 	}
 
-	if(_CheckFdTimeout(2500000))
+	if(_CheckFdTimeout(READ_TIMEOUT))
 	{
 		return read(_fd, buf, n);
 	}
@@ -181,10 +206,11 @@ bool SerialRW::_CheckFdTimeout(int usec) {
 	// Initialize file descriptor sets
 	fd_set read_fds, write_fds, except_fds;
 
+
 	//set timeout
 	struct timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = usec;
+	timeout.tv_sec = (usec / 1000000);
+	timeout.tv_usec = usec - (timeout.tv_sec * 1000000);
 
 	FD_ZERO(&read_fds);
 	FD_ZERO(&write_fds);

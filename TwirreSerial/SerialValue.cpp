@@ -16,6 +16,12 @@
 #include "../TwirreSerial/SerialValue.h"
 
 
+//size type for TwirreSerial arrays
+typedef uint16_t serial_size_t;
+
+//timeout in milliseconds for array update
+const uint32_t ARRAY_UPDATE_TIMEOUT = 5 * 1000;
+
 using namespace std;
 
 namespace twirre
@@ -64,15 +70,30 @@ namespace twirre
 	template<typename T>
 	void SerialArrayValue<T>::updateFromSerial()
 	{
-		_serial.Read(this->_size);
+		//read the incoming array size
+		serial_size_t updateSize;
+		_serial.Read(updateSize);
+		this->_size = updateSize;
 
+		//resize the value array to match the incoming array
 		if (this->_size > 0) this->_val = reinterpret_cast<T*>(realloc(this->_val, sizeof(T) * this->_size));
 
+		//calculate number of bytes to read
 		int bytesToRead = this->_size * sizeof(T);
 		int bytesRead = 0;
 
+		//read all bytes, or abort on timeout
+		auto startRead = std::chrono::steady_clock::now();
 		while(bytesRead < bytesToRead)
 		{
+			auto timeNow = std::chrono::steady_clock::now();
+			auto timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startRead).count();
+			if(timeElapsed > ARRAY_UPDATE_TIMEOUT)
+			{
+				std::cerr << "timeout during serial array value update. expected=" << bytesToRead << " received=" << bytesRead << std::endl;
+				return;
+			}
+
 			bytesRead += _serial.readNBytes((reinterpret_cast<unsigned char*>(this->_val)) + bytesRead, bytesToRead - bytesRead);
 		}
 	}
@@ -80,13 +101,23 @@ namespace twirre
 	template<typename T>
 	void SerialArrayValue<T>::addToMessage(vector<unsigned char> & data) const
 	{
-		const unsigned char * sizeBytes = reinterpret_cast<const unsigned char *>(&(this->_size));
-		data.push_back(sizeBytes[0]);
-		data.push_back(sizeBytes[1]);
+		serial_size_t serialSize = this->_size;
+		if(this->_size >= std::numeric_limits<serial_size_t>::max())
+		{
+			std::cerr << "array value size exceeds serial protocol limitations (" << this->_size << " > " << (std::numeric_limits<serial_size_t>::max() - 1) << "), truncating to max safe size";
+			serialSize = (std::numeric_limits<serial_size_t>::max() - 1);
+		}
 
-		uint16_t byteCount = this->_size * sizeof(T);
+
+		const unsigned char * sizeBytes = reinterpret_cast<const unsigned char *>(&serialSize);
+		for(int i = 0; i < sizeof(serial_size_t); i++)
+		{
+			data.push_back(sizeBytes[i]);
+		}
+
+		uint64_t byteCount = serialSize * sizeof(T);
 		const unsigned char * valBytes = reinterpret_cast<const unsigned char *>(&(this->_val));
-		for (uint16_t i = 0; i < byteCount; i++)
+		for (uint64_t i = 0; i < byteCount; i++)
 		{
 			data.push_back(valBytes[i]);
 		}
