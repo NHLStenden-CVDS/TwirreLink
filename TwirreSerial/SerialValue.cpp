@@ -17,7 +17,7 @@
 
 
 //size type for TwirreSerial arrays
-typedef uint16_t serial_size_t;
+typedef uint32_t serial_size_t;
 
 //timeout in milliseconds for array update
 const uint32_t ARRAY_UPDATE_TIMEOUT = 5 * 1000;
