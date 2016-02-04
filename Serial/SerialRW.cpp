@@ -18,7 +18,8 @@
 using namespace std;
 
 
-const int READ_TIMEOUT = 1 * 1000 * 1000;		//time in microseconds to wait for incoming data
+const int READ_TIMEOUT_FIRSTBYTE = 1 * 1000 * 1000;		//time in microseconds to wait for incoming data
+const int READ_TIMEOUT_INTRABYTE = 4;					//time in deciseconds to wait for additional bytes (resets after each received byte)
 
 #define BAUD_CASE(RATE)							\
 		case RATE:								\
@@ -27,7 +28,7 @@ const int READ_TIMEOUT = 1 * 1000 * 1000;		//time in microseconds to wait for in
 
 
 
-SerialRW::SerialRW() : _fd(0), bytesToRead(1)
+SerialRW::SerialRW() : _fd(0)
 {
 }
 
@@ -117,9 +118,8 @@ int SerialRW::Initialize(const char *serialPort, int baud)
 
 	/* set bytes to read */
 	// see: http://unixwiz.net/techtips/termios-vmin-vtime.html
-	toptions.c_cc[VMIN] = 16;
-	bytesToRead = 16;
-	toptions.c_cc[VTIME] = 10;
+	toptions.c_cc[VMIN] = 0;
+	toptions.c_cc[VTIME] = READ_TIMEOUT_INTRABYTE;
 
 	/* commit flags */
 	if (tcsetattr(_fd, TCSANOW, &toptions) < 0)
@@ -164,12 +164,7 @@ bool SerialRW::readString(std::string &s)
 //Returns number of bytes read
 int SerialRW::readNBytes(unsigned char *buf, int n)
 {
-	if(bytesToRead != n)
-	{
-	_changeNrOfBytesNeeded(n);
-	}
-
-	if(_CheckFdTimeout(READ_TIMEOUT))
+	if(_CheckFdTimeout(READ_TIMEOUT_FIRSTBYTE))
 	{
 		return read(_fd, buf, n);
 	}
@@ -182,24 +177,6 @@ int SerialRW::readNBytes(unsigned char *buf, int n)
 int SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
 {
 	return write(_fd, bytes, nrOfBytes);
-}
-
-
-void SerialRW::_changeNrOfBytesNeeded(int nrOfBytesNeeded)
-{
-	struct termios toptions;
-
-	if (tcgetattr(_fd, &toptions) < 0)
-	{
-		throw(runtime_error(string("init_serialport: Couldn't get term attributes")));
-	}
-
-	toptions.c_cc[VMIN] = nrOfBytesNeeded;
-
-	if (tcsetattr(_fd, TCSANOW, &toptions) < 0)
-	{
-		throw(runtime_error(string("init_serialport: Couldn't set term attributes")));
-	}
 }
 
 bool SerialRW::_CheckFdTimeout(int usec) {
