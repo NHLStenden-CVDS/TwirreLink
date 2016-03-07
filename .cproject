@@ -29,7 +29,7 @@
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.2050048072" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1592510612" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.dialect.std.1956714305" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.dialect.flags.1730920583" superClass="gnu.c.compiler.option.dialect.flags" value="" valueType="string"/>
+								<option id="gnu.c.compiler.option.dialect.flags.1730920583" name="Other dialect flags" superClass="gnu.c.compiler.option.dialect.flags" useByScannerDiscovery="true" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1292725877" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool command="g++-4.9" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1756600868" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -138,5 +138,7 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/twirrelink"/>
 		</configuration>
+		<configuration configurationName="ARM"/>
+		<configuration configurationName="x86"/>
 	</storageModule>
 </cproject>
