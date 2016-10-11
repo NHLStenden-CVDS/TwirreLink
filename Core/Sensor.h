@@ -42,11 +42,14 @@ namespace twirre
 		virtual Value & peekValue(std::string name);
 		virtual std::map<std::string, Value*> peekValues(const std::vector<std::string> &names);
 
-		virtual Value & Sense(const std::string &name);
-		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names);
 
-		virtual Value & operator[](const std::string &name);
-		virtual std::map<std::string, Value*> operator[](const std::vector<std::string> &names);
+		virtual std::map<std::string, Value*> Sense_impl(const std::vector<std::string> &names);
+
+		Value & Sense(const std::string &name) final;
+		std::map<std::string, Value*> Sense(const std::vector<std::string> &names) final;
+
+		Value & operator[](const std::string &name) final;
+		std::map<std::string, Value*> operator[](const std::vector<std::string> &names) final;
 
 		virtual std::string ToString() override;
 	protected:

@@ -41,7 +41,7 @@ namespace twirre
 	 * If a given value name is invalid, ErrorValue will be returned for that name
 	 * If the serial communication failed the old values will be returned
 	 */
-	map<string, Value*> SerialSensor::Sense(const vector<string> &names)
+	map<string, Value*> SerialSensor::Sense_impl(const vector<string> &names)
 	{
 		map<string, Value*> valuesMap;
 		vector<Value*> values;

@@ -71,10 +71,35 @@ namespace twirre
 		return GetParameter(name);
 	}
 
+	std::map<std::string, Parameter*> Actuator::GetParameters(const std::vector<std::string> & names)
+	{
+		std::map<string, Parameter*> returnvalues;
+
+		for(const auto& name : names)
+		{
+			//skip duplicate names
+			if(returnvalues.find(name) == returnvalues.end())
+			{
+				if(_parametersList.find(name) == _parametersList.end())
+				{
+					returnvalues[name] = ErrorValue::getInstance();
+				}
+				else
+				{
+					returnvalues[name] = _parametersList.at(name);
+				}
+			}
+		}
+
+		return returnvalues;
+	}
+
 	void Actuator::Actuate()
 	{
 		//lock the owned_mutex
 		_actuateMutex.lock();
+
+		//prepare logging
 
 		//call actuation implementation
 		ActuateImpl();

@@ -105,6 +105,13 @@ namespace twirre
 
 	std::map<std::string, Value*> Sensor::Sense(const std::vector<std::string> &names)
 	{
+		//call logger if required
+
+		return Sense_impl(names);
+	}
+
+	std::map<std::string, Value*> Sensor::Sense_impl(const std::vector<std::string> &names)
+	{
 		std::map<std::string, Value*> returnValues;
 
 		for(auto & name : names)

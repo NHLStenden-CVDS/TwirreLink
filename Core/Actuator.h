@@ -75,6 +75,8 @@ namespace twirre
 		//this forwards to GetParameter(name)
 		virtual Parameter & operator[](const std::string & name);
 
+		virtual std::map<std::string, Parameter*> GetParameters(const std::vector<std::string> & names);
+
 		void Actuate();
 
 	protected:

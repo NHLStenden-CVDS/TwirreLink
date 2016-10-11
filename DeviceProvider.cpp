@@ -39,4 +39,14 @@ namespace twirre
 	{
 		_links.erase(link);
 	}
+
+	void DeviceProvider::addLogger(TwirreLogger * log)
+	{
+		_loggers.insert(log);
+	}
+
+	void DeviceProvider::removeLogger(TwirreLogger * log)
+	{
+		_loggers.erase(log);
+	}
 }

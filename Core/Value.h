@@ -26,6 +26,37 @@ namespace twirre
 		type_void, type_int8, type_uint8, type_int16, type_uint16, type_int32, type_uint32, type_int64, type_uint64, type_float, type_double
 	};
 
+	static constexpr inline const char * enumtostr(const NativeType t)
+	{
+		switch(t)
+		{
+		case NativeType::type_void:
+			return "type_void";
+		case NativeType::type_int8:
+			return "type_int8";
+		case NativeType::type_uint8:
+			return "type_uint8";
+		case NativeType::type_int16:
+			return "type_int16";
+		case NativeType::type_uint16:
+			return "type_uint16";
+		case NativeType::type_int32:
+			return "type_int32";
+		case NativeType::type_uint32:
+			return "type_uint32";
+		case NativeType::type_int64:
+			return "type_int64";
+		case NativeType::type_uint64:
+			return "type_uint64";
+		case NativeType::type_float:
+			return "type_float";
+		case NativeType::type_double:
+			return "type_double";
+		default:
+			return nullptr;
+		}
+	}
+
 	template<typename T>
 	constexpr NativeType _getNativeType();
 
