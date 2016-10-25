@@ -14,6 +14,7 @@
 #include "Core/Actuator.h"
 #include "Core/Sensor.h"
 #include "Core/Value.h"
+#include "Logger/TwirreLogger.h"
 
 namespace twirre
 {
@@ -29,7 +30,12 @@ namespace twirre
 		virtual const std::map<std::string, Sensor*> & getSensors() = 0;
 	protected:
 		void doNotifyChange();
+		void addLogger(TwirreLogger * log);
+		void removeLogger(TwirreLogger * log);
 	private:
+		void sensorLoggerCallback(Sensor * sensor, std::map<std::string, Value*>& sensorValues);
+		void actuatorLoggerCallback(Actuator * actuators, std::map<std::string, Parameter*>& actuatorParameters);
+		std::set<TwirreLogger *> _loggers;
 		std::set<TwirreLink *> _links;
 		void addLink(TwirreLink * link);
 		void removeLink(TwirreLink * link);

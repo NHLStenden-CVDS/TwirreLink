@@ -75,13 +75,23 @@ namespace twirre
 		//this forwards to GetParameter(name)
 		virtual Parameter & operator[](const std::string & name);
 
+		virtual std::map<std::string, Parameter*> GetParameters(const std::vector<std::string> & names);
+
 		void Actuate();
+
+		void clearActuateLoggerCallback();
+		void setActuateLoggerCallback(std::function<void(Actuator *, std::map<std::string, Parameter*>&)> cbfn);
 
 	protected:
 		std::map<std::string, Parameter*> _parametersList;
 		owned_mutex _actuateMutex; //lock actuator from first value set until actuation
 		void registerParameter(Parameter* val);
 		void registerParameters(std::vector<Parameter *> parms);
+
+		std::function<void(Actuator *, std::map<std::string, Parameter*>&)> _actuateLoggerCallback;
+		bool _actuateLoggerSet;
+
+		void logActuation();
 
 		/**
 		 * Update this Actuator using the modified parameters

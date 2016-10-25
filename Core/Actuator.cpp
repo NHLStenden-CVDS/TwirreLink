@@ -19,7 +19,7 @@ namespace twirre
 	Actuator::Actuator(const string name, const string description) :
 			Device(name, description)
 	{
-
+		clearActuateLoggerCallback();
 	}
 
 	Actuator::~Actuator()
@@ -71,16 +71,58 @@ namespace twirre
 		return GetParameter(name);
 	}
 
+	std::map<std::string, Parameter*> Actuator::GetParameters(const std::vector<std::string> & names)
+	{
+		std::map<string, Parameter*> returnvalues;
+
+		for(const auto& name : names)
+		{
+			//skip duplicate names
+			if(returnvalues.find(name) == returnvalues.end())
+			{
+				if(_parametersList.find(name) == _parametersList.end())
+				{
+					returnvalues[name] = ErrorValue::getInstance();
+				}
+				else
+				{
+					returnvalues[name] = _parametersList.at(name);
+				}
+			}
+		}
+
+		return returnvalues;
+	}
+
 	void Actuator::Actuate()
 	{
 		//lock the owned_mutex
 		_actuateMutex.lock();
+
+		//log
+		if(_actuateLoggerSet)
+		{
+			logActuation();
+		}
 
 		//call actuation implementation
 		ActuateImpl();
 
 		//unlock the owned mutex
 		_actuateMutex.unlock();
+	}
+
+	void Actuator::logActuation()
+	{
+		std::map<std::string, Parameter*> actuatedParams;
+		for(auto param : _parametersList)
+		{
+			if(param.second->isModified())
+			{
+				actuatedParams.insert(param);
+			}
+		}
+		_actuateLoggerCallback(this, actuatedParams);
 	}
 
 	void Actuator::registerParameter(Parameter* parm)
@@ -95,6 +137,18 @@ namespace twirre
 		{
 			registerParameter(parm);
 		}
+	}
+
+	void Actuator::clearActuateLoggerCallback()
+	{
+		_actuateLoggerCallback = [](Actuator *, std::map<std::string, Parameter*>&){};
+		_actuateLoggerSet = false;
+	}
+
+	void Actuator::setActuateLoggerCallback(std::function<void(Actuator *, std::map<std::string, Parameter*>&)> cbfn)
+	{
+		_actuateLoggerCallback = cbfn;
+		_actuateLoggerSet = true;
 	}
 
 } /* namespace twirre */

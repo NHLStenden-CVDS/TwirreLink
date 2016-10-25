@@ -10,8 +10,13 @@
 #include <exception>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 #include "TwirreLink.h"
+
+#include <chrono>
+
 #include "TwirreSerial/TwirreSerial.h"
 
 using namespace std;
@@ -67,6 +72,8 @@ namespace twirre
 
 	TwirreLink::~TwirreLink()
 	{
+		stopLogging();
+
 		//remove all links
 		for (auto prov : _providers)
 		{
@@ -173,6 +180,8 @@ namespace twirre
 		//check if provider was actually added
 		if(_providers.find(&prov) == _providers.end()) return;
 
+
+
 		//break bidirectional link
 		prov.removeLink(this);
 		removeLink(&prov);
@@ -219,11 +228,63 @@ namespace twirre
 			auto& sensors = prov->getSensors();
 			_sensorList.insert(sensors.begin(), sensors.end());
 		}
+
+		logDevices();
 	}
 
 	void TwirreLink::removeLink(DeviceProvider * which)
 	{
 		_providers.erase(which);
 	}
+
+	void TwirreLink::startLogging(const string & loggingPath)
+	{
+		if(_logger != nullptr) return;
+
+		auto now = std::chrono::system_clock::now();
+		auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+		std::stringstream ss;
+		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y%m%d%H%M%S.tlog");
+		std::string datetime = ss.str();
+
+		string outpath = loggingPath + datetime;
+		std::cout << "creating logger at " << outpath << std::endl;
+		_logger = new TwirreLogger(outpath);
+
+		logDevices();
+
+		for(auto & provider : _providers)
+		{
+			provider->addLogger(_logger);
+		}
+	}
+
+	bool TwirreLink::stopLogging(void)
+	{
+		for(auto & provider : _providers)
+		{
+			provider->removeLogger(_logger);
+		}
+
+		if(_logger != nullptr)
+		{
+			delete _logger;
+			return true;
+		}
+		return false;
+	}
+
+	void TwirreLink::logDevices(void)
+	{
+		if(_logger == nullptr) return;
+
+		//log actuators
+		_logger->logActuators(_actuatorList);
+		//log sensors
+		_logger->logSensors(_sensorList);
+	}
+
+
 
 } /* namespace twirre */

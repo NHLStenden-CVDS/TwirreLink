@@ -34,7 +34,7 @@ namespace twirre
 		//disable move assignment
 		SerialSensor& operator=(SerialSensor&&) = delete;
 
-		virtual std::map<std::string, Value*> Sense(const std::vector<std::string> &names) override;
+		virtual std::map<std::string, Value*> Sense_impl(const std::vector<std::string> &names) override;
 	protected:
 		SerialRW & _serial;
 		std::mutex & _serialMutex;

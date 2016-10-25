@@ -14,6 +14,7 @@
 
 #include "Core/Actuator.h"
 #include "Core/Sensor.h"
+#include "Logger/TwirreLogger.h"
 #include "DeviceProvider.h"
 
 namespace twirre
@@ -131,13 +132,30 @@ namespace twirre
 		 */
 		Actuator& getActuator(const std::string & actuatorName);
 
+		/**
+		 * Start logging all actions to logfile at loggingPath
+		 *
+		 * @param loggingPath path where the logfile should be created
+		 */
+		void startLogging(const std::string & loggingPath);
+
+		/**
+		 * Stop logging and close the logfile
+		 *
+		 * @return returns true if a logger was active and has been stopped, returns false if no logger was active.
+		 */
+		bool stopLogging(void);
+
 	private:
-		void notifyChange();
+		void logDevices(void);
+		void notifyChange(void);
 		void removeLink(DeviceProvider * which); //called by DeviceProvider's destructor
 
 		std::set<DeviceProvider *> _providers;
 		std::map<std::string, Actuator*> _actuatorList;
 		std::map<std::string, Sensor*> _sensorList;
+
+		TwirreLogger * _logger = nullptr;
 	};
 
 } /* namespace twirre */
