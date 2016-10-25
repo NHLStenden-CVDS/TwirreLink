@@ -253,10 +253,20 @@ namespace twirre
 		_logger = new TwirreLogger(outpath);
 
 		logDevices();
+
+		for(auto & provider : _providers)
+		{
+			provider->addLogger(_logger);
+		}
 	}
 
 	bool TwirreLink::stopLogging(void)
 	{
+		for(auto & provider : _providers)
+		{
+			provider->removeLogger(_logger);
+		}
+
 		if(_logger != nullptr)
 		{
 			delete _logger;

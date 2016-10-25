@@ -20,6 +20,7 @@ namespace twirre
 	Sensor::Sensor(const string name, const string description) :
 			Device(name, description)
 	{
+		clearLoggerCallback();
 	}
 
 	Sensor::~Sensor()
@@ -105,9 +106,12 @@ namespace twirre
 
 	std::map<std::string, Value*> Sensor::Sense(const std::vector<std::string> &names)
 	{
-		//call logger if required
+		auto vals = Sense_impl(names);
 
-		return Sense_impl(names);
+		//call logger if required
+		_loggerCallback(this, vals);
+
+		return vals;
 	}
 
 	std::map<std::string, Value*> Sensor::Sense_impl(const std::vector<std::string> &names)
@@ -170,6 +174,16 @@ namespace twirre
 		{
 			registerValue(val);
 		}
+	}
+
+	void Sensor::clearLoggerCallback()
+	{
+		_loggerCallback = [](Sensor *, std::map<std::string, Value*>&){};
+	}
+
+	void Sensor::setLoggerCallback(std::function<void(Sensor *, std::map<std::string, Value*>&)> cbfn)
+	{
+		_loggerCallback = cbfn;
 	}
 
 } /* namespace twirre */

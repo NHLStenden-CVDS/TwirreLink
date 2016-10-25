@@ -19,7 +19,7 @@ namespace twirre
 	Actuator::Actuator(const string name, const string description) :
 			Device(name, description)
 	{
-
+		clearActuateLoggerCallback();
 	}
 
 	Actuator::~Actuator()
@@ -99,13 +99,30 @@ namespace twirre
 		//lock the owned_mutex
 		_actuateMutex.lock();
 
-		//prepare logging
+		//log
+		if(_actuateLoggerSet)
+		{
+			logActuation();
+		}
 
 		//call actuation implementation
 		ActuateImpl();
 
 		//unlock the owned mutex
 		_actuateMutex.unlock();
+	}
+
+	void Actuator::logActuation()
+	{
+		std::map<std::string, Parameter*> actuatedParams;
+		for(auto param : _parametersList)
+		{
+			if(param.second->isModified())
+			{
+				actuatedParams.insert(param);
+			}
+		}
+		_actuateLoggerCallback(this, actuatedParams);
 	}
 
 	void Actuator::registerParameter(Parameter* parm)
@@ -120,6 +137,18 @@ namespace twirre
 		{
 			registerParameter(parm);
 		}
+	}
+
+	void Actuator::clearActuateLoggerCallback()
+	{
+		_actuateLoggerCallback = [](Actuator *, std::map<std::string, Parameter*>&){};
+		_actuateLoggerSet = false;
+	}
+
+	void Actuator::setActuateLoggerCallback(std::function<void(Actuator *, std::map<std::string, Parameter*>&)> cbfn)
+	{
+		_actuateLoggerCallback = cbfn;
+		_actuateLoggerSet = true;
 	}
 
 } /* namespace twirre */

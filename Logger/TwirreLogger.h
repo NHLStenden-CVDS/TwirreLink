@@ -27,10 +27,14 @@ namespace twirre
 
 		void logActuators(std::map<std::string, Actuator*>& actuators);
 		void logSensors(std::map<std::string, Sensor*>& sensors);
+		void logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues);
+		void logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters);
 
 		void onDevicelistChanged(void);
 
 		uint64_t getTimestamp(void);
+
+
 
 	private:
 		std::shared_ptr<std::ofstream> _logfile;

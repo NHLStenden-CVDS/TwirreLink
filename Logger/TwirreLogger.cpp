@@ -88,6 +88,52 @@ namespace twirre
 		*_logfile << "# end of full sensor list" << endl;
 	}
 
+	void TwirreLogger::logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues)
+	{
+		*_logfile << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
+
+		for(auto & value : sensorValues)
+		{
+			*_logfile << "\t" << value.second->getName() << ":";
+
+			if(value.second->isArray())
+			{
+				*_logfile << "array; logging not implemented yet";
+			}
+			else
+			{
+				*_logfile << value.second->as_string();
+			}
+
+			*_logfile << endl;
+		}
+
+		*_logfile << "}" << endl;
+	}
+
+	void TwirreLogger::logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters)
+	{
+		*_logfile << getTimestamp() << " actuate " << actuator->getName() << " {" << endl;
+
+		for(auto & param : actuatorParameters)
+		{
+			*_logfile << "\t" << param.second->getName() << ":";
+
+			if(param.second->isArray())
+			{
+				*_logfile << "array; logging not implemented yet";
+			}
+			else
+			{
+				*_logfile << param.second->as_string();
+			}
+
+			*_logfile << endl;
+		}
+
+		*_logfile << "}" << endl;
+	}
+
 	void TwirreLogger::onDevicelistChanged()
 	{
 		*_logfile << "# TwirreLink device list changed" << endl;

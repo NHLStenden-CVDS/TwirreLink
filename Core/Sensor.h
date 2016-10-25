@@ -45,14 +45,18 @@ namespace twirre
 
 		virtual std::map<std::string, Value*> Sense_impl(const std::vector<std::string> &names);
 
-		Value & Sense(const std::string &name) final;
-		std::map<std::string, Value*> Sense(const std::vector<std::string> &names) final;
+		Value & Sense(const std::string &name);
+		std::map<std::string, Value*> Sense(const std::vector<std::string> &names);
 
-		Value & operator[](const std::string &name) final;
-		std::map<std::string, Value*> operator[](const std::vector<std::string> &names) final;
+		Value & operator[](const std::string &name);
+		std::map<std::string, Value*> operator[](const std::vector<std::string> &names);
 
 		virtual std::string ToString() override;
+
+		void clearLoggerCallback();
+		void setLoggerCallback(std::function<void(Sensor *, std::map<std::string, Value*>&)> cbfn);
 	protected:
+		std::function<void(Sensor *, std::map<std::string, Value*>&)> _loggerCallback;
 		std::map<std::string, Value*> _valueList;
 		void registerValue(Value* val);
 		void registerValues(std::vector<Value *> vals);
