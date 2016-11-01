@@ -164,14 +164,19 @@ bool SerialRW::readString(std::string &s)
 //Returns number of bytes read
 int SerialRW::readNBytes(unsigned char *buf, int n)
 {
-	if(_CheckFdTimeout(READ_TIMEOUT_FIRSTBYTE))
+	int nread = 0;
+	while(nread < n)
 	{
-		return read(_fd, buf, n);
+		if(_CheckFdTimeout(READ_TIMEOUT_FIRSTBYTE))
+		{
+			nread += read(_fd, buf + nread, n - nread);
+		}
+		else
+		{
+			return nread;
+		}
 	}
-	else
-	{
-		return 0;
-	}
+	return nread;
 }
 
 int SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
