@@ -245,12 +245,13 @@ namespace twirre
 		auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
 		std::stringstream ss;
-		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y%m%d%H%M%S.tlog");
+		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y-%m-%d_%H-%M-%S");
 		std::string datetime = ss.str();
 
-		string outpath = loggingPath + datetime;
+		string outpath = loggingPath + datetime + ".tlog";
+		string binpath = loggingPath + datetime + ".tbin";
 		std::cout << "creating logger at " << outpath << std::endl;
-		_logger = new TwirreLogger(outpath);
+		_logger = new TwirreLogger(outpath, binpath);
 
 		logDevices();
 

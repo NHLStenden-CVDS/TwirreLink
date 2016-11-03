@@ -35,7 +35,7 @@
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1292725877" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool command="g++-4.9" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1756600868" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+							<tool command="g++" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1756600868" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
 								<option id="gnu.cpp.compiler.option.optimization.level.486053786" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1664310588" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.927190228" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
@@ -50,8 +50,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1963169062" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
 								<option defaultValue="true" id="gnu.c.link.option.shared.246081770" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
 							</tool>
-							<tool command="g++-4.9" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1691032883" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option defaultValue="true" id="gnu.cpp.link.option.shared.572024457" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
+							<tool command="g++" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1691032883" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
+								<option defaultValue="true" id="gnu.cpp.link.option.shared.572024457" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" useByScannerDiscovery="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.732653357" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

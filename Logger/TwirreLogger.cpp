@@ -14,24 +14,52 @@ using namespace std;
 namespace twirre
 {
 
-	TwirreLogger::TwirreLogger(const string & logpath)
+	TwirreLogger::TwirreLogger(const string & logpath, const string & binpath)
 	{
 		_tp_start = std::chrono::steady_clock::now();
 		_logfile = make_shared<ofstream>();
 		_logfile->open(logpath);
+		if(!_logfile->is_open())
+		{
+			throw std::runtime_error("TwirreLogger: failed to create tlog file");
+		}
+
 		*_logfile << "# TwirreLogger initializing" << endl;
 		*_logfile << getTimestamp() << " init" << endl;
+
+		//init binary file
+		_binfile = make_shared<ofstream>();
+		_binfile->open(binpath, std::ofstream::binary);
+		if(!_binfile->is_open())
+		{
+			throw std::runtime_error("TwirreLogger: failed to create tbin file");
+		}
+
+		*_logfile << getTimestamp() << " create binfile " << binpath << std::endl;
 	}
 
 	TwirreLogger::~TwirreLogger()
 	{
-		*_logfile << getTimestamp() << " stop" << endl;
-		*_logfile << "# TwirreLogger stopped" << endl;
-		_logfile->close();
+		//close logfile
+		{
+			std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+
+			*_logfile << getTimestamp() << " stop" << endl;
+			*_logfile << "# TwirreLogger stopped" << endl;
+			_logfile->close();
+		}
+		//close binfile
+		{
+			std::lock_guard<std::mutex> binMutexLock (_binfileMutex);
+
+			_binfile->close();
+		}
 	}
 
 	void TwirreLogger::logActuators(std::map<std::string, Actuator*>& actuators)
 	{
+		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+
 		*_logfile << "# Full actuator list" << endl;
 		*_logfile << getTimestamp() << " actuators {" << endl;
 
@@ -61,6 +89,8 @@ namespace twirre
 
 	void TwirreLogger::logSensors(std::map<std::string, Sensor*>& sensors)
 	{
+		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+
 		*_logfile << "# Full sensor list" << endl;
 		*_logfile << getTimestamp() << " sensors {" << endl;
 
@@ -90,6 +120,7 @@ namespace twirre
 
 	void TwirreLogger::logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues)
 	{
+		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
 		*_logfile << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
 
 		for(auto & value : sensorValues)
@@ -98,7 +129,13 @@ namespace twirre
 
 			if(value.second->isArray())
 			{
-				*_logfile << "array; logging not implemented yet";
+				*_logfile << "array (" << _binaryDataOffset << "," << value.second->getSize() << ")";
+
+				//write to binfile. Temporarily release logfileMutex.
+				logMutexLock.unlock();
+				logBinArrayValue(value.second);
+				logMutexLock.lock();
+
 			}
 			else
 			{
@@ -113,6 +150,7 @@ namespace twirre
 
 	void TwirreLogger::logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters)
 	{
+		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
 		*_logfile << getTimestamp() << " actuate " << actuator->getName() << " {" << endl;
 
 		for(auto & param : actuatorParameters)
@@ -121,7 +159,11 @@ namespace twirre
 
 			if(param.second->isArray())
 			{
-				*_logfile << "array; logging not implemented yet";
+				*_logfile << "array (" << _binaryDataOffset << "," << param.second->getSize() << ")";
+
+				logMutexLock.unlock();
+				logBinArrayValue(dynamic_cast<Value *>(param.second));
+				logMutexLock.lock();
 			}
 			else
 			{
@@ -134,8 +176,20 @@ namespace twirre
 		*_logfile << "}" << endl;
 	}
 
+	void TwirreLogger::logBinArrayValue(Value * val)
+	{
+		std::lock_guard<std::mutex> binMutexLock (_binfileMutex);
+
+		auto dataptr = val->getBuffer();
+		size_t nbytes = val->getSize() * val->getElementSize();
+		_binfile->write(reinterpret_cast<char *>(dataptr), nbytes);
+		_binaryDataOffset += nbytes;
+	}
+
 	void TwirreLogger::onDevicelistChanged()
 	{
+		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+
 		*_logfile << "# TwirreLink device list changed" << endl;
 		*_logfile << getTimestamp() << "devicelist_changed" << endl;
 	}
