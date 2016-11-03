@@ -30,7 +30,6 @@ namespace twirre
 		void logSensors(std::map<std::string, Sensor*>& sensors);
 		void logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues);
 		void logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters);
-		void logBinArrayValue(Value * val);
 
 		void onDevicelistChanged(void);
 
@@ -45,6 +44,11 @@ namespace twirre
 		std::chrono::time_point<std::chrono::steady_clock> _tp_start;
 
 		size_t _binaryDataOffset = 0; //offset where the next binary blob should be written in the binfile
+
+		template<class T>
+		void logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock);
+
+		void logBinArrayValue(Value * val);
 	};
 }
 #endif /* LOGGER_TWIRRELOGGER_H_ */

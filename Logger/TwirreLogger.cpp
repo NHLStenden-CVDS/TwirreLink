@@ -118,12 +118,10 @@ namespace twirre
 		*_logfile << "# end of full sensor list" << endl;
 	}
 
-	void TwirreLogger::logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues)
+	template<class T>
+	void TwirreLogger::logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock)
 	{
-		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
-		*_logfile << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
-
-		for(auto & value : sensorValues)
+		for(auto & value : values)
 		{
 			*_logfile << "\t" << value.second->getName() << ":";
 
@@ -131,11 +129,9 @@ namespace twirre
 			{
 				*_logfile << "array (" << _binaryDataOffset << "," << value.second->getSize() << ")";
 
-				//write to binfile. Temporarily release logfileMutex.
 				logMutexLock.unlock();
-				logBinArrayValue(value.second);
+				logBinArrayValue(dynamic_cast<Value *>(value.second));
 				logMutexLock.lock();
-
 			}
 			else
 			{
@@ -144,6 +140,14 @@ namespace twirre
 
 			*_logfile << endl;
 		}
+	}
+
+	void TwirreLogger::logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues)
+	{
+		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
+		*_logfile << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
+
+		logDeviceValues(sensorValues, logMutexLock);
 
 		*_logfile << "}" << endl;
 	}
@@ -153,28 +157,12 @@ namespace twirre
 		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
 		*_logfile << getTimestamp() << " actuate " << actuator->getName() << " {" << endl;
 
-		for(auto & param : actuatorParameters)
-		{
-			*_logfile << "\t" << param.second->getName() << ":";
-
-			if(param.second->isArray())
-			{
-				*_logfile << "array (" << _binaryDataOffset << "," << param.second->getSize() << ")";
-
-				logMutexLock.unlock();
-				logBinArrayValue(dynamic_cast<Value *>(param.second));
-				logMutexLock.lock();
-			}
-			else
-			{
-				*_logfile << param.second->as_string();
-			}
-
-			*_logfile << endl;
-		}
+		logDeviceValues(actuatorParameters, logMutexLock);
 
 		*_logfile << "}" << endl;
 	}
+
+
 
 	void TwirreLogger::logBinArrayValue(Value * val)
 	{
