@@ -110,7 +110,7 @@ namespace twirre
 
 
 		const unsigned char * sizeBytes = reinterpret_cast<const unsigned char *>(&serialSize);
-		for(int i = 0; i < sizeof(serial_size_t); i++)
+		for(size_t i = 0; i < sizeof(serial_size_t); i++)
 		{
 			data.push_back(sizeBytes[i]);
 		}
