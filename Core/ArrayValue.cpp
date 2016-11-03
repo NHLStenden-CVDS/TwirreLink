@@ -107,7 +107,7 @@ namespace twirre
 	ArrayValue<T>::ArrayValue(const string name, owned_mutex * actuatorMutex, const uint32_t size, const T defaultValue) :
 			Parameter(name, actuatorMutex), _val(reinterpret_cast<T*>(malloc(size * sizeof(T)))), _size(size)
 	{
-		for (int i = 0; i < size; i++)
+		for (uint32_t i = 0; i < size; i++)
 		{
 			_val[i] = defaultValue;
 		}
