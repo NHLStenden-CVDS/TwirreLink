@@ -18,14 +18,14 @@ using namespace std;
 	template <typename T>																		\
 	GET_T ArrayValue<T>::as_##GET_T ()															\
 	{																							\
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		if(_size == 0) return GET_T(0);															\
 		return static_cast<GET_T>(_val[0]);														\
 	}																							\
 	template <typename T>																		\
 	GET_T ArrayValue<T>::as_##GET_T (uint32_t id)												\
 	{																							\
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		if(id >= _size) throw std::out_of_range("index out of bounds on value array"); 			\
 		return static_cast<GET_T>(_val[id]);													\
 	}																							\
@@ -41,7 +41,7 @@ using namespace std;
 	void ArrayValue<T>::set(const SET_T * vals, const uint32_t size)							\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		_modified = true;																		\
 		_size = size;																			\
 		if(_size != 0)																			\
@@ -155,7 +155,7 @@ namespace twirre
 	ArrayValue<T> & ArrayValue<T>::operator =(ArrayValue<T> && other) noexcept
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 
 		//need to swap data
 		std::swap(_val, other._val);
@@ -251,7 +251,7 @@ namespace twirre
 	void ArrayValue<T>::setNative(T* data, uint32_t size)
 	{
 		if (_actuatorMutex) _actuatorMutex->lock();
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));
 		_size = size;
 		memcpy(_val, data, size * sizeof(T));
@@ -261,7 +261,7 @@ namespace twirre
 	template<typename T>
 	T ArrayValue<T>::getNative(uint32_t id)
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		return _val[id];
 	}
 
@@ -285,7 +285,7 @@ namespace twirre
 	template<typename T>
 	std::string ArrayValue<T>::as_string()
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		//for now, get underlying pointer, treat it as char* (forcing last byte to 0), and return that as string (restoring the last byte of the original value)
 		char* str = reinterpret_cast<char*>(_val);
 		size_t bytes = _size * (sizeof(T) / sizeof(char));
@@ -310,7 +310,7 @@ namespace twirre
 	template<typename T>
 	void ArrayValue<T>::set(const Value& val)
 	{
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);

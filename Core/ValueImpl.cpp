@@ -19,14 +19,14 @@ using namespace std;
 	template <typename T>																		\
 	GET_T ValueImpl<T>::as_##GET_T () 															\
 	{ 																							\
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		return static_cast<GET_T>(_val); 														\
 	}																							\
 	template <typename T>																		\
 	GET_T ValueImpl<T>::as_##GET_T (uint32_t id)												\
 	{																							\
 		if(id > 0) throw std::out_of_range("index out of bounds on single-element value"); 		\
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);									\
 		return as_##GET_T ();																	\
 	}
 
@@ -36,7 +36,7 @@ using namespace std;
 	void ValueImpl<T>::set(const SET_T val ) 													\
 	{ 																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		_modified = true;																		\
 		_val = static_cast<T>(val);																\
 	}																							\
@@ -45,7 +45,7 @@ using namespace std;
 	void ValueImpl<T>::set(const SET_T * vals, const uint32_t size)								\
 	{																							\
 		if(_actuatorMutex) _actuatorMutex->lock();												\
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);									\
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);								\
 		if(size > 0)																			\
 			_val = static_cast<T>(vals[0]);														\
 		_modified = true;																		\
@@ -68,14 +68,14 @@ template<typename T>
 	template<typename T>
 	T ValueImpl<T>::getNativeValue()
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		return _val;
 	}
 
 	template<typename T>
 	void ValueImpl<T>::setNativeValue(T val)
 	{
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		_val = val;
 	}
 
@@ -118,7 +118,7 @@ template<typename T>
 	template<typename T>
 	void ValueImpl<T>::copyTo(Parameter * parm) const
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		parm->set(_val);
 	}
 
@@ -166,7 +166,7 @@ template<typename T>
 	template<typename T>
 	std::string ValueImpl<T>::as_string()
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		return to_string(_val);
 	}
 
@@ -184,7 +184,7 @@ template<typename T>
 	template<typename T>
 	void ValueImpl<T>::set(const Value& val)
 	{
-		std::unique_lock<std::shared_timed_mutex>(_rwMutex);
+		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		//The underlying value type of val is unknown, so it's needed to call its copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);
