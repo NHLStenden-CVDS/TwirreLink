@@ -140,23 +140,23 @@ void SerialRW::flush()
 
 bool SerialRW::readString(std::string &s)
 {
-	s = "";
-	s.reserve(2048);
+	std::stringstream stringStream;
 
 	char t;
-
 	if(!Read<char>(t))
 	{
 		return false;
 	}
 	while (t != '\0')
 	{
-		s += t;
+		stringStream << t;
 		if(!Read<char>(t))
 		{
 			return false;
 		}
 	}
+
+	s = stringStream.str();
 
 	return true;
 }
