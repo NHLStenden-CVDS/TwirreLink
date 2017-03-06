@@ -77,6 +77,7 @@ namespace twirre
 
 		virtual std::map<std::string, Parameter*> GetParameters(const std::vector<std::string> & names);
 
+		//actuate will apply the updated parameters
 		void Actuate();
 
 		void clearActuateLoggerCallback();

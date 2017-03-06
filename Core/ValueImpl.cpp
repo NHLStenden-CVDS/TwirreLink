@@ -184,7 +184,7 @@ template<typename T>
 	void ValueImpl<T>::set(const Value& val)
 	{
 		std::unique_lock<std::shared_timed_mutex> rwLock(_rwMutex);
-		//The underlying value type of val is unknown, so it's needed to call its copyTo function
+		//The underlying value type of val is unknown, so it is necessary to call it's copyTo function
 		//(which will in turn call the correct set(...) function of this object)
 		val.copyTo(this);
 	}
