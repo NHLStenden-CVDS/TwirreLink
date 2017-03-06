@@ -26,7 +26,6 @@ using namespace std;
 	GET_T ValueImpl<T>::as_##GET_T (uint32_t id)												\
 	{																							\
 		if(id > 0) throw std::out_of_range("index out of bounds on single-element value"); 		\
-		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);									\
 		return as_##GET_T ();																	\
 	}
 

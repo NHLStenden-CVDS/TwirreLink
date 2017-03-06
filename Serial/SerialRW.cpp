@@ -12,6 +12,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdint>
+#include <sstream>
 
 #include "SerialRW.h"
 

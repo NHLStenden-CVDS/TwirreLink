@@ -32,6 +32,8 @@ namespace twirre
 		_binfile->open(binpath, std::ofstream::binary);
 		if(!_binfile->is_open())
 		{
+			*_logfile << getTimestamp() << "! error create binfile " << binpath << " : failed to create file" << endl;
+			_logfile->close();
 			throw std::runtime_error("TwirreLogger: failed to create tbin file");
 		}
 
@@ -121,24 +123,38 @@ namespace twirre
 	template<class T>
 	void TwirreLogger::logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock)
 	{
+		int errorCount = 0;
 		for(auto & value : values)
 		{
-			*_logfile << "\t" << value.second->getName() << ":";
-
-			if(value.second->isArray())
+			if(value.second->isValid()) //if sense/actuate was called with non-existent value names, for those names a special errorValue is returned. Only log valid values for now.
 			{
-				*_logfile << "array (" << _binaryDataOffset << "," << value.second->getSize() << ")";
+				*_logfile << "\t" << value.second->getName() << ":";
 
-				logMutexLock.unlock();
-				logBinArrayValue(dynamic_cast<Value *>(value.second));
-				logMutexLock.lock();
+				if(value.second->isArray())
+				{
+					*_logfile << "array (" << _binaryDataOffset << "," << value.second->getSize() << ")";
+
+					logMutexLock.unlock();
+					logBinArrayValue(dynamic_cast<Value *>(value.second));
+					logMutexLock.lock();
+				}
+				else
+				{
+					*_logfile << value.second->as_string();
+				}
+
+				*_logfile << endl;
 			}
-			else
+			else //count invalid values
 			{
-				*_logfile << value.second->as_string();
+				errorCount++;
 			}
+		}
 
-			*_logfile << endl;
+		//if errorValues are present, write an error to the logfile containing the count of errored values.
+		if(errorCount > 0)
+		{
+			*_logfile << "!\t<error>:" << errorCount << (errorCount > 1 ? " errorvalues" : " errorvalue") << " present" << endl;
 		}
 	}
 
@@ -161,8 +177,6 @@ namespace twirre
 
 		*_logfile << "}" << endl;
 	}
-
-
 
 	void TwirreLogger::logBinArrayValue(Value * val)
 	{
