@@ -184,7 +184,7 @@ namespace twirre
 	protected:
 		virtual void copyTo(Parameter* parm) const = 0;
 		std::string _name;
-		std::shared_timed_mutex _rwMutex;
+		mutable std::shared_timed_mutex _rwMutex;
 	};
 
 	class Parameter: public Value
@@ -281,7 +281,7 @@ namespace twirre
 		virtual void set(const T val);
 
 	protected:
-		std::shared_timed_mutex _rwMutex;
+		mutable std::shared_timed_mutex _rwMutex;
 		T _val;
 	};
 
@@ -393,11 +393,6 @@ namespace twirre
 	extern template class ScalarImpl<int64_t> ;
 	extern template class ScalarImpl<float> ;
 	extern template class ScalarImpl<double> ;
-
-
-
-
-
 } /* namespace twirre */
 
 

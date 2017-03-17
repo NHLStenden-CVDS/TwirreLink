@@ -102,15 +102,18 @@ namespace twirre
 	void SerialArrayValue<T>::addToMessage(vector<unsigned char> & data) const
 	{
 		serial_size_t serialSize = this->_size;
+		//this check will not work: it always passes because this->_size cannot exceed it's own limit
+		/*
 		if(this->_size >= std::numeric_limits<serial_size_t>::max())
 		{
 			std::cerr << "array value size exceeds serial protocol limitations (" << this->_size << " > " << (std::numeric_limits<serial_size_t>::max() - 1) << "), truncating to max safe size";
 			serialSize = (std::numeric_limits<serial_size_t>::max() - 1);
 		}
+		*/
 
 
 		const unsigned char * sizeBytes = reinterpret_cast<const unsigned char *>(&serialSize);
-		for(int i = 0; i < sizeof(serial_size_t); i++)
+		for(size_t i = 0; i < sizeof(serial_size_t); i++)
 		{
 			data.push_back(sizeBytes[i]);
 		}

@@ -25,28 +25,28 @@ using namespace twirre;
 #ifdef TWIRRELINK_DEBUG_MAIN
 int main()
 {
-	TwirreSerial ifx("/dev/ttyACM0");
+	TwirreSerial ifx("/dev/ttyACM0");	//connect to arduino DUE running TwirreLink firmware
 	TwirreLink twirre(ifx);
 
 	bool haveNaza = twirre.haveActuator("naza");
 
 	while (true)
 	{
-		auto imuvals = twirre.getSensor("myAHRS+")[
-		{	"pitch", "yaw", "roll"}];
+		//get imu values
+		auto imuvals = twirre.getSensor("myAHRS+")[{"pitch", "yaw", "roll"}];
 		//print the imu values
 		for (auto & val : imuvals)
 		{
 			std::cout << val.first << ":\t" << val.second->as_int16_t() << "\t";
 		}
+		//print sonar height
 		auto& distvals = twirre.getSensor("sonar1")["distanceValues"];
 		std::cout << "alt:\t" << distvals.as_int16_t();
-
 		std::cout << std::endl;
 
+		//send control to flight controller based on IMU values
 		if (haveNaza)
 		{
-
 			auto& naza = twirre.getActuator("naza");
 
 			//set the naza actuator values
@@ -54,7 +54,7 @@ int main()
 			naza["yaw"] = (imuvals["yaw"]->as_float() / 180.0f);
 			naza["roll"] = (imuvals["roll"]->as_float() / 180.0f);
 			naza["gaz"] = (distvals.as_float(0) / 100.0f) - 1.0f;
-			naza["timeout"] = 10000;
+			naza["timeout"] = 10000;	//timeout in ms, arduino PWM output will reset to [0,0,0,0] if no new actuation is performed within this period
 
 			naza.Actuate();//send updated values to the naza actuator
 		}
@@ -245,12 +245,13 @@ namespace twirre
 		auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
 		std::stringstream ss;
-		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y%m%d%H%M%S.tlog");
+		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y-%m-%d_%H-%M-%S");
 		std::string datetime = ss.str();
 
-		string outpath = loggingPath + datetime;
+		string outpath = loggingPath + datetime + ".tlog";
+		string binpath = loggingPath + datetime + ".tbin";
 		std::cout << "creating logger at " << outpath << std::endl;
-		_logger = new TwirreLogger(outpath);
+		_logger = new TwirreLogger(outpath, binpath);
 
 		logDevices();
 

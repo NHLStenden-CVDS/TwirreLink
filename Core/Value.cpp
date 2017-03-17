@@ -30,7 +30,7 @@ using namespace std;
 	template <typename T>																		\
 	GET_T ScalarImpl<T>::as_##GET_T ()															\
 	{																							\
-		std::shared_lock<decltype(_rwMutex)>(_rwMutex);											\
+		std::shared_lock<decltype(_rwMutex)> rwLock(_rwMutex);									\
 		return static_cast<GET_T>(_val);														\
 	}
 
@@ -177,7 +177,7 @@ namespace twirre
 	template<typename T>
 	std::string ScalarImpl<T>::as_string()
 	{
-		std::shared_lock<std::shared_timed_mutex>(_rwMutex);
+		std::shared_lock<std::shared_timed_mutex> rwLock(_rwMutex);
 		return to_string(_val);
 	}
 
