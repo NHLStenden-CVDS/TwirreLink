@@ -45,6 +45,7 @@ namespace twirre
 
 		virtual std::map<std::string, Value*> Sense_impl(const std::vector<std::string> &names);
 
+		virtual void onSense(const std::vector<std::string> &names);	//will be called by the Sense functions before sense_impl is called
 		Value & Sense(const std::string &name);
 		std::map<std::string, Value*> Sense(const std::vector<std::string> &names);
 

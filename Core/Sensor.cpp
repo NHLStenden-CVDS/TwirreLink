@@ -97,6 +97,10 @@ namespace twirre
 		return returnvalues;
 	}
 
+	void Sensor::onSense(const std::vector<std::string> &names)
+	{
+		//default: do nothing
+	}
 
 	Value & Sensor::Sense(const string &valueName)
 	{
@@ -106,6 +110,8 @@ namespace twirre
 
 	std::map<std::string, Value*> Sensor::Sense(const std::vector<std::string> &names)
 	{
+		onSense(names);
+
 		auto vals = Sense_impl(names);
 
 		//call logger if required
