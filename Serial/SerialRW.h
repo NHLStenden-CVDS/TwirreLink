@@ -8,6 +8,12 @@
 #ifndef SERIALRW_H_
 #define SERIALRW_H_
 
+enum class StringTerminator
+{
+	ZERO,
+	LF
+};
+
 class SerialRW
 {
 public:
@@ -15,7 +21,7 @@ public:
 	~SerialRW();
 	int _fd;
 	int Initialize(const char *serialPort, int baud);
-	bool readString(std::string &s);
+	bool readString(std::string &s, StringTerminator term = StringTerminator::ZERO);
 	int readNBytes(unsigned char *buf, int n);
 	int writeBytes(unsigned char *bytes, int nrOfBytes);
 	void flush();

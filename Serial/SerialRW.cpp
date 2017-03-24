@@ -139,16 +139,30 @@ void SerialRW::flush()
 
 
 
-bool SerialRW::readString(std::string &s)
+bool SerialRW::readString(std::string &s, StringTerminator term)
 {
 	std::stringstream stringStream;
+
+	char termchar;
+	switch(term)
+	{
+	case StringTerminator::ZERO:
+		termchar = '\0';
+		break;
+	case StringTerminator::LF:
+		termchar = '\n';
+		break;
+	default:
+		termchar = '\0';
+		break;
+	}
 
 	char t;
 	if(!Read<char>(t))
 	{
 		return false;
 	}
-	while (t != '\0')
+	while (t != termchar)
 	{
 		stringStream << t;
 		if(!Read<char>(t))
