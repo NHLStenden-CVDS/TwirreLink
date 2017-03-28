@@ -47,9 +47,16 @@ using namespace std;
 		if(_size != 0)																			\
 		{																						\
 			_val = reinterpret_cast<T*>(realloc(_val, size * sizeof(T)));						\
-			for(uint16_t i = 0; i < size; i++)													\
+			if(std::is_same<T, SET_T>::value)													\
 			{																					\
-				_val[i] = static_cast<T>(vals[i]);												\
+				std::memcpy(_val, vals, size * sizeof(T));										\
+			}																					\
+			else																				\
+			{																					\
+				for(uint32_t i = 0; i < size; i++)												\
+				{																				\
+					_val[i] = static_cast<T>(vals[i]);											\
+				}																				\
 			}																					\
 		}																						\
 		else																					\
