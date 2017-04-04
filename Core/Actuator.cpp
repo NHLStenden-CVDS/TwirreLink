@@ -108,6 +108,15 @@ namespace twirre
 		//call actuation implementation
 		ActuateImpl();
 
+		//clear modify flag
+		for(auto param : _parametersList)
+		{
+			if(param.second->isModified())
+			{
+				param.second->resetModified();
+			}
+		}
+
 		//unlock the owned mutex
 		_actuateMutex.unlock();
 	}

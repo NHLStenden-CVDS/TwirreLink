@@ -42,7 +42,6 @@ namespace twirre
 		{
 			if (pair.second->isModified())
 			{
-				pair.second->resetModified();
 				paramsToSet.push_back(pair.second);
 			}
 		}
