@@ -36,6 +36,9 @@ namespace twirre
 		//Initialize sensors and actuators
 		if (!_InitActuators()) throw std::runtime_error("Twirre initialization failed: could not init actuators");
 		if (!_InitSensors()) throw std::runtime_error("Twirre initialization failed: could not init sensors");
+
+		//this will setup logging
+		doNotifyChange();
 	}
 
 	TwirreSerial::~TwirreSerial()
