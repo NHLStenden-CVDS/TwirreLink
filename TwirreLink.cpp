@@ -263,17 +263,16 @@ namespace twirre
 
 	bool TwirreLink::stopLogging(void)
 	{
+		if(_logger == nullptr) return false;
+
 		for(auto & provider : _providers)
 		{
 			provider->removeLogger(_logger);
 		}
 
-		if(_logger != nullptr)
-		{
-			delete _logger;
-			return true;
-		}
-		return false;
+		delete _logger;
+		_logger = nullptr;
+		return true;
 	}
 
 	void TwirreLink::logDevices(void)
