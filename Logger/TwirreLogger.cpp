@@ -132,11 +132,19 @@ namespace twirre
 
 				if(value.second->isArray())
 				{
-					*_logfile << "array (" << _binaryDataOffset << "," << value.second->getSize() << ")";
+					auto arraySize = value.second->getSize();
+					if(arraySize <= _maxArraySize)
+					{
+						*_logfile << "array (" << _binaryDataOffset << "," << arraySize << ")";
 
-					logMutexLock.unlock();
-					logBinArrayValue(dynamic_cast<Value *>(value.second));
-					logMutexLock.lock();
+						logMutexLock.unlock();
+						logBinArrayValue(dynamic_cast<Value *>(value.second));
+						logMutexLock.lock();
+					}
+					else
+					{
+						*_logfile << "array_big (" << arraySize << ")";
+					}
 				}
 				else
 				{
@@ -201,5 +209,10 @@ namespace twirre
 		auto now = std::chrono::steady_clock::now();
 		auto timestamp = now - _tp_start;
 		return std::chrono::duration_cast<std::chrono::microseconds>(timestamp).count();
+	}
+
+	void TwirreLogger::setMaxArraySize(size_t max)
+	{
+		_maxArraySize = max;
 	}
 }

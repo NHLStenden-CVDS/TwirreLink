@@ -146,6 +146,13 @@ namespace twirre
 		 */
 		bool stopLogging(void);
 
+		/**
+		 * Set a size limit for logging array values. Has no effect when logging hasn't been started.
+		 *
+		 * @param max The maximum size of arrays to fully log. Arrays with bigger size are not written to the binfile.
+		 */
+		void setLoggingMaxArraySize(size_t max);
+
 	private:
 		void logDevices(void);
 		void notifyChange(void);

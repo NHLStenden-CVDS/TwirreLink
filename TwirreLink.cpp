@@ -275,6 +275,12 @@ namespace twirre
 		return true;
 	}
 
+	void TwirreLink::setLoggingMaxArraySize(size_t max)
+	{
+		if(_logger == nullptr) return;
+		_logger->setMaxArraySize(max);
+	}
+
 	void TwirreLink::logDevices(void)
 	{
 		if(_logger == nullptr) return;

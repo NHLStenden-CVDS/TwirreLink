@@ -17,6 +17,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <numeric>
 
 namespace twirre
 {
@@ -35,6 +36,8 @@ namespace twirre
 
 		uint64_t getTimestamp(void);
 
+		void setMaxArraySize(size_t max);
+
 	private:
 		std::mutex _logfileMutex;
 		std::mutex _binfileMutex;
@@ -44,11 +47,14 @@ namespace twirre
 		std::chrono::time_point<std::chrono::steady_clock> _tp_start;
 
 		size_t _binaryDataOffset = 0; //offset where the next binary blob should be written in the binfile
+		size_t _maxArraySize = std::numeric_limits<size_t>::max();	//arrays with size above this value are not written to the binfile
 
 		template<class T>
 		void logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock);
 
 		void logBinArrayValue(Value * val);
+
+
 	};
 }
 #endif /* LOGGER_TWIRRELOGGER_H_ */
