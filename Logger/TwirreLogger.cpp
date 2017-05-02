@@ -8,6 +8,8 @@
 #include "TwirreLogger.h"
 
 #include <iostream>
+#include <sstream>
+#include <cstring>
 
 using namespace std;
 
@@ -38,36 +40,55 @@ namespace twirre
 		}
 
 		*_logfile << getTimestamp() << " create binfile " << binpath << std::endl;
+
+		//start async writer threads
+		_runLogfileThread = true;
+		_logfileThread = new thread(&TwirreLogger::logfileThreadMain, this);
+		_runBinfileThread = true;
+		_binfileThread = new thread(&TwirreLogger::binfileThreadMain, this);
 	}
 
 	TwirreLogger::~TwirreLogger()
 	{
+		//stop async writer threads
+		{
+			lock_guard<mutex> logfileLock(_logfileMutex);
+			_runLogfileThread = false;
+		}
+		_logfileCV.notify_all();
+		_logfileThread->join();
+		delete _logfileThread;
+
+		{
+			lock_guard<mutex> binfileLock(_binfileMutex);
+			_runBinfileThread = false;
+		}
+		_binfileCV.notify_all();
+		_binfileThread->join();
+		delete _binfileThread;
+
 		//close logfile
 		{
-			std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
-
 			*_logfile << getTimestamp() << " stop" << endl;
 			*_logfile << "# TwirreLogger stopped" << endl;
 			_logfile->close();
 		}
 		//close binfile
 		{
-			std::lock_guard<std::mutex> binMutexLock (_binfileMutex);
-
 			_binfile->close();
 		}
 	}
 
 	void TwirreLogger::logActuators(std::map<std::string, Actuator*>& actuators)
 	{
-		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+		stringstream logStream;
 
-		*_logfile << "# Full actuator list" << endl;
-		*_logfile << getTimestamp() << " actuators {" << endl;
+		logStream << "# Full actuator list" << endl;
+		logStream << getTimestamp() << " actuators {" << endl;
 
 		for(auto & actuator : actuators)
 		{
-			*_logfile << "\t" << actuator.second->getName() << " {" << endl;
+			logStream << "\t" << actuator.second->getName() << " {" << endl;
 
 			auto parameters = actuator.second->GetParameters(actuator.second->getAvailableParameters());
 			for(auto parameter : parameters)
@@ -75,30 +96,32 @@ namespace twirre
 				string name = parameter.second->getName();
 				NativeType type = parameter.second->getNativeType();
 				bool isArray = parameter.second->isArray();
-				*_logfile << "\t\t" << name << ":";
+				logStream << "\t\t" << name << ":";
 				if(isArray) {
-					*_logfile << "array_";
+					logStream << "array_";
 				}
-				*_logfile << enumtostr(type) << endl;
+				logStream << enumtostr(type) << endl;
 			}
 
-			*_logfile << "\t}" << endl;
+			logStream << "\t}" << endl;
 		}
 
-		*_logfile << "}" << endl;
-		*_logfile << "# end of full actuator list" << endl;
+		logStream << "}" << endl;
+		logStream << "# end of full actuator list" << endl;
+
+		logString(logStream.str());
 	}
 
 	void TwirreLogger::logSensors(std::map<std::string, Sensor*>& sensors)
 	{
-		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
+		stringstream logStream;
 
-		*_logfile << "# Full sensor list" << endl;
-		*_logfile << getTimestamp() << " sensors {" << endl;
+		logStream << "# Full sensor list" << endl;
+		logStream << getTimestamp() << " sensors {" << endl;
 
 		for(auto & sensor : sensors)
 		{
-			*_logfile << "\t" << sensor.second->getName() << " {" << endl;
+			logStream<< "\t" << sensor.second->getName() << " {" << endl;
 
 			auto values = sensor.second->peekValues(sensor.second->getAvailableValues());
 			for(auto value : values)
@@ -106,52 +129,54 @@ namespace twirre
 				string name = value.second->getName();
 				NativeType type = value.second->getNativeType();
 				bool isArray = value.second->isArray();
-				*_logfile << "\t\t" << name << ":";
+				logStream << "\t\t" << name << ":";
 				if(isArray) {
-					*_logfile << "array_";
+					logStream << "array_";
 				}
-				*_logfile << enumtostr(type) << endl;
+				logStream << enumtostr(type) << endl;
 			}
 
-			*_logfile << "\t}" << endl;
+			logStream << "\t}" << endl;
 		}
 
-		*_logfile << "}" << endl;
-		*_logfile << "# end of full sensor list" << endl;
+		logStream << "}" << endl;
+		logStream << "# end of full sensor list" << endl;
+
+		logString(logStream.str());
 	}
 
 	template<class T>
-	void TwirreLogger::logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock)
+	string TwirreLogger::logDeviceValues(const std::map<std::string, T *> & values)
 	{
+		stringstream logStream;
+
 		int errorCount = 0;
 		for(auto & value : values)
 		{
 			if(value.second->isValid()) //if sense/actuate was called with non-existent value names, for those names a special errorValue is returned. Only log valid values for now.
 			{
-				*_logfile << "\t" << value.second->getName() << ":";
+				logStream << "\t" << value.second->getName() << ":";
 
 				if(value.second->isArray())
 				{
 					auto arraySize = value.second->getSize();
 					if(arraySize <= _maxArraySize)
 					{
-						*_logfile << "array (" << _binaryDataOffset << "," << arraySize << ")";
+						logStream << "array (" << _binaryDataOffset << "," << arraySize << ")";
 
-						logMutexLock.unlock();
 						logBinArrayValue(dynamic_cast<Value *>(value.second));
-						logMutexLock.lock();
 					}
 					else
 					{
-						*_logfile << "array_big (" << arraySize << ")";
+						logStream << "array_big (" << arraySize << ")";
 					}
 				}
 				else
 				{
-					*_logfile << value.second->as_string();
+					logStream << value.second->as_string();
 				}
 
-				*_logfile << endl;
+				logStream << endl;
 			}
 			else //count invalid values
 			{
@@ -162,46 +187,73 @@ namespace twirre
 		//if errorValues are present, write an error to the logfile containing the count of errored values.
 		if(errorCount > 0)
 		{
-			*_logfile << "!\t<error>:" << errorCount << (errorCount > 1 ? " errorvalues" : " errorvalue") << " present" << endl;
+			logStream << "!\t<error>:" << errorCount << (errorCount > 1 ? " errorvalues" : " errorvalue") << " present" << endl;
 		}
+
+		return logStream.str();
 	}
 
 	void TwirreLogger::logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues)
 	{
-		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
-		*_logfile << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
+		stringstream logStream;
 
-		logDeviceValues(sensorValues, logMutexLock);
+		logStream << getTimestamp() << " sense " << sensor->getName() << " {" << endl;
 
-		*_logfile << "}" << endl;
+		logStream << logDeviceValues(sensorValues);
+
+		logStream << "}" << endl;
+
+		logString(logStream.str());
 	}
 
 	void TwirreLogger::logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters)
 	{
-		std::unique_lock<std::mutex> logMutexLock(_logfileMutex);
-		*_logfile << getTimestamp() << " actuate " << actuator->getName() << " {" << endl;
+		stringstream logStream;
 
-		logDeviceValues(actuatorParameters, logMutexLock);
+		logStream << getTimestamp() << " actuate " << actuator->getName() << " {" << endl;
 
-		*_logfile << "}" << endl;
+		logStream << logDeviceValues(actuatorParameters);
+
+		logStream << "}" << endl;
+
+		logString(logStream.str());
+	}
+
+	void TwirreLogger::logString(const string & str)
+	{
+		//push to log queue
+		{
+			lock_guard<mutex> logfileLock(_logfileMutex);
+			_logQueue.push_back(str);
+		}
+		_logfileCV.notify_one();
 	}
 
 	void TwirreLogger::logBinArrayValue(Value * val)
 	{
-		std::lock_guard<std::mutex> binMutexLock (_binfileMutex);
-
 		auto dataptr = val->getBuffer();
 		size_t nbytes = val->getSize() * val->getElementSize();
-		_binfile->write(reinterpret_cast<char *>(dataptr), nbytes);
 		_binaryDataOffset += nbytes;
+
+		//push to queue
+		{
+			lock_guard<mutex> binfileLock(_binfileMutex);
+
+			size_t start = _binQueueSize;
+			_binQueueSize += nbytes;
+
+			_binQueue.reserve(_binQueueSize); //ensure queue has enough capacity
+			memcpy(_binQueue.data() + start, dataptr, nbytes);
+		}
+		_binfileCV.notify_one();
 	}
 
 	void TwirreLogger::onDevicelistChanged()
 	{
-		std::lock_guard<std::mutex> logMutexLock (_logfileMutex);
-
-		*_logfile << "# TwirreLink device list changed" << endl;
-		*_logfile << getTimestamp() << "devicelist_changed" << endl;
+		stringstream logStream;
+		logStream << "# TwirreLink device list changed" << endl;
+		logStream << getTimestamp() << "devicelist_changed" << endl;
+		logString(logStream.str());
 	}
 
 	uint64_t TwirreLogger::getTimestamp(void)
@@ -214,5 +266,52 @@ namespace twirre
 	void TwirreLogger::setMaxArraySize(size_t max)
 	{
 		_maxArraySize = max;
+	}
+
+	void TwirreLogger::logfileThreadMain()
+	{
+		std::vector<string> currentData;
+
+		while(true)
+		{
+			{
+				unique_lock<mutex> logfileLock(_logfileMutex);
+				_logfileCV.wait(logfileLock, [this](){ return (!_runLogfileThread) || (!_logQueue.empty()); });
+				if(!_runLogfileThread) break;
+
+				//fetch new data
+				std::swap(_logQueue, currentData);
+			}
+
+			//write all data to log file
+			for(string & str : currentData)
+			{
+				*_logfile << str;
+			}
+			currentData.clear();
+		}
+	}
+
+	void TwirreLogger::binfileThreadMain()
+	{
+		std::vector<char> currentData;
+		size_t dataSize;
+
+		while(true)
+		{
+			{
+				unique_lock<mutex> binfileLock(_binfileMutex);
+				_binfileCV.wait(binfileLock, [this](){ return (!_runBinfileThread) || (_binQueueSize > 0); });
+				if(!_runBinfileThread) break;
+
+				//fetch new data
+				std::swap(_binQueue, currentData);
+				dataSize = _binQueueSize;
+				_binQueueSize = 0;
+			}
+
+			//write data to logfile
+			_binfile->write(currentData.data(), dataSize);
+		}
 	}
 }
