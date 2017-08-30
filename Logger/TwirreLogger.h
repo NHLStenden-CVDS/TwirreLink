@@ -17,7 +17,9 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <numeric>
+#include <queue>
 
 namespace twirre
 {
@@ -32,16 +34,16 @@ namespace twirre
 		void logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues);
 		void logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters);
 
+		//callback for twirrelink
 		void onDevicelistChanged(void);
 
+		//get current log timestamp
 		uint64_t getTimestamp(void);
 
+		//arrays with more than max elements will not have their data written to the binfile
 		void setMaxArraySize(size_t max);
 
 	private:
-		std::mutex _logfileMutex;
-		std::mutex _binfileMutex;
-
 		std::shared_ptr<std::ofstream> _logfile;
 		std::shared_ptr<std::ofstream> _binfile;
 		std::chrono::time_point<std::chrono::steady_clock> _tp_start;
@@ -50,10 +52,27 @@ namespace twirre
 		size_t _maxArraySize = std::numeric_limits<size_t>::max();	//arrays with size above this value are not written to the binfile
 
 		template<class T>
-		void logDeviceValues(const std::map<std::string, T *> & values, std::unique_lock<std::mutex> & logMutexLock);
+		std::string logDeviceValues(const std::map<std::string, T *> & values);
 
+		void logString(const std::string & str);
 		void logBinArrayValue(Value * val);
 
+		//async thread
+		std::vector<std::string> _logQueue;
+		std::vector<char> _binQueue;
+		std::size_t _binQueueSize = 0;	//_binQueue is used as dynamic array, so vector::size() will not work. This means we have to keep track of array size ourselves.
+		std::mutex _logfileMutex;
+		std::mutex _binfileMutex;
+		std::condition_variable _logfileCV;
+		std::condition_variable _binfileCV;
+		std::thread * _logfileThread;
+		std::thread * _binfileThread;
+
+		bool _runLogfileThread = false;
+		bool _runBinfileThread = false;
+
+		void logfileThreadMain();
+		void binfileThreadMain();
 
 	};
 }
