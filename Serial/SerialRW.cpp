@@ -1,9 +1,9 @@
-/*
- * SerialRW.cpp
- *
- *  Created on: Dec 20, 2012
- *      Author: jasper
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #include <stdio.h>
 #include <fcntl.h>

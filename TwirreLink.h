@@ -1,9 +1,9 @@
-/*
- * TwirreLink.h
- *
- *  Created on: Apr 9, 2015
- *      Author: root
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #ifndef TWIRRELINK_H_
 #define TWIRRELINK_H_

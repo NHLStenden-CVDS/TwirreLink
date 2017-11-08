@@ -1,9 +1,9 @@
-/*
- * ValueImpl.cpp
- *
- *  Created on: Dec 10, 2015
- *      Author: mrd
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #include <string>
 #include <iostream>

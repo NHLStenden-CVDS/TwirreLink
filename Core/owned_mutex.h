@@ -1,9 +1,9 @@
-/*
- * OwnedMutex.h
- *
- *  Created on: Jun 26, 2015
- *      Author: m-r-d
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #ifndef CORE_OWNED_MUTEX_H_
 #define CORE_OWNED_MUTEX_H_

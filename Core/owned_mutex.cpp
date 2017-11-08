@@ -1,9 +1,9 @@
-/*
- * OwnedMutex.cpp
- *
- *  Created on: Jun 26, 2015
- *      Author: m-r-d
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #include "owned_mutex.h"
 #include <stdexcept>

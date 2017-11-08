@@ -1,9 +1,10 @@
-/*
- * Sensor.h
- *
- *  Created on: Mar 6, 2015
- *      Author: root
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
+
 #ifndef SENSOR_H_
 #define SENSOR_H_
 

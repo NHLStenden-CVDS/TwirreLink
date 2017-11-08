@@ -1,9 +1,9 @@
-/*
- * TwirreLogger.cpp
- *
- *  Created on: Oct 7, 2016
- *      Author: mrd
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #include "TwirreLogger.h"
 

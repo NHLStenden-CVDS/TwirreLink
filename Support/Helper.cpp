@@ -1,9 +1,9 @@
-/*
- * Helper.cpp
- *
- *  Created on: Mar 10, 2015
- *      Author: root
- */
+ /*
+  * Copyright © 2017, Centre of Expertise Computer Vision & Data Science, NHL Stenden university of applied sciences
+  * All rights reserved.
+  *
+  * no warranty, no liability
+  */
 
 #include "Helper.h"
 
