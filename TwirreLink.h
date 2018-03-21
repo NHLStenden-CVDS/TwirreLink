@@ -16,6 +16,7 @@
 #include <map>
 #include <set>
 #include <initializer_list>
+#include <thread>
 
 #include "Core/Actuator.h"
 #include "Core/Sensor.h"
@@ -166,6 +167,9 @@ namespace twirre
 		std::set<DeviceProvider *> _providers;
 		std::map<std::string, Actuator*> _actuatorList;
 		std::map<std::string, Sensor*> _sensorList;
+
+		mutable std::recursive_mutex _provMutex;	//protects access / modification of providers
+		mutable std::recursive_mutex _tlMutex;	//protects access / modification of sensorlist and acutatorlist
 
 		TwirreLogger * _logger = nullptr;
 	};

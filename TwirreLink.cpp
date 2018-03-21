@@ -120,6 +120,8 @@ namespace twirre
 
 	TwirreLink & TwirreLink::operator =(const TwirreLink & other)
 	{
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		//remove all links
 		for (auto prov : _providers)
 		{
@@ -140,6 +142,8 @@ namespace twirre
 
 	TwirreLink & TwirreLink::operator =(TwirreLink && other)
 	{
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		//remove all links
 		for (auto prov : _providers)
 		{
@@ -160,16 +164,22 @@ namespace twirre
 
 	const std::map<string, Actuator*> & TwirreLink::getActuators()
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
+
 		return _actuatorList;
 	}
 
 	const std::map<string, Sensor*> & TwirreLink::getSensors()
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
+
 		return _sensorList;
 	}
 
 	void TwirreLink::addProvider(DeviceProvider& prov, bool update)
 	{
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		//prevent duplicate insertion
 		if(_providers.find(&prov) != _providers.end()) return;
 
@@ -182,10 +192,10 @@ namespace twirre
 
 	void TwirreLink::removeProvider(DeviceProvider& prov)
 	{
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		//check if provider was actually added
 		if(_providers.find(&prov) == _providers.end()) return;
-
-
 
 		//break bidirectional link
 		prov.removeLink(this);
@@ -196,16 +206,20 @@ namespace twirre
 
 	bool TwirreLink::haveSensor(const string & sensorName) const
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
 		return (_sensorList.find(sensorName) != _sensorList.end());
 	}
 
 	bool TwirreLink::haveActuator(const string & actuatorName) const
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
 		return (_actuatorList.find(actuatorName) != _actuatorList.end());
 	}
 
 	Actuator& TwirreLink::getActuator(const string & actuatorName)
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
+
 		if (_actuatorList.find(actuatorName) == _actuatorList.end())
 		{
 			throw runtime_error("GetActuator: no actuator with that name");
@@ -215,6 +229,8 @@ namespace twirre
 
 	Sensor& TwirreLink::getSensor(const string & sensorName)
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
+
 		if (_sensorList.find(sensorName) == _sensorList.end())
 		{
 			throw runtime_error("GetSensor: no sensor with name: " + sensorName);
@@ -224,14 +240,21 @@ namespace twirre
 
 	void TwirreLink::notifyChange()
 	{
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
+
 		_actuatorList.clear();
 		_sensorList.clear();
-		for (const auto prov : _providers)
+
 		{
-			auto& actuators = prov->getActuators();
-			_actuatorList.insert(actuators.begin(), actuators.end());
-			auto& sensors = prov->getSensors();
-			_sensorList.insert(sensors.begin(), sensors.end());
+			lock_guard<recursive_mutex> provLock(_provMutex);
+
+			for (const auto prov : _providers)
+			{
+				auto& actuators = prov->getActuators();
+				_actuatorList.insert(actuators.begin(), actuators.end());
+				auto& sensors = prov->getSensors();
+				_sensorList.insert(sensors.begin(), sensors.end());
+			}
 		}
 
 		logDevices();
@@ -239,6 +262,8 @@ namespace twirre
 
 	void TwirreLink::removeLink(DeviceProvider * which)
 	{
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		_providers.erase(which);
 	}
 
@@ -260,6 +285,8 @@ namespace twirre
 
 		logDevices();
 
+		lock_guard<recursive_mutex> provLock(_provMutex);
+
 		for(auto & provider : _providers)
 		{
 			provider->addLogger(_logger);
@@ -270,9 +297,13 @@ namespace twirre
 	{
 		if(_logger == nullptr) return false;
 
-		for(auto & provider : _providers)
 		{
-			provider->removeLogger(_logger);
+			lock_guard<recursive_mutex> provLock(_provMutex);
+
+			for(auto & provider : _providers)
+			{
+				provider->removeLogger(_logger);
+			}
 		}
 
 		delete _logger;
@@ -289,6 +320,8 @@ namespace twirre
 	void TwirreLink::logDevices(void)
 	{
 		if(_logger == nullptr) return;
+
+		lock_guard<recursive_mutex> deviceLock(_tlMutex);
 
 		//log actuators
 		_logger->logActuators(_actuatorList);
