@@ -37,6 +37,7 @@ namespace twirre
 		void logActuators(std::map<std::string, Actuator*>& actuators);
 		void logSensors(std::map<std::string, Sensor*>& sensors);
 		void logSensorEvent(Sensor * sensor, std::map<std::string, Value *> sensorValues);
+		void manualSensorEvent(std::string sensorName, const std::vector<std::pair<std::string, std::string>> & values);
 		void logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters);
 
 		//callback for twirrelink

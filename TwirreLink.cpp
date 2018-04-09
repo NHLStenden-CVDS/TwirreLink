@@ -311,6 +311,13 @@ namespace twirre
 		return true;
 	}
 
+	void TwirreLink::writeToLog(std::string sensorName, const std::vector<std::pair<std::string, std::string>> & values)
+	{
+		if(_logger == nullptr) return;
+
+		_logger->manualSensorEvent(sensorName, values);
+	}
+
 	void TwirreLink::setLoggingMaxArraySize(size_t max)
 	{
 		if(_logger == nullptr) return;
