@@ -211,6 +211,22 @@ namespace twirre
 		logString(logStream.str());
 	}
 
+	void TwirreLogger::manualSensorEvent(std::string sensorName, const std::vector<std::pair<std::string, std::string>> & values)
+	{
+		stringstream logStream;
+
+		logStream << getTimestamp() << " manual " << sensorName << " {" << endl;
+
+		for(const auto& kv: values)
+		{
+			logStream << "\t" << kv.first << ":" << kv.second << endl;
+		}
+
+		logStream << "}" << endl;
+
+		logString(logStream.str());
+	}
+
 	void TwirreLogger::logActuatorEvent(Actuator * actuator, std::map<std::string, Parameter *> actuatorParameters)
 	{
 		stringstream logStream;

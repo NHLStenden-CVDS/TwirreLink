@@ -275,7 +275,7 @@ namespace twirre
 		auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
 		std::stringstream ss;
-		ss << std::put_time(std::localtime(&in_time_t), "twirrelog_%Y-%m-%d_%H-%M-%S");
+		ss << std::put_time(std::localtime(&in_time_t), "Twirrelog_%Y%m%dT%H%M%S%z");
 		std::string datetime = ss.str();
 
 		string outpath = loggingPath + datetime + ".tlog";
@@ -309,6 +309,13 @@ namespace twirre
 		delete _logger;
 		_logger = nullptr;
 		return true;
+	}
+
+	void TwirreLink::writeToLog(std::string sensorName, const std::vector<std::pair<std::string, std::string>> & values)
+	{
+		if(_logger == nullptr) return;
+
+		_logger->manualSensorEvent(sensorName, values);
 	}
 
 	void TwirreLink::setLoggingMaxArraySize(size_t max)

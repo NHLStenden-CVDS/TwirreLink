@@ -153,6 +153,14 @@ namespace twirre
 		bool stopLogging(void);
 
 		/**
+		 * Manually write some values into the logfile, similar to a 'sense' event (except that it will be called a 'manual' event instead)
+		 *
+		 * @param sensorName The name of the sensor to emulate
+		 * @param values A vector containing pairs of valuenames with their corresponding values to write
+		 */
+		void writeToLog(std::string sensorName, const std::vector<std::pair<std::string, std::string>> & values);
+
+		/**
 		 * Set a size limit for logging array values. Has no effect when logging hasn't been started.
 		 *
 		 * @param max The maximum size of arrays to fully log. Arrays with bigger size are not written to the binfile.
