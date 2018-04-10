@@ -1,7 +1,7 @@
 #!/bin/bash
 
-LIB_DIR="/usr/local/lib"
-INC_DIR="/usr/local/include/twirrelink"
+LIB_DIR="/usr/aarch64-linux-gnu/lib"
+INC_DIR="/usr/aarch64-linux-gnu/include/twirrelink"
 
 rm -rf $INC_DIR
 
