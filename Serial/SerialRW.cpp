@@ -38,7 +38,7 @@ SerialRW::SerialRW() : _fd(0)
 {
 }
 
-int SerialRW::Initialize(const char *serialPort, int baud)
+bool SerialRW::Initialize(const char *serialPort, int baud)
 {
 	struct termios toptions;
 
@@ -134,7 +134,7 @@ int SerialRW::Initialize(const char *serialPort, int baud)
 		return -1;
 	}
 
-	return _fd;
+	return (_fd >= 0);
 }
 
 void SerialRW::flush()

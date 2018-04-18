@@ -30,7 +30,7 @@ namespace twirre
 	TwirreSerial::TwirreSerial(const char * device, const int baudrate)
 	{
 		//Initialize serial port
-		if (_serial.Initialize(device, baudrate) < 0) throw std::runtime_error("Twirre initialization failed: failed to init serial port");
+		if (!_serial.Initialize(device, baudrate)) throw std::runtime_error("Twirre initialization failed: failed to init serial port");
 
 		//Wait for arduino to initialize the connection
 		std::this_thread::sleep_for(std::chrono::seconds(1));

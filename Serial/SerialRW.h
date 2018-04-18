@@ -24,8 +24,11 @@ class SerialRW
 public:
 	SerialRW();
 	~SerialRW();
-	int _fd;
-	int Initialize(const char *serialPort, int baud);
+	union {
+		int _fd;
+		void* _handle;
+	};
+	bool Initialize(const char *serialPort, int baud);
 	bool readString(std::string &s, StringTerminator term = StringTerminator::ZERO);
 	int readNBytes(unsigned char *buf, int n);
 	int writeBytes(unsigned char *bytes, int nrOfBytes);
