@@ -13,5 +13,114 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{33005d93-bd57-4135-8c81-650ce4e4bfe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{2200b09a-5445-4913-b23d-4052f1d8f3d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logger">
+      <UniqueIdentifier>{8ca08eb7-c444-4045-a2cd-b90444edc710}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logger">
+      <UniqueIdentifier>{0189ef0d-560c-4d85-a61a-50fdb402d841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{53d9af76-0f27-4696-93f0-dc7cb7b3421e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{9436c6f2-798b-4b83-9967-3a37e2ace5e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TwirreSerial">
+      <UniqueIdentifier>{e15fc9ac-7279-4fa1-974a-2cdaaf347a06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TwirreSerial">
+      <UniqueIdentifier>{84c944b4-71c3-4983-a8ea-0df74e90342d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Core\Actuator.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\ArrayValue.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\Device.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\owned_mutex.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\Sensor.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\Value.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\ValueImpl.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Logger\TwirreLogger.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Support\Helper.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TwirreSerial\SerialActuator.cpp">
+      <Filter>Source Files\TwirreSerial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TwirreSerial\SerialSensor.cpp">
+      <Filter>Source Files\TwirreSerial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TwirreSerial\SerialValue.cpp">
+      <Filter>Source Files\TwirreSerial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TwirreSerial\TwirreSerial.cpp">
+      <Filter>Source Files\TwirreSerial</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Core\Actuator.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\ArrayValue.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Device.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\owned_mutex.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Sensor.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Value.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\ValueImpl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Logger\TwirreLogger.h">
+      <Filter>Header Files\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Support\Helper.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreSerial\SerialActuator.h">
+      <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreSerial\SerialDevice.h">
+      <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreSerial\SerialSensor.h">
+      <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreSerial\SerialValue.h">
+      <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreSerial\TwirreSerial.h">
+      <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -115,6 +115,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Core\Actuator.cpp" />
+    <ClCompile Include="..\..\..\Core\ArrayValue.cpp" />
+    <ClCompile Include="..\..\..\Core\Device.cpp" />
+    <ClCompile Include="..\..\..\Core\owned_mutex.cpp" />
+    <ClCompile Include="..\..\..\Core\Sensor.cpp" />
+    <ClCompile Include="..\..\..\Core\Value.cpp" />
+    <ClCompile Include="..\..\..\Core\ValueImpl.cpp" />
+    <ClCompile Include="..\..\..\Logger\TwirreLogger.cpp" />
+    <ClCompile Include="..\..\..\Support\Helper.cpp" />
+    <ClCompile Include="..\..\..\TwirreSerial\SerialActuator.cpp" />
+    <ClCompile Include="..\..\..\TwirreSerial\SerialSensor.cpp" />
+    <ClCompile Include="..\..\..\TwirreSerial\SerialValue.cpp" />
+    <ClCompile Include="..\..\..\TwirreSerial\TwirreSerial.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Core\Actuator.h" />
+    <ClInclude Include="..\..\..\Core\ArrayValue.h" />
+    <ClInclude Include="..\..\..\Core\Device.h" />
+    <ClInclude Include="..\..\..\Core\owned_mutex.h" />
+    <ClInclude Include="..\..\..\Core\Sensor.h" />
+    <ClInclude Include="..\..\..\Core\Value.h" />
+    <ClInclude Include="..\..\..\Core\ValueImpl.h" />
+    <ClInclude Include="..\..\..\Logger\TwirreLogger.h" />
+    <ClInclude Include="..\..\..\Support\Helper.h" />
+    <ClInclude Include="..\..\..\TwirreSerial\SerialActuator.h" />
+    <ClInclude Include="..\..\..\TwirreSerial\SerialDevice.h" />
+    <ClInclude Include="..\..\..\TwirreSerial\SerialSensor.h" />
+    <ClInclude Include="..\..\..\TwirreSerial\SerialValue.h" />
+    <ClInclude Include="..\..\..\TwirreSerial\TwirreSerial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
