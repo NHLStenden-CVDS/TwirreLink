@@ -87,6 +87,12 @@
     <ClCompile Include="..\..\..\Serial\SerialRW_win.cpp">
       <Filter>Source Files\Serial</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DeviceProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TwirreLink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Core\Actuator.h">
@@ -133,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Serial\SerialRW.h">
       <Filter>Header Files\Serial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DeviceProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TwirreLink.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
