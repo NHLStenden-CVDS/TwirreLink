@@ -37,6 +37,12 @@
     <Filter Include="Source Files\TwirreSerial">
       <UniqueIdentifier>{84c944b4-71c3-4983-a8ea-0df74e90342d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Serial">
+      <UniqueIdentifier>{3237b30f-8425-4f34-a3ca-20356ce256ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Serial">
+      <UniqueIdentifier>{63b82310-1faf-40ab-a92f-fac7b1248297}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Core\Actuator.cpp">
@@ -77,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\TwirreSerial\TwirreSerial.cpp">
       <Filter>Source Files\TwirreSerial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Serial\SerialRW_win.cpp">
+      <Filter>Source Files\Serial</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\TwirreSerial\TwirreSerial.h">
       <Filter>Header Files\TwirreSerial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Serial\SerialRW.h">
+      <Filter>Header Files\Serial</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
