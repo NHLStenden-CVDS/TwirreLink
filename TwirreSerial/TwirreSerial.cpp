@@ -10,7 +10,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
+//#include <unistd.h>
 #include <iostream>
 #include <chrono>
 
@@ -33,7 +33,7 @@ namespace twirre
 		if (_serial.Initialize(device, baudrate) < 0) throw std::runtime_error("Twirre initialization failed: failed to init serial port");
 
 		//Wait for arduino to initialize the connection
-		sleep(1);
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		//Flush file descriptor (discard read/write data)
 		_serial.flush();
@@ -55,7 +55,7 @@ namespace twirre
 	{
 		unsigned char iamsg[] = {'I', 'A'};
 		_serial.writeBytes(iamsg, 2);
-		sleep(1);
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::string s;
 		if (_serial.readString(s))
 		{
@@ -76,7 +76,7 @@ namespace twirre
 		};
 		is m;
 		_serial.Write<is>(m);
-		sleep(1);
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::string s;
 		if (_serial.readString(s))
 		{
@@ -148,7 +148,7 @@ namespace twirre
 		{
 			//protocol error
 			std::cerr << "CheckOK: Protocol Error, resetting serial" << std::endl;
-			usleep(250000);
+			std::this_thread::sleep_for(std::chrono::microseconds(250000));
 			serialRW.flush();
 		}
 		return false;
