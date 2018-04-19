@@ -13,7 +13,9 @@
 #ifndef SERIALRW_H_
 #define SERIALRW_H_
 
+#ifdef _MSC_VER
 #include "Serial.h"
+#endif
 
 enum class StringTerminator
 {
@@ -27,7 +29,11 @@ public:
 	SerialRW();
 	~SerialRW();
 
+#ifdef _MSC_VER
 	CSerial _ser;
+#else
+	int _fd;
+#endif
 
 	bool Initialize(const char *serialPort, int baud);
 	bool readString(std::string &s, StringTerminator term = StringTerminator::ZERO);
@@ -54,6 +60,13 @@ public:
 		readNBytes((unsigned char*)&thing, sizeof(T));
 		return thing;
 	}
+
+#ifndef _MSC_VER
+private:
+	bool _CheckFdTimeout(int usec);
+#endif
 };
+
+
 
 #endif /* SERIALRW_H_ */
