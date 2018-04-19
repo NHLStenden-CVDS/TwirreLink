@@ -93,6 +93,9 @@
     <ClCompile Include="..\..\..\TwirreLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Serial\Serial.cpp">
+      <Filter>Source Files\Serial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Core\Actuator.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\TwirreLink.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Serial\Serial.h">
+      <Filter>Header Files\Serial</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

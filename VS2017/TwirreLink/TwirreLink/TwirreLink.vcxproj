@@ -45,7 +45,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -125,6 +125,7 @@
     <ClCompile Include="..\..\..\Core\ValueImpl.cpp" />
     <ClCompile Include="..\..\..\DeviceProvider.cpp" />
     <ClCompile Include="..\..\..\Logger\TwirreLogger.cpp" />
+    <ClCompile Include="..\..\..\Serial\Serial.cpp" />
     <ClCompile Include="..\..\..\Serial\SerialRW_win.cpp" />
     <ClCompile Include="..\..\..\Support\Helper.cpp" />
     <ClCompile Include="..\..\..\TwirreLink.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="..\..\..\Core\ValueImpl.h" />
     <ClInclude Include="..\..\..\DeviceProvider.h" />
     <ClInclude Include="..\..\..\Logger\TwirreLogger.h" />
+    <ClInclude Include="..\..\..\Serial\Serial.h" />
     <ClInclude Include="..\..\..\Serial\SerialRW.h" />
     <ClInclude Include="..\..\..\Support\Helper.h" />
     <ClInclude Include="..\..\..\TwirreLink.h" />

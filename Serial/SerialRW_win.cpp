@@ -34,53 +34,23 @@ const int READ_TIMEOUT_INTRABYTE = 400;					//time in deciseconds to wait for ad
 
 
 
-SerialRW::SerialRW() : _handle(nullptr)
+SerialRW::SerialRW()
 {
 }
 
 bool SerialRW::Initialize(const char *serialPort, int baud)
 {
-	_handle = CreateFile(serialPort, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (_handle == INVALID_HANDLE_VALUE)
-	{
-		if (GetLastError() == ERROR_FILE_NOT_FOUND) 
-		{
-			throw std::runtime_error("Failed to find port");
-		}
-		else 
-		{
-			throw std::runtime_error("Cannot open port");
-		}
-	}
-
-	DCB parms = { 0 };
-	parms.DCBlength = sizeof(parms);
-	parms.BaudRate = baud;
-	parms.ByteSize = 8;
-	parms.Parity = 0;
-	parms.StopBits = 1;
-	if (!SetCommState(_handle, &parms)) 
-	{
-		throw std::runtime_error("Cannot set port attributes");
-	}
-
-	COMMTIMEOUTS time = { 0 };
-	time.ReadIntervalTimeout = READ_TIMEOUT_INTRABYTE;
-	time.ReadTotalTimeoutConstant = READ_TIMEOUT_FIRSTBYTE;
-	time.ReadTotalTimeoutMultiplier = READ_TIMEOUT_INTRABYTE;
-	time.WriteTotalTimeoutConstant = READ_TIMEOUT_FIRSTBYTE;
-	time.WriteTotalTimeoutMultiplier = READ_TIMEOUT_INTRABYTE;
-	if (SetCommTimeouts(_handle, &time) == 0)
-	{
-		throw std::runtime_error("Cannot set port timeouts");
-	}
-
-	return true;
+	return _ser.Open(3, 115200);
 }
 
 void SerialRW::flush()
 {
-	PurgeComm(_handle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+	int buf;
+	int rd = 1;
+	while (rd)
+	{
+		rd = _ser.ReadData(&buf, 4);
+	}
 }
 
 
@@ -128,27 +98,17 @@ int SerialRW::readNBytes(unsigned char *buf, int n)
 	int nread = 0;
 	while (nread < n)
 	{
-		DWORD read_bytes;
-		bool status = ReadFile(_handle, buf + nread, n - nread, &read_bytes, nullptr);
-		nread += read_bytes;
-		if (!status) break;
+		nread += _ser.ReadData(buf + nread, n - nread);
 	}
 	return nread;
 }
 
 int SerialRW::writeBytes(unsigned char *bytes, int nrOfBytes)
 {
-	DWORD written_bytes;
-	WriteFile(_handle, bytes, nrOfBytes, &written_bytes, nullptr);
-	return written_bytes;
-}
-
-bool SerialRW::_CheckFdTimeout(int usec) 
-{
-	throw std::logic_error("unsupported on Windows");
+	return _ser.SendData(reinterpret_cast<const char*>(bytes), nrOfBytes);
 }
 
 SerialRW::~SerialRW()
 {
-	CloseHandle(_handle);
+	_ser.Close();
 }
