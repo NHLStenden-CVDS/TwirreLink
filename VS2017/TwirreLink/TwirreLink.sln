@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwirreLink", "TwirreLink\TwirreLink.vcxproj", "{102E7F94-44DD-441A-8171-DBECCD896944}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{102E7F94-44DD-441A-8171-DBECCD896944}.Release|x64.ActiveCfg = Release|x64
+		{102E7F94-44DD-441A-8171-DBECCD896944}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8C4DD67-4026-4EB8-9A7E-2545D0A9E74C}
+	EndGlobalSection
+EndGlobal
