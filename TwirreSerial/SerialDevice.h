@@ -13,6 +13,8 @@
 #ifndef SERIALDEVICE_H_
 #define SERIALDEVICE_H_
 
+#include "../Serial/SerialRW.h"
+
 namespace twirre
 {
 	class SerialDevice
