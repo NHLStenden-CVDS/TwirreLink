@@ -21,6 +21,10 @@ TwirreLink only requires a C++14-capable compiler to be built. An Eclipse CDT pr
 * Select correct build profile in eclipse (ARM or x86) -> (Right-click project > Build Configurations > Set active)
 * Build project
 
+The syntax highlighting of Eclipse might be broken for this project. This is because Eclipse's indexer defaults to the wrong build profile. To fix this: 
+* change the indexer build profile (Right-click project > Properties > C/C++ General > Indexer > select correct profile under 'Build configuration for the indexer').
+* rebuild the index (Right-click project > Index > Rebuild)
+
 Please note that TwirreLink uses std::thread, which does require you to link the pthread library in projects using the TwirreLink library.
 
 The Eclipse project is configured to run either the **install-arm.sh** or **install-x86.sh** script after the build. The script will install the library file and header files into the corresponding **/usr/local/...** folders (see script for details). As sudo is required for this script, eclipse uses GKSU to start the script and prompt for a password. In order for this to work, the GKSU package must be installed (eg. **sudo apt install gksu**).
