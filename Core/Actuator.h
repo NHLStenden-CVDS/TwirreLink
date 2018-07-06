@@ -20,13 +20,31 @@
 
 namespace twirre
 {
+	/**
+	 * Actuator is the base class for all 'actuator'-type devices.
+	 *
+	 *
+	 *
+	 * Actuator is thread-safe in such a way that multiple threads can interact with it without requiring external
+	 * synchronisation. The Actuator will never see an inconsistent/mixed state of parameters.
+	 *
+	 * This safety is implemented using an 'owned_mutex', which keeps track of which thread has currently locked it.
+	 * Upon setting the first parameter, the thread will take 'ownership' of the mutex, or, if the mutex is already
+	 * owned by a different thread, wait until ownership is released. Once a thread has ownership, it is free to set
+	 * additional parameters as required. Upon calling the Actuate() function, ownership is released allowing another
+	 * thread to interact with the actuator.
+	 *
+	 * Essentially, the Actuator will be locked by a specific thread between setting the first parameter and calling
+	 * the Actuate() function. Because of this, it is recommended to keep the delay between setting parameters and
+	 * calling Actuate() as short as possible.
+	 */
 	class Actuator: public Device
 	{
 	public:
 		/**
 		 * Create an actuator
-		 * @param name
-		 * @param description
+		 * @param name the name this instance will get in TwirreLink
+		 * @param description a short description of the type of device this actuator represents
 		 */
 		Actuator(const std::string name, const std::string description);
 		virtual ~Actuator();
@@ -78,12 +96,27 @@ namespace twirre
 		 * @return a reference to the requested parameter (if name is valid), a reference to ErrorValue otherwise
 		 */
 		virtual Parameter & GetParameter(const std::string & name);
-		//this forwards to GetParameter(name)
+		/**
+		 * this forwards to GetParameter(name)
+		 * @see GetParameter()
+		 */
 		virtual Parameter & operator[](const std::string & name);
 
+		/**
+		 * Get multiple parameters by name
+		 *
+		 * @param names the names of the parameters to get
+		 *
+		 * @return a map of names to parameter-pointers is returned. For each requested name, an entry will be present. If no
+		 * parameter exists with a given name, that name will be mapped to a pointer to ErrorValue in the result.
+		 */
 		virtual std::map<std::string, Parameter*> GetParameters(const std::vector<std::string> & names);
 
-		//actuate will apply the updated parameters
+		/**
+		 * Apply the updated parameters.
+		 *
+		 * The Actuator will get notified that one or more parameters have been updated, giving it the opportunity to react on those changes
+		 */
 		void Actuate();
 
 		void clearActuateLoggerCallback();
@@ -102,6 +135,8 @@ namespace twirre
 
 		/**
 		 * Update this Actuator using the modified parameters
+		 *
+		 * This function must be implemented by a derived class. It will be called inside of the Actuate() function.
 		 */
 		virtual void ActuateImpl() = 0;
 	};

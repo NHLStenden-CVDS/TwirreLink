@@ -19,13 +19,36 @@
 
 namespace twirre
 {
+	/**
+	 * A mutex with the concept of 'ownership'. Similar to a recursive mutex, this mutex can be locked multiple times by the same thread. However,
+	 * a single unlock suffices to fully unlock this mutex. Upon locking, the mutex will store the thread::id of the locking thread, which is then
+	 * regarded as the 'owner' of the mutex. Only the owner can lock/unlock the mutex. Upon unlocking, ownership is lost.
+	 */
 	class owned_mutex
 	{
 	public:
 		owned_mutex();
 		virtual ~owned_mutex();
 
+		/**
+		 * Lock this mutex.
+		 *
+		 * If the mutex is currently not owned, the calling thread will take ownership of the mutex. If the mutex is owned by the calling thread itself,
+		 * this operation will return without any effect. If the mutex is owned by a different thread, the calling thread will wait until ownership becomes
+		 * available again, after which it will take ownership.
+		 *
+		 * This mutex can be locked multiple times, and only requires a single unlock to become fully unlocked again.
+		 */
 		void lock();
+
+		/**
+		 * Unlock this mutex.
+		 *
+		 * The mutex will be fully unlocked. This relinquishes ownership of the mutex, so a different thread is allowed to lock it.
+		 * This operation will do nothing if this mutex is not currently owned by a thread.
+		 *
+		 * @throw std::logic_error when lock() is called from a different thread than the current owner.
+		 */
 		void unlock();
 
 	private:
