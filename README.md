@@ -1,6 +1,7 @@
 # TwirreLink
 
 * [TwirreLink library](#twirrelink-library)
+* [Documentation](#documentation)
 * [TwirreSerial](#twirreserial)
 * [Building on Linux](#building-on-linux)
 * [Building on Windows](#building-on-windows)
@@ -10,6 +11,9 @@
 
 ## TwirreLink library
 TwirreLink is a C++ library for sensor and actuator communication. It has been designed to be easy-to-use, modular and extendable. The generic structure enables a large amount of devices to be integrated into the TwirreLink system.
+
+## Documentation
+Documentation is automatically generated using Doxygen, and available here: <https://nhlstenden-cvds.github.io/TwirreLink/>
 
 ## TwirreSerial
 TwirreLink includes the TwirreSerial protocol for communication between a computer and an Arduino DUE running TwirreArduino firmware. The protocol specification can be found here: <https://github.com/NHLStenden-CVDS/Twirre/releases/download/doc-alpha/twirreSerialProtocol.pdf>
