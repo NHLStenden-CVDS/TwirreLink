@@ -25,18 +25,50 @@ namespace twirre
 {
 	class TwirreLink;
 
+	/**
+	 * A DeviceProvider is a collection of Actuators and Sensors which can be connected to a TwirreLink instance.
+	 *
+	 *
+	 */
 	class DeviceProvider
 	{
 		friend class TwirreLink;
 	public:
+		/**
+		 * Default empty constructor
+		 */
 		DeviceProvider() {};
 		virtual ~DeviceProvider();
+		/**
+		 * Add an Actuator to this provider
+		 *
+		 * @param a a pointer to the Actuator to be added
+		 */
 		virtual void addActuator(Actuator * a);
+		/**
+		 * Add a Sensor to this provider
+		 *
+		 * @param s a pointer to the Sensor to be added
+		 */
 		virtual void addSensor(Sensor * s);
+		/**
+		 * Get all available actuators
+		 *
+		 * @return A const reference to the internal map is returned. This map maps an actuator name to a pointer to the actual Actuator object.
+		 */
 		virtual const std::map<std::string, Actuator*> & getActuators();
+		/**
+		 * Get all available sensors
+		 *
+		 * @return A const reference to the internal map is returned. This map maps an sensor name to a pointer to the actual Sensor object.
+		 */
 		virtual const std::map<std::string, Sensor*> & getSensors();
 	protected:
+		/**
+		 * Notifies all connected instances of TwirreLink that they should update, because a change (added/removed device) has occurred in this provider.
+		 */
 		void doNotifyChange();
+
 		void addLogger(TwirreLogger * log);
 		void removeLogger(TwirreLogger * log);
 		std::map<std::string, Sensor*> _sensors;

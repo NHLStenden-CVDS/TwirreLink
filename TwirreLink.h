@@ -75,12 +75,20 @@ namespace twirre
 		/**
 		 * Register all sensors and actuators of the given provider.
 		 * The sensor- and actuator-map of the provider will be inserted into the corresponding maps of this TwirreLink.
-		 * Name collisions will be resolved by adding "_<number>" to the colliding sensor's or actuator's name.
+		 *
+		 * If there is a name collision between devices in different providers, some of those devices will no longer be visible.
 		 *
 		 * @param prov the device provider to register
 		 */
 		void addProvider(DeviceProvider& prov, bool update = true);
 
+		/**
+		 * Remove a provider, making all its devices unavailable for use within this TwirreLink instance.
+		 *
+		 * If the given provider is not present in this TwirreLink instance, the call has no effect.
+		 *
+		 * @param prov The provider which should be detached from this TwirreLink
+		 */
 		void removeProvider(DeviceProvider& prov);
 
 		/**

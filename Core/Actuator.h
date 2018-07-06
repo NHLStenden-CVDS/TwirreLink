@@ -123,6 +123,14 @@ namespace twirre
 		void setActuateLoggerCallback(std::function<void(Actuator *, std::map<std::string, Parameter*>&)> cbfn);
 
 	protected:
+
+		/**
+		 * Update this Actuator using the modified parameters
+		 *
+		 * This function must be implemented by a derived class. It will be called inside of the Actuate() function.
+		 */
+		virtual void ActuateImpl() = 0;
+
 		std::map<std::string, Parameter*> _parametersList;
 		owned_mutex _actuateMutex; //lock actuator from first value set until actuation
 		void registerParameter(Parameter* val);
@@ -132,13 +140,6 @@ namespace twirre
 		bool _actuateLoggerSet;
 
 		void logActuation();
-
-		/**
-		 * Update this Actuator using the modified parameters
-		 *
-		 * This function must be implemented by a derived class. It will be called inside of the Actuate() function.
-		 */
-		virtual void ActuateImpl() = 0;
 	};
 
 } /* namespace twirre */
