@@ -31,12 +31,16 @@ namespace twirre
 	public:
 		DeviceProvider() {};
 		virtual ~DeviceProvider();
-		virtual const std::map<std::string, Actuator*> & getActuators() = 0;
-		virtual const std::map<std::string, Sensor*> & getSensors() = 0;
+		virtual void addActuator(Actuator * a);
+		virtual void addSensor(Sensor * s);
+		virtual const std::map<std::string, Actuator*> & getActuators();
+		virtual const std::map<std::string, Sensor*> & getSensors();
 	protected:
 		void doNotifyChange();
 		void addLogger(TwirreLogger * log);
 		void removeLogger(TwirreLogger * log);
+		std::map<std::string, Sensor*> _sensors;
+		std::map<std::string, Actuator*> _actuators;
 	private:
 		void sensorLoggerCallback(Sensor * sensor, std::map<std::string, Value*>& sensorValues);
 		void actuatorLoggerCallback(Actuator * actuators, std::map<std::string, Parameter*>& actuatorParameters);

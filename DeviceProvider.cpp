@@ -31,6 +31,28 @@ namespace twirre
 		}
 	}
 
+	void DeviceProvider::addSensor(Sensor * s)
+	{
+		_sensors[s->getName()] = s;
+		doNotifyChange();
+	}
+
+	void DeviceProvider::addActuator(Actuator * a)
+	{
+		_actuators[a->getName()] = a;
+		doNotifyChange();
+	}
+
+	const std::map<std::string, Sensor*> & DeviceProvider::getSensors()
+	{
+		return _sensors;
+	}
+
+	const std::map<std::string, Actuator*> & DeviceProvider::getActuators()
+	{
+		return _actuators;
+	}
+
 	void DeviceProvider::doNotifyChange()
 	{
 		//set logger callbacks
