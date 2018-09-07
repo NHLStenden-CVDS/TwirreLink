@@ -1,4 +1,4 @@
-Part of the Twirre architecture: <https://nhlstenden-cvds.github.io/Twirre>{:target="_blank"}
+Part of the Twirre architecture: <https://nhlstenden-cvds.github.io/Twirre>
 
 # TwirreLink
 
