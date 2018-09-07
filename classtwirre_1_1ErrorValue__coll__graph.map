@@ -1,0 +1,7 @@
+<map id="twirre::ErrorValue" name="twirre::ErrorValue">
+<area shape="rect" id="node2" href="$classtwirre_1_1Parameter.html" title="twirre::Parameter" alt="" coords="119,201,241,228"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1Value.html" title="twirre::Value" alt="" coords="5,83,99,109"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1Scalar.html" title="twirre::Scalar" alt="" coords="193,5,292,32"/>
+<area shape="rect" id="node6" href="$classtwirre_1_1ScalarImpl.html" title="twirre::ScalarImpl\l\&lt; uint8_t \&gt;" alt="" coords="282,134,405,175"/>
+<area shape="rect" id="node5" href="$classtwirre_1_1owned__mutex.html" title="A mutex with the concept of &#39;ownership&#39;. " alt="" coords="123,83,265,109"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="twirre::SerialActuator" name="twirre::SerialActuator">
+<area shape="rect" id="node2" href="$classtwirre_1_1Actuator.html" title="Actuator is the base class for all &#39;actuator&#39;&#45;type devices. " alt="" coords="74,96,184,123"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1Device.html" title="twirre::Device" alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1owned__mutex.html" title="A mutex with the concept of &#39;ownership&#39;. " alt="" coords="131,5,273,32"/>
+<area shape="rect" id="node5" href="$classtwirre_1_1SerialDevice.html" title="twirre::SerialDevice" alt="" coords="209,96,344,123"/>
+<area shape="rect" id="node6" href="$classSerialRW.html" title="SerialRW" alt="" coords="370,96,448,123"/>
+</map>

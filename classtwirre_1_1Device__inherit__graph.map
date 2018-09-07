@@ -1,0 +1,6 @@
+<map id="twirre::Device" name="twirre::Device">
+<area shape="rect" id="node2" href="$classtwirre_1_1Actuator.html" title="Actuator is the base class for all &#39;actuator&#39;&#45;type devices. " alt="" coords="30,80,140,107"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1Sensor.html" title="twirre::Sensor" alt="" coords="181,80,283,107"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1SerialActuator.html" title="twirre::SerialActuator" alt="" coords="5,155,149,181"/>
+<area shape="rect" id="node5" href="$classtwirre_1_1SerialSensor.html" title="twirre::SerialSensor" alt="" coords="173,155,308,181"/>
+</map>

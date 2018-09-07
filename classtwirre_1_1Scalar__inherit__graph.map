@@ -1,0 +1,11 @@
+<map id="twirre::Scalar" name="twirre::Scalar">
+<area shape="rect" id="node2" href="$classtwirre_1_1ScalarImpl.html" title="twirre::ScalarImpl\l\&lt; uint8_t \&gt;" alt="" coords="5,81,128,122"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1ScalarImpl.html" title="twirre::ScalarImpl\&lt; T \&gt;" alt="" coords="153,88,308,115"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1Value.html" title="twirre::Value" alt="" coords="333,88,427,115"/>
+<area shape="rect" id="node5" href="$classtwirre_1_1Parameter.html" title="twirre::Parameter" alt="" coords="319,171,441,197"/>
+<area shape="rect" id="node6" href="$classtwirre_1_1ArrayValue.html" title="twirre::ArrayValue\&lt; T \&gt;" alt="" coords="135,245,293,272"/>
+<area shape="rect" id="node8" href="$classtwirre_1_1ErrorValue.html" title="twirre::ErrorValue" alt="" coords="319,245,441,272"/>
+<area shape="rect" id="node9" href="$classtwirre_1_1ValueImpl.html" title="twirre::ValueImpl\&lt; T \&gt;" alt="" coords="465,245,617,272"/>
+<area shape="rect" id="node7" href="$classtwirre_1_1SerialArrayValue.html" title="twirre::SerialArrayValue\&lt; T \&gt;" alt="" coords="119,320,309,347"/>
+<area shape="rect" id="node10" href="$classtwirre_1_1SerialValueImpl.html" title="twirre::SerialValueImpl\&lt; T \&gt;" alt="" coords="449,320,633,347"/>
+</map>

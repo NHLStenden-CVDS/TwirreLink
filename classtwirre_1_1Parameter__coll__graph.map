@@ -1,0 +1,5 @@
+<map id="twirre::Parameter" name="twirre::Parameter">
+<area shape="rect" id="node2" href="$classtwirre_1_1Value.html" title="twirre::Value" alt="" coords="7,83,101,109"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1Scalar.html" title="twirre::Scalar" alt="" coords="5,5,104,32"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1owned__mutex.html" title="A mutex with the concept of &#39;ownership&#39;. " alt="" coords="126,83,268,109"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="twirre::Actuator" name="twirre::Actuator">
+<area shape="rect" id="node2" href="$classtwirre_1_1Device.html" title="twirre::Device" alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1owned__mutex.html" title="A mutex with the concept of &#39;ownership&#39;. " alt="" coords="131,5,273,32"/>
+</map>

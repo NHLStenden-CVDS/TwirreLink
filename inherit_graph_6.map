@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classtwirre_1_1Scalar.html" title="twirre::Scalar" alt="" coords="5,71,104,97"/>
+<area shape="rect" id="node2" href="$classtwirre_1_1ScalarImpl.html" title="twirre::ScalarImpl\l\&lt; uint8_t \&gt;" alt="" coords="169,5,293,46"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1ScalarImpl.html" title="twirre::ScalarImpl\&lt; T \&gt;" alt="" coords="153,71,309,97"/>
+<area shape="rect" id="node4" href="$classtwirre_1_1Value.html" title="twirre::Value" alt="" coords="183,121,278,148"/>
+<area shape="rect" id="node5" href="$classtwirre_1_1Parameter.html" title="twirre::Parameter" alt="" coords="357,121,480,148"/>
+<area shape="rect" id="node6" href="$classtwirre_1_1ArrayValue.html" title="twirre::ArrayValue\&lt; T \&gt;" alt="" coords="529,71,687,97"/>
+<area shape="rect" id="node8" href="$classtwirre_1_1ErrorValue.html" title="twirre::ErrorValue" alt="" coords="547,121,669,148"/>
+<area shape="rect" id="node9" href="$classtwirre_1_1ValueImpl.html" title="twirre::ValueImpl\&lt; T \&gt;" alt="" coords="532,223,684,249"/>
+<area shape="rect" id="node7" href="$classtwirre_1_1SerialArrayValue.html" title="twirre::SerialArrayValue\&lt; T \&gt;" alt="" coords="737,147,927,173"/>
+<area shape="rect" id="node10" href="$classtwirre_1_1SerialValueImpl.html" title="twirre::SerialValueImpl\&lt; T \&gt;" alt="" coords="739,209,925,236"/>
+<area shape="rect" id="node11" href="$classtwirre_1_1SerialValue.html" title="twirre::SerialValue" alt="" coords="544,172,672,199"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="twirre::SerialDevice" name="twirre::SerialDevice">
+<area shape="rect" id="node2" href="$classtwirre_1_1SerialActuator.html" title="twirre::SerialActuator" alt="" coords="5,80,149,107"/>
+<area shape="rect" id="node3" href="$classtwirre_1_1SerialSensor.html" title="twirre::SerialSensor" alt="" coords="173,80,308,107"/>
+</map>
